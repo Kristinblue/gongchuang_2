@@ -9,7 +9,6 @@
   <buildtool_depend>ament_cmake_python</buildtool_depend>
   <depend>rclcpp</depend>
   <depend>robot_interfaces</depend>
-  <depend>std_msgs</depend>
   <depend>serial_driver</depend>
   <build_depend>asio_cmake_module</build_depend>
   <build_depend>asio</build_depend>

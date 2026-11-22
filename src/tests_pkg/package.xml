@@ -9,7 +9,6 @@
   <exec_depend>rclpy</exec_depend>
   <exec_depend>communication_pkg</exec_depend>
   <depend>std_srvs</depend>
-  <exec_depend>std_msgs</exec_depend>
   <depend>sensor_msgs</depend>
   <depend>robot_interfaces</depend>
   <export><build_type>ament_python</build_type></export>

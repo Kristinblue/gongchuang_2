@@ -11,7 +11,6 @@ from rclpy.executors import SingleThreadedExecutor
 from rclpy.node import Node
 from rclpy.signals import SignalHandlerOptions
 from robot_interfaces.msg import Command, SerialFrame
-from std_msgs.msg import UInt8MultiArray
 
 from communication_pkg.my_cmd import MyCMD
 
@@ -35,7 +34,6 @@ class SerialTest(Node):
         self.cmd = MyCMD(self.publisher)
         if os.environ.get('GONGCHUANG_SERIAL_FRAMES') == '1':
             self.create_subscription(SerialFrame, 'robot/serial_frames', self.frame_callback, 100)
-            self.create_subscription(UInt8MultiArray, 'robot/serial_rx_raw', self.raw_rx_callback, 100)
         self.actions = {
             'move_straight': (self.cmd.move_straight, -32768, 32767),
             'move_straight_dis': (self.cmd.move_straight_dis, -32768, 32767),
@@ -74,14 +72,8 @@ class SerialTest(Node):
     def frame_callback(self, frame):
         """把串口桥实际记录的帧交给客户端串口页。"""
         direction = 'TX' if frame.tx else 'RX'
-        self.write_frame(direction, frame.data)
-
-    def raw_rx_callback(self, message):
-        self.write_frame('RX [RAW]', message.data)
-
-    def write_frame(self, label, data):
-        hex_bytes = bytes(data).hex(' ').upper()
-        os.write(sys.stdout.fileno(), f'\x1e{label} {hex_bytes}\n'.encode('ascii'))
+        hex_bytes = bytes(frame.data).hex(' ').upper()
+        os.write(sys.stdout.fileno(), f'\x1e{direction} {hex_bytes}\n'.encode('ascii'))
 
     def run_action(self, name, argument):
         """把整数参数交给对应的 MyCMD 方法。"""

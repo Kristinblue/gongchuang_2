@@ -463,7 +463,7 @@ public:
     serialLayout->addLayout(serialFields);
     auto *serialTools = new QHBoxLayout;
     serialDirection_->addItems({"全部", "TX", "RX"});
-    serialCommand_->addItems({"全部", "RawData", "00", "01", "02", "03", "04", "05", "06", "07", "08"});
+    serialCommand_->addItems({"全部", "00", "01", "02", "03", "04", "05", "06", "07", "08"});
     serialTools->addWidget(new QLabel("方向"));
     serialTools->addWidget(serialDirection_);
     serialTools->addWidget(new QLabel("命令"));
@@ -786,9 +786,13 @@ private:
     while (start >= 0) {
       const int end = shellBuffer_.indexOf('\n', start + 1);
       if (end < 0) break;
-      serialLines_.append(QString::fromLatin1(shellBuffer_.mid(start + 1, end - start - 1)));
+      const auto line = shellBuffer_.mid(start + 1, end - start - 1);
+      // 方向前缀和六个十六进制字节，共 20 个字符。
+      if (line.size() == 20 && (line.startsWith("TX AA 55 ") || line.startsWith("RX AA 55 "))) {
+        serialLines_.append(QString::fromLatin1(line));
+        changed = true;
+      }
       shellBuffer_.remove(start, end - start + 1);
-      changed = true;
       start = shellBuffer_.indexOf('\x1e', start);
     }
     if (changed) {
@@ -816,9 +820,8 @@ private:
       if (cursor.position() > 0) cursor.insertBlock();
       QTextCharFormat format;
       const bool tx = line.startsWith("TX ");
-      const bool raw = line.startsWith("RX [RAW] ");
-      format.setForeground(QColor(tx ? "#004BBD" : raw ? "#6B21A8" : "#B41635"));
-      const int prefixLength = line.indexOf(' ', raw ? 3 : 0);
+      format.setForeground(QColor(tx ? "#004BBD" : "#B41635"));
+      const int prefixLength = line.indexOf(' ');
       format.setFontWeight(QFont::Bold);
       cursor.insertText(line.left(prefixLength), format);
       format.setFontWeight(QFont::Normal);
@@ -830,7 +833,6 @@ private:
 
   // 帧格式：TX [SIM] AA 55 06 00 00 05，AA 55 后面第一个字节是命令位。
   static QString commandOf(const QString &line) {
-    if (line.startsWith("RX [RAW] ")) return "RawData";
     const auto parts = line.split(' ', Qt::SkipEmptyParts);
     const int at = parts.indexOf("AA");
     return at >= 0 && at + 2 < parts.size() ? parts[at + 2] : QString();
