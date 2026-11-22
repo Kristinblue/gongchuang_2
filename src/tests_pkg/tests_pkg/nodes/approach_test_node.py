@@ -60,7 +60,7 @@ class ApproachTest(Node):
                 self.send(Command.STOP,0)
             return
         self.halted = False
-        self.target.publish(Objects(header=frame.header, width=frame.width, height=frame.height, items=[target]))
+        self.target.publish(Objects(header=frame.header, items=[target]))
         # 横向误差给转向（02），纵向误差给前后（01），都限制在各自参数的范围内。
         self.send(Command.TURN, max(-self.turn_limit,min(self.turn_limit,(target.x1+target.x2)*.5-self.x)))
         self.send(Command.STRAIGHT, -max(-self.move_limit,min(self.move_limit,target.y2-self.y)))

@@ -121,8 +121,7 @@ private:
   }
 
   void pair_frame() {
-    if (!pending_image_ || !pending_boxes_ || pending_image_->header != pending_boxes_->header ||
-        pending_image_->width != pending_boxes_->width || pending_image_->height != pending_boxes_->height) return;
+    if (!pending_image_ || !pending_boxes_ || pending_image_->header != pending_boxes_->header) return;
     image_ = std::move(pending_image_);
     boxes_ = std::move(pending_boxes_);
     received_ = Clock::now();

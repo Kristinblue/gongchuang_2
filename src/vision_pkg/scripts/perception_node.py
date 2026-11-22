@@ -88,7 +88,7 @@ class PerceptionNode(Node):
     def process(self, image, detections):
         width, height = image.width, image.height
         if (image.encoding != 'bgr8' or not width or not height or image.step < width * 3 or
-                len(image.data) != image.step * height or (detections.width, detections.height) != (width,height)):
+                len(image.data) != image.step * height):
             return
         if self.size != (width,height):
             self.processor = GetObjs(self.config, width=width, height=height)
@@ -109,7 +109,7 @@ class PerceptionNode(Node):
         angle = self.robot.camera_deg if self.robot.camera_known else None
         objects, regions = processor.process(frame, boxes, classes, scores, self.robot.team, ready, angle)
 
-        output = Objects(header=image.header, width=width, height=height)
+        output = Objects(header=image.header)
         for obj in objects:
             x1,y1,x2,y2 = map(float,obj['box'])
             output.items.append(Object(name=obj['name'], id=obj['id'], score=obj['score'],

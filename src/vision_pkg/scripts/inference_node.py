@@ -56,7 +56,7 @@ class InferenceNode(Node):
         iou = self.get_parameter('yolo.iou_threshold').value
         boxes, classes, scores = self.detector.predict(frame, conf=confidence, iou=iou)
         # 原图和检测共用 camera_node 给的 header，感知节点据此配成一对。
-        result = Objects(header=message.header, width=message.width, height=message.height)
+        result = Objects(header=message.header)
         for box, index, score in zip(boxes, classes, scores):
             if not 0 <= index < len(self.labels):
                 continue

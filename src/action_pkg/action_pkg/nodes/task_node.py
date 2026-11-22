@@ -92,8 +92,7 @@ class TaskNode(Node):
             selected = next((obj for obj in message.items if obj.observed and
                              obj.name == target['name'] and obj.id == target['id']), None)
             if selected is not None:
-                self.target.publish(Objects(header=message.header, width=message.width,
-                                            height=message.height, items=[selected]))
+                self.target.publish(Objects(header=message.header, items=[selected]))
 
         self.publish_status(selected)
 
