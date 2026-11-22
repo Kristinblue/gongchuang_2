@@ -33,7 +33,6 @@ case "${1:-start}" in
           exit 1
         fi
         args+=("model:=$model" simulate_uart:=true safety_detector:=true)
-        ros_domain=27
         ;;
       *) echo "未知启动模式: $mode" >&2; exit 2 ;;
     esac

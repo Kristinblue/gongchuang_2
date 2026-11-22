@@ -21,7 +21,7 @@ HELP = '''00  启动时查询队伍（实车串口自动发送）
 03  grab 0              夹爪，0 开，1 关
 04  camera 20           相机俯角，0～80 度
 05  move_turn_angle 30  相对转角（度），正值向右，负值向左
-06  angle_calib 90      设置当前绝对角度，暂用于模拟测试
+06  绝对角度校准（保留）
 07  move_straight_dis 20  按厘米直行，正值向前，负值向后
 08  move_stop / stop    停车
     help / quit         查看命令 / 退出'''
@@ -41,8 +41,6 @@ class SerialTest(Node):
             'move_turn_angle': (self.cmd.move_turn_angle, -32768, 32767),
             'grab': (self.cmd.grab, 0, 1),
             'camera': (self.cmd.camera, 0, 80),
-            'angle_calib': (self.cmd.angle_calib, -32768, 32767),
-            'set_angle': (self.cmd.angle_calib, -32768, 32767),
         }
 
     def run(self):
@@ -92,10 +90,7 @@ class SerialTest(Node):
             return
         action(value)
         self.publisher.wait_for_all_acked(Duration(seconds=0.5))
-        if name in ('angle_calib', 'set_angle'):
-            print(f'[SerialTest] 已发布绝对角度 {value}，06 仅用于伪串口调试')
-        else:
-            print(f'[SerialTest] 已发布 {name} {value}')
+        print(f'[SerialTest] 已发布 {name} {value}')
 
     def stop(self):
         self.cmd.move_stop()

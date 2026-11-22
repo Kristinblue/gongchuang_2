@@ -37,7 +37,7 @@ public:
   ~SerialNode() override;
 
 private:
-  void command_callback(const Command &msg, int64_t max_pitch, bool allow_calib);
+  void command_callback(const Command &msg, int64_t max_pitch);
   bool send(uint8_t command, int16_t value);
   void trace(const SimpleProtocol::Frame &frame, bool tx);
   void close_serial();
@@ -46,45 +46,36 @@ private:
   // 成员按“先资源、后话题”的顺序声明；构造时按这个顺序初始化，析构时反过来释放。
   MyUART my_uart_;              // 串口本身，析构自动 close
   ProtocolParser parser_;       // 串口字节流 -> 完整帧
-  bool simulated_{false};       // true 时不打开真实串口
   bool moving_{false};          // 正在接收连续的前后或转向误差
   std::chrono::steady_clock::time_point last_command_{};  // 看门狗计时起点
   State state_;                 // 最后一条 robot/state
   rclcpp::Publisher<State>::SharedPtr state_pub_;
-  rclcpp::Publisher<Feedback>::SharedPtr feedback_;
-  rclcpp::Publisher<SerialFrame>::SharedPtr frames_;
-  rclcpp::Subscription<Command>::SharedPtr sub_;
+  rclcpp::Publisher<Feedback>::SharedPtr feedback_pub_;
+  rclcpp::Publisher<SerialFrame>::SharedPtr frames_pub_;
+  rclcpp::Subscription<Command>::SharedPtr command_sub_;
   rclcpp::TimerBase::SharedPtr timer_;
 };
 
 SerialNode::SerialNode() : Node("serial_node") {
-  // simulate=true 时不打开真实串口，只把打包结果发到 serial_frames，
-  // 用于没接单片机时验证话题和字节帧。
-  simulated_ = declare_parameter("simulate", false);
   // uart.device / uart.baudrate 和 robot.yaml 里的层级一致。
   const auto dev = declare_parameter("uart.device", "/dev/ttyS6");
-  const bool allow_calib = declare_parameter("uart.allow_reserved_calib", simulated_);
   const auto baud = declare_parameter("uart.baudrate", 115200);
   // 相机俯角的软件限位，0 度水平，向下为正。
   const auto max_pitch = declare_parameter("max_pitch_deg", 80);
   if (max_pitch < 0 || max_pitch > 80) throw std::invalid_argument("max_pitch_deg 要在 0～80 之间");
   // 保留最后一条状态，感知和任务节点晚一点启动也可以收到当前队伍、串口状态等。
-  // transient_local 相当于“持久化最后一条”，后来的订阅者也能收到。
   state_pub_ = create_publisher<State>("robot/state", rclcpp::QoS(1).transient_local());
-  feedback_ = create_publisher<Feedback>("robot/feedback", 10);
+  feedback_pub_ = create_publisher<Feedback>("robot/feedback", 10);
+
   // 完整协议帧给客户端串口页看：tx=true 是发出去的，false 是收到的。
-  frames_ = create_publisher<SerialFrame>("robot/serial_frames", 100);
-  // callback：收到 MyCMD 的命令，交给下面的 command_callback()。
-  sub_ = create_subscription<Command>("robot/command", 10, [this, max_pitch, allow_calib](const Command &msg) {
-    command_callback(msg, max_pitch, allow_calib);
+  frames_pub_ = create_publisher<SerialFrame>("robot/serial_frames", 100);
+
+  command_sub_ = create_subscription<Command>("robot/command", 10, [this, max_pitch](const Command &msg) {
+    command_callback(msg, max_pitch);
   });
-  if (simulated_) {
-    RCLCPP_INFO(get_logger(), "[SerialNode] 模拟模式，记录发送帧");
-    return;
-  }
   // callback：每 10 ms 调 read() 检查回包。非阻塞打开串口，没数据时立即返回。
   timer_ = create_wall_timer(10ms, [this] { read(); });
-  // 先发 08,0 停车，再发 00,0 查询队伍。
+  // 先发停车，再发 00,0 查询队伍。
   if (!my_uart_.open(dev, baud) || !send(Command::STOP, 0) || !send(Command::GET_FLAG, 0)) {
     close_serial();
     throw std::runtime_error("无法初始化串口 " + dev);
@@ -100,18 +91,36 @@ SerialNode::~SerialNode() {
 }
 
 // 收到 MyCMD 发布的动作后，检查参数，再按协议写串口。
-void SerialNode::command_callback(const Command &msg, int64_t max_pitch, bool allow_calib) {
-  // 串口没打开、又不是模拟模式时，任何命令都不发。
-  if (!state_.open && !simulated_) return;
+void SerialNode::command_callback(const Command &msg, int64_t max_pitch) {
+  if (!state_.open) return;
 
   const auto cmd = msg.command;
   const auto value = msg.value;
   // 06 校准参数待定，先保留编号。队伍查询参数固定为 0，夹爪只能 0/1。
   // 不合法的命令直接丢弃，不去赌下位机能不能处理。
-  if (cmd > Command::STOP || (!allow_calib && cmd == Command::ANGLE_CALIB) ||
-      (cmd == Command::GET_FLAG && value != 0) ||
-      (cmd == Command::GRAB && (value < 0 || value > 1)) ||
-      (cmd == Command::CAMERA && (value < 0 || value > max_pitch))) {
+  bool valid = true;
+  switch (cmd) {
+    case Command::GET_FLAG:
+      valid = value == 0;
+      break;
+    case Command::GRAB:
+      valid = value == 0 || value == 1;
+      break;
+    case Command::CAMERA:
+      valid = value >= 0 && value <= max_pitch;
+      break;
+    case Command::STRAIGHT:
+    case Command::TURN:
+    case Command::TURN_ANGLE:
+    case Command::STRAIGHT_DIS:
+    case Command::STOP:
+      break;
+    case Command::ANGLE_CALIB:
+    default:
+      valid = false;
+      break;
+  }
+  if (!valid) {
     RCLCPP_WARN_THROTTLE(get_logger(), *get_clock(), 2000, "[SerialNode] 忽略非法命令 command=0x%02X value=%d",
                          static_cast<unsigned>(cmd), static_cast<int>(value));
     return;
@@ -120,43 +129,46 @@ void SerialNode::command_callback(const Command &msg, int64_t max_pitch, bool al
     close_serial();
     return;
   }
-  // 模拟模式：不写串口，直接打包并发布到 serial_frames，给客户端看。
-  if (simulated_) return;
-  // 这里记录的是发给舵机的目标角度和时间。感知节点根据时间等相机画面稳定。
-  if (cmd == Command::CAMERA && (!state_.camera_known || state_.camera_deg != value)) {
-    state_.camera_known = true;
-    state_.camera_deg = value;
-    state_.camera_changed = now();
-    state_pub_->publish(state_);
-  }
-  // 只有需要持续发送的运动误差使用短超时。一条相对转向可由 STM32 独立执行。
-  if (cmd == Command::STRAIGHT || cmd == Command::TURN) {
-    moving_ = true;
-    last_command_ = std::chrono::steady_clock::now();
-  } else if (cmd == Command::STOP || cmd == Command::TURN_ANGLE ||
-             cmd == Command::STRAIGHT_DIS) {
-    moving_ = false;
+  switch (cmd) {
+    case Command::CAMERA:
+      // 这里记录的是发给舵机的目标角度和时间。感知节点根据时间等相机画面稳定。
+      if (state_.camera_known && state_.camera_deg == value) break;
+      state_.camera_known = true;
+      state_.camera_deg = value;
+      state_.camera_changed = now();
+      state_pub_->publish(state_);
+      break;
+    // 只有需要持续发送的运动误差使用短超时。一条相对转向可由 STM32 独立执行。
+    case Command::STRAIGHT:
+    case Command::TURN:
+      moving_ = true;
+      last_command_ = std::chrono::steady_clock::now();
+      break;
+    case Command::STOP:
+    case Command::TURN_ANGLE:
+    case Command::STRAIGHT_DIS:
+      moving_ = false;
+      break;
+    default:
+      break;
   }
 }
 
 // SimpleProtocol 打包，MyUART 只负责把字节写出去。
 bool SerialNode::send(uint8_t command, int16_t value) {
   const auto frame = SimpleProtocol::pack(command, value);
-  // 模拟模式不碰硬件；真实模式写失败说明串口断了。
-  if (!simulated_ && !my_uart_.write(frame.data(), frame.size())) return false;
-  // 不管有没有真的写串口，都记录一帧 TX 给客户端。
+  if (!my_uart_.write(frame.data(), frame.size())) return false;
   trace(frame, true);
   return true;
 }
 
-// 把完整协议帧发布到 robot/serial_frames。
-// tx=true 是发出去的，false 是收到的；simulated 标记是不是模拟模式。
+// 把完整协议帧发布到 robot/serial_frames，调试的客户端用的
+// tx=true 是发出去的，false 是收到的。
 void SerialNode::trace(const SimpleProtocol::Frame &frame, bool tx) {
   SerialFrame msg;
   msg.tx = tx;
-  msg.simulated = simulated_;
   msg.data = frame;
-  frames_->publish(msg);
+  frames_pub_->publish(msg);
 }
 
 // 关闭串口：先尽力发一帧停车，再发布 open=false 给任务节点和客户端。
@@ -177,7 +189,7 @@ void SerialNode::read() {
   }
   // 一次最多读 256 字节，够 42 帧；剩下的下一轮再读。
   uint8_t data[256];
-  const auto count = my_uart_.read(data, sizeof(data));
+  const auto count = my_uart_.read(data, sizeof(data));//小于零表示失败
   if (count < 0) { close_serial(); return; }
   if (count == 0) return;
   parser_.feed(data, count);
@@ -188,17 +200,24 @@ void SerialNode::read() {
     Feedback msg;
     msg.command = packet->command;
     msg.value = packet->value;
-    feedback_->publish(msg);
-    // 回包 command=0 是队伍确认：0 红方，1 蓝方，记到 State 里。
-    if (msg.command == Feedback::FLAG && (msg.value == 0 || msg.value == 1)) {
-      state_.team = msg.value == 0 ? "red" : "blue";
-      state_pub_->publish(state_);
-    } else if (msg.command == Feedback::ANGLE && msg.value >= 0 && msg.value <= 360 &&
-               (!state_.angle_known || state_.angle_deg != msg.value)) {
-      // 回包 command=1 是绝对角度 0~360；状态只在角度变化时更新。
-      state_.angle_deg = msg.value;
-      state_.angle_known = true;
-      state_pub_->publish(state_);
+    feedback_pub_->publish(msg);
+    switch (msg.command) {
+      case Feedback::FLAG:
+        // 回包 command=0 是队伍确认：0 红方，1 蓝方，记到 State 里。
+        if (msg.value != 0 && msg.value != 1) break;
+        state_.team = msg.value == 0 ? "red" : "blue";
+        state_pub_->publish(state_);
+        break;
+      case Feedback::ANGLE:
+        // 回包 command=1 是绝对角度 0~360；状态只在角度变化时更新。
+        if (msg.value < 0 || msg.value > 360) break;
+        if (state_.angle_known && state_.angle_deg == msg.value) break;
+        state_.angle_deg = msg.value;
+        state_.angle_known = true;
+        state_pub_->publish(state_);
+        break;
+      default:
+        break;
     }
   }
 }

@@ -27,14 +27,14 @@ ros2 topic echo /approach_test/command
 
 ## 客户端靠近测试的模拟串口
 
-点「测试节点」里的靠近测试会启动模拟串口。在香橙派加载工作区后，可以查看运动话题和打包出的帧。
+点「测试节点」里的靠近测试会启动模拟串口。命令行在上面的靠近测试命令末尾加 `simulate_uart:=true` 即可。`tools/run.sh` 会启动 STM32 模拟器，把生成的 `/dev/pts/N` 交给 `serial_node`，仍走同一套串口收发。在香橙派加载工作区后，可以查看运动话题和打包出的帧。
 
 ```bash
 ROS_DOMAIN_ID=27 ros2 topic echo /robot/command
 ROS_DOMAIN_ID=27 ros2 topic echo /robot/serial_frames
 ```
 
-客户端使用独立 ROS 域，避免测试消息进入正式任务的串口。
+开启模拟串口的靠近测试使用独立 ROS 域 27，避免测试消息进入正式任务的串口。
 
 ## 摄像头
 
@@ -65,7 +65,6 @@ cmd> move_turn 10
 cmd> move_turn_angle 30
 cmd> grab 0
 cmd> camera 20
-cmd> angle_calib 90
 cmd> stop
 cmd> help
 cmd> quit
@@ -73,6 +72,6 @@ cmd> quit
 
 测试命令和 `MyCMD` 方法同名。每条输入发布一次对应命令。`move_turn_angle` 直接发送相对转角，正值向右，负值向左。模拟串口也能查看它的发送帧。
 
-`angle_calib 90`（也可写 `set_angle 90`）调用 `MyCMD.angle_calib()`。`06` 的含义与参数定义待定，当前只在模拟串口打包。
+`06` 预留给绝对角度校准，参数待定，串口节点暂不发送该指令。
 
 默认由 `stm32_sim.py` 提供伪串口，`serial_node` 按普通串口读写。接好 STM32 并腾出 UART 后，用 `bash tools/run.sh serial /dev/ttyS6` 启动实车测试。

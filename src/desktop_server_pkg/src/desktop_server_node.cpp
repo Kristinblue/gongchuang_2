@@ -42,7 +42,6 @@ public:
     const int port = declare_parameter("port", 8080);
     const auto source = declare_parameter("camera_source", "usb");
     const auto mode = declare_parameter("mode", "preview");
-    const bool serial_simulated = declare_parameter("serial_simulated", false);
     // 靠近测试用的参考点，画在预览画面上，坐标以相机原图为准。
     const auto point_x = declare_parameter("point.x0", 640.0);
     const auto point_y = declare_parameter("point.y0", 550.0);
@@ -113,7 +112,7 @@ public:
       response.set_content(std::string(std::istreambuf_iterator<char>(file), {}), "text/html; charset=utf-8");
     });
     // callback：客户端轮询 /status，读取当前任务阶段、视频是否可用、以及可调的设置。
-    server_.Get("/status", [this, source, mode, serial_simulated](const auto &, auto &response) {
+    server_.Get("/status", [this, source, mode](const auto &, auto &response) {
       const auto confidence = read_confidence();
       std::lock_guard lock(mutex_);
       auto json = "{\"camera_source\":\"" + source + "\",\"jpeg_quality\":" +
@@ -131,7 +130,6 @@ public:
         json += ",\"command\":" + std::to_string(serial_feedback_->command) +
           ",\"value\":" + std::to_string(serial_feedback_->value);
       }
-      json += serial_simulated ? ",\"simulated\":true" : ",\"simulated\":false";
       json += ",\"seq\":" + std::to_string(serial_seq_);
       json += ",\"frames\":[";
       for (const auto &line : serial_lines_) {

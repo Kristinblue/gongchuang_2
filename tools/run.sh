@@ -33,14 +33,12 @@ if [[ ${1:-} == serial ]]; then
   export ROS_DOMAIN_ID=28 ROS_LOCALHOST_ONLY=1
   namespace="/serial_test_$$"
   uart=${2:-}
-  allow_reserved_calib=false
   if [[ -z $uart ]]; then
     start_stm32_sim
-    allow_reserved_calib=true
   fi
   serial_prefix=$(ros2 pkg prefix communication_pkg)
   "$serial_prefix/lib/communication_pkg/serial_node" --ros-args -r "__ns:=$namespace" \
-    -p "uart.device:=$uart" -p "uart.allow_reserved_calib:=$allow_reserved_calib" &
+    -p "uart.device:=$uart" &
   serial_pid=$!
   trap cleanup EXIT
   ros2 run tests_pkg serial_test_node --ros-args -r "__ns:=$namespace"
@@ -53,6 +51,7 @@ if [[ ${1:-} == approach ]]; then
 fi
 for arg in "$@"; do
   if [[ $arg == simulate_uart:=true ]]; then
+    export ROS_DOMAIN_ID=27
     start_stm32_sim
     ros2 launch robot_launch "$launch" "$@" "uart:=$uart"
     exit

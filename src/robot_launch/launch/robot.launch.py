@@ -47,7 +47,7 @@ def nodes(context):
 
     # 默认链路：相机 → 感知节点转发画面 → HTTP 服务。
     actions = [
-        node('desktop_server_pkg', 'desktop_server_node', camera_source=source, mode=mode, yolo_enabled=bool(model), serial_simulated=simulate_uart, port=int(value('port')), **{'point.x0': point_x, 'point.y0': point_y}),
+        node('desktop_server_pkg', 'desktop_server_node', camera_source=source, mode=mode, yolo_enabled=bool(model), port=int(value('port')), **{'point.x0': point_x, 'point.y0': point_y}),
         node('vision_pkg', 'perception_node', detect=bool(model), camera_settle_ms=trans.get('camera_settle_ms', 400)),
         node('vision_pkg', 'camera_node', device=value('camera_device'),
              url=url, FPS=fps, FOURCC=FOURCC),
