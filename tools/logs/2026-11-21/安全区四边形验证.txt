@@ -1,0 +1,8 @@
+14:46:44 安全区四边形离线验证
+
+用现有 v2 检测结果试外接四边形。再从紫色轮廓找每条边的支持点，拟合四条直线并取交点。结果图画中线和伤员区进场方向。
+
+命令
+python tools/experiments/detect_safety/v2/fit_quad.py
+
+72 张样图中 detected 72、full 12、ok 9。粗拟合有 6 张四角留在画内，2 张通过四边轮廓支持检查。三张已知投影点的平面合成图，角点 RMS 为 0.67–0.98 px。合成图不含围栏厚度，实拍样图没有角点真值。结果图在 tools/experiments/detect_safety/reports/v2/delivery_quad.jpg。
