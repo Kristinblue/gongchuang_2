@@ -36,10 +36,8 @@ class MyCMD:
 
     def move_straight(self, error: int):
         """前进/后退，正数前进，负数后退
-        由像素决定，以及PID的参数
-        不是严格的speed！！！！！
+        发送的是像素误差，送入下位机的PID
         """
-        # error 是像素误差，不是 m/s；实际速度由 STM32 的 PID 决定。
         self._send(Command.STRAIGHT, error)
 
     def move_straight_dis(self, dis: int):
