@@ -9,7 +9,7 @@
 
 // MyUART：把 Linux 串口（/dev/ttyS6、/dev/ttyUSB0 这类设备文件）包成一个类。
 //
-// 这一层只负责“打开、读、写、清缓存、关闭”，不关心字节是什么含义；
+// 这一层只负责“打开、读、写、关闭”，不关心字节是什么含义；
 // 协议打包在 SimpleProtocol 里，ROS 话题和看门狗在 serial_node 里。
 // 这样串口细节和业务逻辑分开，换板子或换串口只动这一个文件。
 //
@@ -36,8 +36,6 @@ public:
   // 非阻塞读，最多读 size 个字节。
   // 返回值 >0 是实际读到的字节数，0 表示暂时没数据，<0 表示串口出错。
   ssize_t read(uint8_t *data, std::size_t size);
-  // 丢掉串口接收缓冲区里还没读的旧字节，开始新的相对转向前会用到。
-  bool clear_input();
   // 关闭串口；重复调用是安全的。
   void close();
 
@@ -45,6 +43,6 @@ private:
   // 由现有 ROS 回调读写串口，无需让 serial_driver 另开线程。
   drivers::common::IoContext io_{0};
   std::unique_ptr<drivers::serial_driver::SerialPort> port_;
-  // 库未暴露设备描述符，用这个描述符做独占、清缓存和读写就绪检查。
+  // 库未暴露设备描述符，用这个描述符做独占和读写就绪检查。
   int control_fd_{-1};
 };

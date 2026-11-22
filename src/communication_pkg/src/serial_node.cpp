@@ -116,14 +116,6 @@ void SerialNode::command_callback(const Command &msg, int64_t max_pitch, bool al
                          static_cast<unsigned>(cmd), static_cast<int>(value));
     return;
   }
-  // 开始一次新的相对转向前，把积压的角度回包清掉。
-  if (!simulated_ && cmd == Command::TURN_ANGLE) {
-    if (!my_uart_.clear_input()) {
-      close_serial();
-      return;
-    }
-    parser_.clear();
-  }
   if (!send(cmd, value)) {
     close_serial();
     return;

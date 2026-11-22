@@ -47,8 +47,6 @@ public:
   // 从缓存里取出一条完整帧；缓存里没有完整帧时返回 std::nullopt。
   // 通常在 while (auto message = parser.parse()) 里循环调用，一次取完所有帧。
   std::optional<SimpleProtocol::Message> parse();
-  // 清空缓存（开始新的相对转向前用，避免把旧回包当成新的）。
-  void clear();
 
 private:
   std::vector<uint8_t> input_;

@@ -14,7 +14,6 @@ hyf移植以前的
 #include <poll.h>
 #include <sys/file.h>
 #include <sys/ioctl.h>
-#include <termios.h>
 #include <unistd.h>
 #include <vector>
 
@@ -92,11 +91,6 @@ ssize_t MyUART::read(uint8_t *data, std::size_t size) {
   } catch (const std::exception &) {
     return -1;
   }
-}
-
-bool MyUART::clear_input() {
-  // TCIFLUSH：只清“已经收到但还没读走”的输入缓存，不影响还没发完的数据。
-  return control_fd_ >= 0 && ::tcflush(control_fd_, TCIFLUSH) == 0;
 }
 
 void MyUART::close() {

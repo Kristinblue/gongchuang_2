@@ -52,7 +52,3 @@ std::optional<SimpleProtocol::Message> ProtocolParser::parse() {
   }
   return std::nullopt;
 }
-
-void ProtocolParser::clear() {
-  input_.clear();
-}
