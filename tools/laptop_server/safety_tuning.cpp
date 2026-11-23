@@ -203,21 +203,17 @@ SafetyTuning::SafetyTuning(QNetworkAccessManager &http) : http_(http) {
   page->addLayout(source_bar);
   auto *layout = new QHBoxLayout;
   page->addLayout(layout, 1);
-  auto *grid = new QGridLayout;
+  grid_ = new QGridLayout;
   const QString titles[]{"原图 · 拖框取样", "紫色掩膜", "红蓝掩膜", "识别结果"};
   for (int i = 0; i < 4; ++i) {
-    auto *group = new QGroupBox(titles[i]);
+    auto *group = groups_[i] = new QGroupBox(titles[i]);
     auto *box = new QVBoxLayout(group);
     views_[i] = new SafetyFrame;
     box->addWidget(views_[i]);
-    grid->addWidget(group, i / 2, i % 2);
+    grid_->addWidget(group, i / 2, i % 2);
   }
-  views_[0]->onSelection = [this](QRect area) {
-    selection_ = area;
-    showFrame();
-  };
   views_[0]->setFocusPolicy(Qt::ClickFocus);
-  layout->addLayout(grid, 1);
+  layout->addLayout(grid_, 1);
   auto *scroll = new QScrollArea(this);
   controls_page_ = scroll;
   scroll->setObjectName("hsvControls");
@@ -268,11 +264,12 @@ SafetyTuning::SafetyTuning(QNetworkAccessManager &http) : http_(http) {
   connect(apply_, &QPushButton::clicked, this, [this] { syncHsv(true); });
   connect(&poll_, &QTimer::timeout, this, [this] {
     if (source_ == Source::Pi) fetchFrame();
-    if (source_ == Source::Webcam && !webcam_frame_.isEmpty()) {
+    if (!webcam_frame_.isEmpty()) {
       QImage frame = QImage::fromData(webcam_frame_, "JPEG");
       webcam_frame_.clear();
       if (!frame.isNull()) {
-        source_info_->setText(webcam_reply_ ? "手机画面" : "手机视频已结束");
+        source_info_->setText(source_ == Source::Pi ? "香橙派画面"
+          : (webcam_reply_ ? "手机画面" : "手机视频已结束"));
         acceptFrame(frame);
       }
     }
@@ -304,7 +301,27 @@ SafetyTuning::SafetyTuning(QNetworkAccessManager &http) : http_(http) {
     connect(previous_key, &QShortcut::activated, this, [this] { browse(-1); });
     connect(next_key, &QShortcut::activated, this, [this] { browse(1); });
   }
+  setSafetyEnabled(false);
   setSource(Source::Pi);
+}
+
+void SafetyTuning::setSafetyEnabled(bool enabled) {
+  safety_enabled_ = enabled;
+  grid_->removeWidget(groups_[0]);
+  grid_->addWidget(groups_[0], 0, 0, 1, enabled ? 1 : 2);
+  groups_[0]->setTitle(enabled ? "原图 · 拖框取样" : "画面");
+  for (std::size_t i = 1; i < groups_.size(); ++i) groups_[i]->setVisible(enabled);
+  views_[0]->clearSelection();
+  selection_ = {};
+  views_[0]->onSelection = {};
+  if (enabled) {
+    views_[0]->onSelection = [this](QRect area) {
+      selection_ = area;
+      showFrame();
+    };
+    if (source_ == Source::Pi) syncHsv(false);
+  }
+  showFrame();
 }
 
 void SafetyTuning::openFolder() {
@@ -350,15 +367,13 @@ void SafetyTuning::browse(int step) {
 void SafetyTuning::setSource(Source source) {
   source_ = source;
   poll_.stop();
-  for (auto *slot : {&frame_reply_, &webcam_reply_}) {
-    auto *reply = slot->data();
-    slot->clear();
-    if (reply) reply->abort();
-  }
+  auto *reply = frame_reply_.data();
+  frame_reply_.clear();
+  if (reply) reply->abort();
+  stopMjpeg();
   files_.clear();
   frame_tag_.clear();
-  webcam_buffer_.clear();
-  webcam_frame_.clear();
+  legacy_video_ = false;
   source_info_->setToolTip({});
   folder_->setVisible(source == Source::Folder);
   previous_->setVisible(source == Source::Folder);
@@ -388,13 +403,21 @@ void SafetyTuning::connectWebcam() {
   }
   if (url.path().isEmpty() || url.path() == "/") url.setPath("/video");
   QSettings().setValue("input/webcam", webcam_address_->text().trimmed());
+  acceptFrame({});
+  source_info_->setText("正在连接手机…");
+  startMjpeg(url);
+}
+
+void SafetyTuning::stopMjpeg() {
   auto *prior = webcam_reply_.data();
   webcam_reply_.clear();
   if (prior) prior->abort();
   webcam_buffer_.clear();
   webcam_frame_.clear();
-  acceptFrame({});
-  source_info_->setText("正在连接手机…");
+}
+
+void SafetyTuning::startMjpeg(const QUrl &url) {
+  stopMjpeg();
   QNetworkRequest request(url);
   request.setTransferTimeout(5000);
   auto *reply = http_.get(request);
@@ -417,10 +440,18 @@ void SafetyTuning::connectWebcam() {
     }
     if (webcam_buffer_.size() > 8 * 1024 * 1024) webcam_buffer_.clear();
   });
-  connect(reply, &QNetworkReply::finished, this, [this, reply] {
+  connect(reply, &QNetworkReply::finished, this, [this, reply, url] {
     reply->deleteLater();
     if (webcam_reply_ != reply) return;
     webcam_reply_.clear();
+    if (source_ == Source::Pi) {
+      source_info_->setText("等待香橙派画面");
+      QTimer::singleShot(1000, this, [this, url] {
+        if (source_ == Source::Pi && legacy_video_ && !webcam_reply_ && server_.resolved(QUrl("/video")) == url)
+          startMjpeg(url);
+      });
+      return;
+    }
     const auto code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     source_info_->setText(code >= 400 ? QString("手机连接失败 · HTTP %1").arg(code)
       : image_.isNull() && webcam_frame_.isEmpty() ? "未收到手机画面" : "手机视频已结束");
@@ -449,6 +480,8 @@ void SafetyTuning::setServer(const QUrl &server) {
   }
   if (source_ == Source::Pi) {
     poll_.stop();
+    stopMjpeg();
+    legacy_video_ = false;
     acceptFrame({});
     source_info_->setText(server_.isEmpty() ? "等待香橙派连接" : "等待香橙派画面");
   }
@@ -461,7 +494,7 @@ void SafetyTuning::setServer(const QUrl &server) {
 }
 
 void SafetyTuning::fetchFrame() {
-  if (frame_reply_ || source_ != Source::Pi || server_.isEmpty()) return;
+  if (frame_reply_ || legacy_video_ || source_ != Source::Pi || server_.isEmpty()) return;
   QNetworkRequest request(server_.resolved(QUrl("/safety/frame")));
   request.setTransferTimeout(3000);
   if (!frame_tag_.isEmpty()) request.setRawHeader("If-None-Match", frame_tag_);
@@ -473,6 +506,11 @@ void SafetyTuning::fetchFrame() {
     frame_reply_.clear();
     const auto overlays = QJsonDocument::fromJson(reply->rawHeader("X-Gongchuang-Vision")).object();
     const auto code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    if (code == 404) {
+      legacy_video_ = true;
+      startMjpeg(server_.resolved(QUrl("/video")));
+      return;
+    }
     if (code == 304) {
       if (overlays_ != overlays) {
         overlays_ = overlays;
@@ -483,7 +521,7 @@ void SafetyTuning::fetchFrame() {
     QImage next;
     if (reply->error() != QNetworkReply::NoError || !next.loadFromData(reply->readAll(), "PNG")) {
       frame_tag_.clear();
-      source_info_->setText(code == 404 ? "香橙派缺少画面接口，请更新预览服务" : "等待香橙派画面");
+      source_info_->setText("等待香橙派画面");
     } else {
       frame_tag_ = reply->rawHeader("ETag");
       source_info_->setText("香橙派画面");
@@ -507,7 +545,7 @@ vision_pkg::SafetyHsv SafetyTuning::hsv() const {
 }
 
 void SafetyTuning::syncHsv(bool save) {
-  if (server_.isEmpty() || hsv_reply_) return;
+  if (!safety_enabled_ || server_.isEmpty() || hsv_reply_) return;
   QNetworkRequest request(server_.resolved(QUrl("/safety/hsv")));
   request.setTransferTimeout(3000);
   if (save) {
@@ -583,13 +621,23 @@ void SafetyTuning::showFrame() {
       {upper.x, std::max(18, upper.y - 4)}, cv::FONT_HERSHEY_SIMPLEX, font_size, color, thickness, cv::LINE_AA);
   };
   const auto boxes = overlays_.value("boxes").toArray();
+  const auto draw_reference = [&](cv::Mat &canvas) {
+    draw_box(canvas, overlays_.value("target").toArray(), {0, 220, 255}, true);
+    const auto point = overlays_.value("point").toArray();
+    if (point.size() != 2) return;
+    const cv::Point pixel(qRound(point[0].toDouble()), qRound(point[1].toDouble()));
+    if (cv::Rect(0, 0, canvas.cols, canvas.rows).contains(pixel))
+      cv::drawMarker(canvas, pixel, {70, 180, 0}, cv::MARKER_CROSS, 16, thickness, cv::LINE_AA);
+  };
   QImage preview = image_;
-  if (!boxes.isEmpty()) {
+  if (!boxes.isEmpty() || (!safety_enabled_ && !overlays_.isEmpty())) {
     cv::Mat marked(preview.height(), preview.width(), CV_8UC3, preview.bits(), preview.bytesPerLine());
     for (const auto &box : boxes) draw_box(marked, box.toArray(), {225, 105, 35}, false);
+    if (!safety_enabled_) draw_reference(marked);
   }
   views_[0]->setImage(preview);
   frame_info_->setText(QString("%1 × %2").arg(image_.width()).arg(image_.height()));
+  if (!safety_enabled_) return;
   const QRect sample = selection_.isEmpty() ? image_.rect() : selection_.intersected(image_.rect());
   cv::Mat hsv_image;
   cv::cvtColor(bgr(cv::Rect(sample.x(), sample.y(), sample.width(), sample.height())), hsv_image, cv::COLOR_BGR2HSV);
@@ -613,13 +661,7 @@ void SafetyTuning::showFrame() {
   if (result.status.detected) {
     cv::polylines(overlay, result.polygon, true, result.status.full ? cv::Scalar(0, 220, 255) : cv::Scalar(0, 130, 255), 2, cv::LINE_AA);
   }
-  draw_box(overlay, overlays_.value("target").toArray(), {0, 220, 255}, true);
-  const auto point = overlays_.value("point").toArray();
-  if (point.size() == 2) {
-    const cv::Point pixel(qRound(point[0].toDouble()), qRound(point[1].toDouble()));
-    if (cv::Rect(0, 0, overlay.cols, overlay.rows).contains(pixel))
-      cv::drawMarker(overlay, pixel, {70, 180, 0}, cv::MARKER_CROSS, 16, thickness, cv::LINE_AA);
-  }
+  draw_reference(overlay);
   views_[1]->setImage(QImage(purple.data, purple.cols, purple.rows, purple.step, QImage::Format_Grayscale8).copy());
   views_[2]->setImage(QImage(colors.data, colors.cols, colors.rows, colors.step, QImage::Format_BGR888).copy());
   views_[3]->setImage(QImage(overlay.data, overlay.cols, overlay.rows, overlay.step, QImage::Format_BGR888).copy(),

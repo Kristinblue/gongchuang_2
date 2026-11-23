@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QCheckBox>
 #include <QColor>
 #include <QCloseEvent>
 #include <QComboBox>
@@ -419,7 +420,18 @@ public:
     settings->addWidget(new QLabel("YOLO 置信度"));
     settings->addWidget(confidence_);
     settings->addWidget(apply_);
+    taskTeam_->addItem("红方", "red");
+    taskTeam_->addItem("蓝方", "blue");
+    settings->addWidget(taskTeam_);
+    settings->addWidget(prepareTask_);
+    settings->addWidget(startTask_);
+    connect(prepareTask_, &QPushButton::clicked, this, [this] {
+      runPreview(QStringLiteral("start task %1").arg(taskTeam_->currentData().toString()));
+    });
+    connect(startTask_, &QPushButton::clicked, this, [this] { runPreview("start-task"); });
     settings->addStretch();
+    auto *safetyMode = new QCheckBox("安全区调试");
+    settings->addWidget(safetyMode);
     preview->addLayout(settings);
 
     auto *right = new QFrame;
@@ -485,7 +497,12 @@ public:
     serialFrames_->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
     serialLayout->addWidget(serialFrames_, 1);
     rightTabs->addTab(serialPage, "串口");
-    rightTabs->addTab(safety_->controlsPage(), "HSV 调色");
+    const int hsvTab = rightTabs->addTab(safety_->controlsPage(), "HSV 调色");
+    rightTabs->setTabVisible(hsvTab, false);
+    connect(safetyMode, &QCheckBox::toggled, this, [this, rightTabs, hsvTab](bool enabled) {
+      safety_->setSafetyEnabled(enabled);
+      rightTabs->setTabVisible(hsvTab, enabled);
+    });
     split->addWidget(rightTabs);
     split->setStretchFactor(0, 3);
     split->setStretchFactor(1, 2);
@@ -630,6 +647,9 @@ private:
     mode_->setEnabled(!active_);
     connect_->setText(active_ ? "断开" : "连接");
     previewStart_->setEnabled(shellReady_ && !pending_);
+    taskTeam_->setEnabled(shellReady_ && !pending_);
+    prepareTask_->setEnabled(shellReady_ && !pending_);
+    startTask_->setEnabled(shellReady_ && !pending_);
     confidence_->setEnabled(online_ && hasDetector_);
     apply_->setEnabled(online_ && hasDetector_ && !setting_);
   }
@@ -929,6 +949,8 @@ private:
   }
 
   QComboBox *inputSource_{new QComboBox}, *mode_{new QComboBox};
+  QComboBox *taskTeam_{new QComboBox};
+  QPushButton *prepareTask_{new QPushButton("准备任务")}, *startTask_{new QPushButton("启动任务")};
   QDoubleSpinBox *confidence_{new QDoubleSpinBox};
   QPushButton *connect_{new QPushButton("连接")}, *apply_{new QPushButton("应用置信度")};
   QToolButton *previewStart_{new QToolButton};

@@ -34,6 +34,7 @@ class TaskNode(Node):
         self.cmd = MyCMD(self.create_publisher(Command, 'robot/command', 10))
         self.task = Task(self.cmd, {'point':point,'distribute':distribute,'trans':trans})
         self.serial_open = False
+        self.start_requested = False
         self.last_frame = float('-inf')
         self.last_stamp = 0
         self.last_status = None
@@ -44,7 +45,7 @@ class TaskNode(Node):
         self.target = self.create_publisher(Objects, 'task/target', frames_qos)
         # 话题 callback：串口状态交给 robot_state，角度回包交给 MyCMD，新检测帧交给 on_frame。
         self.create_subscription(State, 'robot/state', self.robot_state, state_qos)
-        self.create_subscription(Feedback, 'robot/feedback', self.cmd.read_feedback, 10)
+        self.create_subscription(Feedback, 'robot/feedback', self.feedback_callback, 10)
         self.create_subscription(Objects, 'vision/objects', self.on_frame, frames_qos)
         # 服务 callback：等外部明确请求才开始任务。定时 callback watchdog 每 0.1 秒检查一次。
         self.create_service(Trigger, 'task/start', self.start)
@@ -62,9 +63,16 @@ class TaskNode(Node):
         self.task.go_to.team = self.task.team
         if not self.serial_open:
             self.cmd.angle = None
+            self.start_requested = False
         if not self.serial_open and self.task.state != STOP:
             self.task.stop()
             self.publish_status()
+
+    def feedback_callback(self, message):
+        self.cmd.read_feedback(message)
+        if message.command == Feedback.START and message.value == 1 and self.task.state == STOP:
+            self.start_requested = True
+            self.try_start()
 
     def on_frame(self, message):
         """收到新感知帧时，推进 Task 一步，并把选中的目标发给预览。"""
@@ -74,6 +82,8 @@ class TaskNode(Node):
         if not 0 <= age <= 500_000_000 or stamp <= self.last_stamp:
             return
         self.last_stamp, self.last_frame = stamp, time.monotonic()
+        if self.start_requested:
+            self.try_start()
         if self.task.state == STOP:
             return
         # 转回原工程的物块字典，Task 和 GoTo 就能继续用旧接口。
@@ -109,16 +119,23 @@ class TaskNode(Node):
             self.match_status.publish(match)
             self.last_status = match
 
-    def start(self, request, response):
-        if not self.serial_open or self.task.state != STOP or time.monotonic() - self.last_frame > .5:
-            response.message = '需打开串口、新检测帧且任务处于停止状态'
-            return response
+    def try_start(self):
+        if (not self.serial_open or self.task.team not in ('red', 'blue') or
+                self.task.state != STOP or time.monotonic() - self.last_frame > .5):
+            return False
+        self.start_requested = False
         self.task.start()
         self.publish_status()
-        response.success = True
+        return True
+
+    def start(self, request, response):
+        response.success = self.try_start()
+        if not response.success:
+            response.message = '需设置红蓝方、打开串口、有新检测帧且任务处于停止状态'
         return response
 
     def stop(self, request, response):
+        self.start_requested = False
         self.task.stop()
         self.publish_status()
         response.success = True
@@ -126,6 +143,7 @@ class TaskNode(Node):
 
     def reset(self, request, response):
         """清掉本场记录，要求下一次开始前收到复位之后的画面。"""
+        self.start_requested = False
         self.task.reset()
         self.last_stamp = self.get_clock().now().nanoseconds
         self.last_frame = float('-inf')

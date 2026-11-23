@@ -14,7 +14,7 @@ import sys
 import time
 
 START = b'\xaa\x55'
-CODES = {0: '查询队伍', 1: '前进', 2: '转向', 3: '夹爪', 4: '相机', 5: '相对转角', 6: '角度校准（保留）', 7: '距离直行', 8: '停车'}
+CODES = {1: '前进', 2: '转向', 3: '夹爪', 4: '相机', 5: '相对转角', 6: '角度校准（保留）', 7: '距离直行', 8: '停车'}
 
 
 def checksum(frame):
@@ -32,10 +32,9 @@ def pack(command, value):
 class Sim:
     """把像素误差按增益换成速度，带死区，避免在目标附近来回蹭。"""
 
-    def __init__(self, team, speed_gain=0.00015, turn_gain=0.0008,
+    def __init__(self, speed_gain=0.00015, turn_gain=0.0008,
                  speed_limit=0.1, turn_limit=0.5,
                  speed_deadband=15, turn_deadband=12):
-        self.team = team
         self.speed_gain = speed_gain
         self.turn_gain = turn_gain
         self.speed_limit = speed_limit
@@ -137,7 +136,6 @@ class Link:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--team', choices=('red', 'blue'), default='red', help='收到启动查询后回的队伍')
     parser.add_argument('--device-only', action='store_true', help='标准输出只打印伪串口路径')
     parser.add_argument('--sim-host', default='', help='仿真控制地址，如 WSL 的 172.27.176.1 或派上的 192.168.60.1')
     parser.add_argument('--sim-port', type=int, default=8091, help='仿真控制端口')
@@ -156,17 +154,17 @@ def main():
     if args.device_only:
         print(name, flush=True)
         sys.stdout = open(os.devnull, 'w')
-    sim = Sim(args.team, args.speed_gain, args.turn_gain, args.speed_limit,
+    sim = Sim(args.speed_gain, args.turn_gain, args.speed_limit,
               args.turn_limit, args.speed_deadband, args.turn_deadband)
     link = Link(args.sim_host, args.sim_port) if args.sim_host else None
-    print(f'[Stm32Sim] 伪串口 {name}（{args.team} 方）', flush=True)
+    print(f'[Stm32Sim] 伪串口 {name}', flush=True)
     if link is None:
         print(f'[Stm32Sim] 启动：bash tools/run.sh uart:={name} ...', flush=True)
     else:
         print(f'[Stm32Sim] 启动：bash tools/run.sh uart:={name} ...，'
               f'动作会转发到仿真 {args.sim_host}:{args.sim_port}', flush=True)
     buffer = bytearray()
-    greeted = False
+    opened = False
     last = time.monotonic()
     last_forward = 0.0
     last_angle = 0.0
@@ -180,8 +178,8 @@ def main():
                 try:
                     data = os.read(master, 256)
                 except OSError:
-                    # 串口节点关掉了，重开后等待下一次队伍查询。
-                    greeted = False
+                    # 串口节点关掉了，重开后收到一帧就继续上报角度。
+                    opened = False
                     buffer.clear()
                     time.sleep(0.05)
                     continue
@@ -193,13 +191,8 @@ def main():
                 command = buffer[2]
                 raw = buffer[3] | (buffer[4] << 8)
                 value = raw - 65536 if raw >= 32768 else raw
-                if command == 0 and value == 0:
-                    # 查询队伍后，开始连续上报角度。
-                    os.write(master, pack(0, 0 if args.team == 'red' else 1))
-                    greeted = True
-                    last_angle = 0.0
-                else:
-                    sim.handle(command, value)
+                opened = True
+                sim.handle(command, value)
                 if link is not None:
                     if command == 4:
                         link.send(f'C {sim.camera}')
@@ -209,7 +202,7 @@ def main():
             if link is not None and now - last_forward > 0.1:
                 last_forward = now
                 link.send(f'D {sim.speed:.4f} {sim.turn:.4f}')
-            if greeted and now - last_angle >= 0.05:
+            if opened and now - last_angle >= 0.05:
                 os.write(master, pack(1, round(math.degrees(sim.yaw)) % 360))
                 last_angle = now
             if now - sim.last_report > 1.0:

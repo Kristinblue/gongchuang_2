@@ -11,6 +11,8 @@
 #include "vision_pkg/safety_detector.hpp"
 
 class QLabel;
+class QGridLayout;
+class QGroupBox;
 class QLineEdit;
 class QNetworkAccessManager;
 class QNetworkReply;
@@ -26,6 +28,7 @@ public:
   explicit SafetyTuning(QNetworkAccessManager &http);
   void setSource(Source source);
   void setServer(const QUrl &server);
+  void setSafetyEnabled(bool enabled);
   QWidget *controlsPage() const { return controls_page_; }
 
 private:
@@ -33,6 +36,8 @@ private:
   void loadFolder(const QString &path);
   void browse(int step);
   void connectWebcam();
+  void startMjpeg(const QUrl &url);
+  void stopMjpeg();
   void updateFrameSource();
   void fetchFrame();
   void acceptFrame(QImage image, const QJsonObject &overlays = {});
@@ -52,7 +57,10 @@ private:
   QRect selection_;
   QStringList files_;
   int file_index_{0};
+  bool safety_enabled_{false}, legacy_video_{false};
   vision_pkg::SafetyDetector detector_;
+  QGridLayout *grid_{};
+  std::array<QGroupBox *, 4> groups_{};
   std::array<SafetyFrame *, 4> views_{};
   std::array<std::array<QSpinBox *, 6>, 3> inputs_{};
   SafetyHistogram *histogram_;

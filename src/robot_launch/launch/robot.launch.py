@@ -58,7 +58,7 @@ def nodes(context):
     if model:
         actions.append(node('vision_pkg', 'inference_node', **{'yolo.model_path': model}))
     if uart:
-        actions.append(node('communication_pkg', 'serial_node', max_pitch_deg=camera.get('max_pitch_deg', 80), **{'uart.device': uart}))
+        actions.append(node('communication_pkg', 'serial_node', team=value('team'), max_pitch_deg=camera.get('max_pitch_deg', 80), **{'uart.device': uart}))
     if mode == 'approach':
         overrides = {'drive': bool(uart) and not simulate_uart, 'publish_motion': simulate_uart}
         if value('color'):
@@ -83,6 +83,7 @@ def generate_launch_description():
         DeclareLaunchArgument('port', default_value='18080'),
         DeclareLaunchArgument('model', default_value=''),
         DeclareLaunchArgument('uart', default_value=''),
+        DeclareLaunchArgument('team', default_value=''),
         DeclareLaunchArgument('simulate_uart', default_value='false'),
         DeclareLaunchArgument('mode', default_value='preview'),
         DeclareLaunchArgument('safety_detector', default_value='false'),

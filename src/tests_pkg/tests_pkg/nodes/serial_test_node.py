@@ -15,7 +15,7 @@ from robot_interfaces.msg import Command, SerialFrame
 from communication_pkg.my_cmd import MyCMD
 
 
-HELP = '''00  启动时查询队伍（实车串口自动发送）
+HELP = '''00  下发保留，STM32 回 00,1 表示启动正式任务
 01  move_straight 100   前后像素误差，正值向前，负值向后
 02  move_turn -50       转向像素误差，正值向右，负值向左
 03  grab 0              夹爪，0 开，1 关

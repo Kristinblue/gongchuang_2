@@ -60,6 +60,9 @@ SerialNode::SerialNode() : Node("serial_node") {
   // uart.device / uart.baudrate 和 robot.yaml 里的层级一致。
   const auto dev = declare_parameter("uart.device", "/dev/ttyS6");
   const auto baud = declare_parameter("uart.baudrate", 115200);
+  state_.team = declare_parameter<std::string>("team", "");
+  if (!state_.team.empty() && state_.team != "red" && state_.team != "blue")
+    throw std::invalid_argument("team 要填 red 或 blue");
   // 相机俯角的软件限位，0 度水平，向下为正。
   const auto max_pitch = declare_parameter("max_pitch_deg", 80);
   if (max_pitch < 0 || max_pitch > 80) throw std::invalid_argument("max_pitch_deg 要在 0～80 之间");
@@ -75,8 +78,8 @@ SerialNode::SerialNode() : Node("serial_node") {
   });
   // callback：每 10 ms 调 read() 检查回包。非阻塞打开串口，没数据时立即返回。
   timer_ = create_wall_timer(10ms, [this] { read(); });
-  // 先发停车，再发 00,0 查询队伍。
-  if (!my_uart_.open(dev, baud) || !send(Command::STOP, 0) || !send(Command::GET_FLAG, 0)) {
+  // 打开串口后先发停车，等待启动指令。
+  if (!my_uart_.open(dev, baud) || !send(Command::STOP, 0)) {
     close_serial();
     throw std::runtime_error("无法初始化串口 " + dev);
   }
@@ -96,13 +99,10 @@ void SerialNode::command_callback(const Command &msg, int64_t max_pitch) {
 
   const auto cmd = msg.command;
   const auto value = msg.value;
-  // 06 校准参数待定，先保留编号。队伍查询参数固定为 0，夹爪只能 0/1。
+  // 00 和 06 先保留编号，夹爪只能 0/1。
   // 不合法的命令直接丢弃，不去赌下位机能不能处理。
   bool valid = true;
   switch (cmd) {
-    case Command::GET_FLAG:
-      valid = value == 0;
-      break;
     case Command::GRAB:
       valid = value == 0 || value == 1;
       break;
@@ -115,6 +115,7 @@ void SerialNode::command_callback(const Command &msg, int64_t max_pitch) {
     case Command::STRAIGHT_DIS:
     case Command::STOP:
       break;
+    case Command::RESERVED:
     case Command::ANGLE_CALIB:
     default:
       valid = false;
@@ -193,7 +194,7 @@ void SerialNode::read() {
   if (count < 0) { close_serial(); return; }
   if (count == 0) return;
   parser_.feed(data, count);
-  // while 循环把缓存里所有完整帧都取出来，一帧也不落下。
+  // while 循环把缓存里所有完整帧都取出来
   while (auto packet = parser_.parse()) {
     // 有效帧固定为六字节，按解析值重组可得到逐字节相同的回包。
     trace(SimpleProtocol::pack(packet->command, packet->value), false);
@@ -202,12 +203,6 @@ void SerialNode::read() {
     msg.value = packet->value;
     feedback_pub_->publish(msg);
     switch (msg.command) {
-      case Feedback::FLAG:
-        // 回包 command=0 是队伍确认：0 红方，1 蓝方，记到 State 里。
-        if (msg.value != 0 && msg.value != 1) break;
-        state_.team = msg.value == 0 ? "red" : "blue";
-        state_pub_->publish(state_);
-        break;
       case Feedback::ANGLE:
         // 回包 command=1 是绝对角度 0~360；状态只在角度变化时更新。
         if (msg.value < 0 || msg.value > 360) break;

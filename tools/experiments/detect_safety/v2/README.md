@@ -33,5 +33,3 @@ safety = detector.detect(frame)
 72 张图里，57 张判对，14 张保留为 `safety`，1 张判反（`full=False`）。去掉缩图时做的对照测试，识别总耗时中位数分别为 2.81 和 4.46 ms，P95 分别为 7.51 和 7.05 ms（Windows 笔记本）。
 
 ![原图上的绿色 ROI、紫色掩膜、红蓝掩膜和识别结果](../reports/v2/color/examples-extra.jpg)
-
-双击 v2 的启动 CMD 可以翻图。

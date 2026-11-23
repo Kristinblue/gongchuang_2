@@ -7,7 +7,7 @@
 | --- | --- | --- |
 | `stream.py` | Windows | 启动仿真（Godot + WSL 物理），把相机画面推成 MJPEG |
 | `run_sim.sh` | WSL | 自动解析 Windows 地址，用 `source:=http` 启动 ROS |
-| `../stm32_sim.py` | WSL | 伪串口模拟 STM32，回队伍、收动作命令 |
+| `../stm32_sim.py` | WSL | 伪串口模拟 STM32，上报角度、接收动作命令 |
 
 ## 仿真当摄像头
 
@@ -56,23 +56,23 @@ python tools/sim/field.py restore            # 还原（两个 .bak 都会拷回
 ## 模拟 STM32
 
 ```bash
-python3 tools/stm32_sim.py --team red
+python3 tools/stm32_sim.py
 ```
 
 会打印 `伪串口 /dev/pts/N`，然后另开终端：
 
 ```bash
-bash tools/run.sh uart:=/dev/pts/N model:="$PWD/assets/models/train5.onnx"
+bash tools/run.sh uart:=/dev/pts/N team:=red model:="$PWD/assets/models/train5.onnx"
 bash tools/run.sh uart:=/dev/pts/N mode:=approach model:="$PWD/assets/models/train5.onnx"
 ```
 
-伪串口收到 `00, 0` 后回 `00` 队伍信息，并用 `01` 连续上报角度。`01/02/03/04/05/07/08` 按现有协议处理并打印速度和位姿。`01` 正值向前，`07` 按厘米直行，`08` 停车。`/robot/state` 会显示串口状态、队伍和导航角度。
+伪串口收到启动时的停车帧后，用 `01` 连续上报角度。`01/02/03/04/05/07/08` 按现有协议处理并打印速度和位姿。`01` 正值向前，`07` 按厘米直行，`08` 停车。`/robot/state` 会显示串口状态、队伍和导航角度。
 
 加上 `--sim-host` 后，假板还会把动作转发给仿真，车就真的动起来：
 
 ```bash
-python3 tools/stm32_sim.py --team red --sim-host 172.27.176.1   # WSL 看 Windows 的网关
-python3 tools/stm32_sim.py --team red --sim-host 192.168.60.1   # 派看 PC 的有线地址
+python3 tools/stm32_sim.py --sim-host 172.27.176.1   # WSL 看 Windows 的网关
+python3 tools/stm32_sim.py --sim-host 192.168.60.1   # 派看 PC 的有线地址
 ```
 
 转发的是 `D 速度 转向`、`C 俯角`、`G 开合`，`stream.py` 的控制端口默认 8091。
@@ -98,7 +98,7 @@ ssh -N -R 18080:127.0.0.1:18080 pio-wired    # 要用客户端时再加
 
 ```bash
 # WSL
-python3 tools/stm32_sim.py --team red --sim-host 172.27.176.1   # 记下 /dev/pts/N
+python3 tools/stm32_sim.py --sim-host 172.27.176.1   # 记下 /dev/pts/N
 bash tools/sim/run_sim.sh mode:=approach uart:=/dev/pts/N model:="$PWD/assets/models/train5.onnx"
 ros2 service call /approach_test/start std_srvs/srv/Trigger '{}'
 ```

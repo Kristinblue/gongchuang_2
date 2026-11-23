@@ -11,13 +11,19 @@ case "${1:-start}" in
     if systemctl --user is-active --quiet "$unit.service"; then exit 0; fi
     exec bash "$script" start preview
     ;;
+  start-task)
+    source /opt/ros/humble/setup.bash
+    source install/local_setup.bash
+    exec timeout 8s ros2 service call /task/start std_srvs/srv/Trigger '{}'
+    ;;
   start)
     if [[ ! -f install/local_setup.bash ]]; then
       echo "请先运行 bash "$PWD/tools/build.sh"" >&2
       exit 1
     fi
     mode=${2:-preview}
-    args=(source:=usb "mode:=$mode" camera_fps:=10 camera_fourcc:=YUYV)
+    launch_mode=$mode
+    args=(source:=usb camera_fps:=10 camera_fourcc:=YUYV)
     ros_domain=${ROS_DOMAIN_ID:-0}
     case "$mode" in
       preview)
@@ -26,6 +32,20 @@ case "${1:-start}" in
         if [[ -r "$model" ]]; then args+=("model:=$model"); fi
         ;;
       camera_test) ;;
+      task)
+        team=${3:-}
+        if [[ $team != red && $team != blue ]]; then
+          echo '请选择红方或蓝方' >&2
+          exit 2
+        fi
+        model="$PWD/assets/models/train5.rknn"
+        if [[ ! -r "$model" ]]; then
+          echo "正式任务需要模型 $model" >&2
+          exit 1
+        fi
+        launch_mode=preview
+        args+=("model:=$model" uart:=/dev/ttyS6 "team:=$team" safety_detector:=true)
+        ;;
       approach)
         model="$PWD/assets/models/train5.rknn"
         if [[ ! -r "$model" ]]; then
@@ -38,6 +58,7 @@ case "${1:-start}" in
     esac
 
     description="Gongchuang $mode"
+    if [[ $mode == task ]]; then description+=" $team"; fi
     if systemctl --user is-active --quiet "$unit.service"; then
       if [[ $(systemctl --user show "$unit.service" -p Description --value) == "$description" ]]; then
         echo "$mode 已在运行"
@@ -49,7 +70,7 @@ case "${1:-start}" in
       --working-directory="$PWD" --setenv=OPENCV_VIDEOIO_V4L_SELECT_TIMEOUT=2 \
       --setenv=ROS_DOMAIN_ID="$ros_domain" \
       --setenv=FASTRTPS_DEFAULT_PROFILES_FILE="$PWD/tools/preview_fastdds.xml" \
-      /bin/bash "$PWD/tools/run.sh" "${args[@]}"
+      /bin/bash "$PWD/tools/run.sh" "mode:=$launch_mode" "${args[@]}"
     ;;
   stop)
     systemctl --user stop "$unit.service"
@@ -58,7 +79,7 @@ case "${1:-start}" in
     systemctl --user status "$unit.service" --no-pager
     ;;
   *)
-    echo "用法: bash $script [start [preview|approach|camera_test]|ensure-preview|stop|status]" >&2
+    echo "用法: bash $script [start [preview|approach|camera_test|task red|task blue]|start-task|ensure-preview|stop|status]" >&2
     exit 2
     ;;
 esac
