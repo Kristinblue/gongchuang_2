@@ -12,8 +12,11 @@ case "${1:-start}" in
     exec bash "$script" start preview
     ;;
   start-task)
+    # ROS Humble 的环境脚本会读取尚未设置的变量。
+    set +u
     source /opt/ros/humble/setup.bash
     source install/local_setup.bash
+    set -u
     exec timeout 8s ros2 service call /task/start std_srvs/srv/Trigger '{}'
     ;;
   start)
