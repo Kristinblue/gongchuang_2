@@ -34,7 +34,6 @@ class TaskNode(Node):
         self.cmd = MyCMD(self.create_publisher(Command, 'robot/command', 10))
         self.task = Task(self.cmd, {'point':point,'distribute':distribute,'trans':trans})
         self.serial_open = False
-        self.start_requested = False
         self.last_frame = float('-inf')
         self.last_stamp = 0
         self.last_status = None
@@ -63,15 +62,18 @@ class TaskNode(Node):
         self.task.go_to.team = self.task.team
         if not self.serial_open:
             self.cmd.angle = None
-            self.start_requested = False
         if not self.serial_open and self.task.state != STOP:
             self.task.stop()
+        if self.task.state == STOP:
             self.publish_status()
 
     def feedback_callback(self, message):
         self.cmd.read_feedback(message)
-        if message.command == Feedback.START and message.value == 1 and self.task.state == STOP:
-            self.start_requested = True
+        if message.command != Feedback.START:
+            return
+        if message.value == 2:
+            self.reset_match()
+        elif message.value == 1:
             self.try_start()
 
     def on_frame(self, message):
@@ -81,10 +83,9 @@ class TaskNode(Node):
         # 跳过过期、时间戳在未来、或比上次还旧的帧。任务推进只用新数据。
         if not 0 <= age <= 500_000_000 or stamp <= self.last_stamp:
             return
-        self.last_stamp, self.last_frame = stamp, time.monotonic()
-        if self.start_requested:
-            self.try_start()
+        self.last_stamp, self.last_frame = stamp, time.monotonic() - age / 1e9
         if self.task.state == STOP:
+            self.publish_status()
             return
         # 转回原工程的物块字典，Task 和 GoTo 就能继续用旧接口。
         objs = [
@@ -108,6 +109,8 @@ class TaskNode(Node):
 
     def publish_status(self, selected=None):
         stage = 'init_dis' if self.task.state == 'distribute' else self.task.state
+        if stage == STOP:
+            stage = 'waiting_start' if self.can_start() else 'waiting_ready'
         match = MatchState(stage=stage, frames=self.task.frame_count)
         if selected is not None:
             match.target_known = True
@@ -119,11 +122,13 @@ class TaskNode(Node):
             self.match_status.publish(match)
             self.last_status = match
 
+    def can_start(self):
+        return (self.serial_open and self.task.team in ('red', 'blue') and
+                self.task.state == STOP and time.monotonic() - self.last_frame <= .5)
+
     def try_start(self):
-        if (not self.serial_open or self.task.team not in ('red', 'blue') or
-                self.task.state != STOP or time.monotonic() - self.last_frame > .5):
+        if not self.can_start():
             return False
-        self.start_requested = False
         self.task.start()
         self.publish_status()
         return True
@@ -135,26 +140,28 @@ class TaskNode(Node):
         return response
 
     def stop(self, request, response):
-        self.start_requested = False
         self.task.stop()
         self.publish_status()
         response.success = True
         return response
 
     def reset(self, request, response):
+        self.reset_match()
+        response.success = True
+        response.message = '已复位，等待启动'
+        return response
+
+    def reset_match(self):
         """清掉本场记录，要求下一次开始前收到复位之后的画面。"""
-        self.start_requested = False
         self.task.reset()
         self.last_stamp = self.get_clock().now().nanoseconds
         self.last_frame = float('-inf')
         self.publish_status()
-        response.success = True
-        response.message = '上位机已复位，已发布停车指令' if self.serial_open else '上位机已复位，串口未打开'
-        return response
 
     def watchdog(self):
         """半秒没有新检测帧就停车。"""
         if self.task.state == STOP:
+            self.publish_status()
             return
         if time.monotonic() - self.last_frame > .5:
             self.task.stop()

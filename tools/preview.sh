@@ -11,13 +11,15 @@ case "${1:-start}" in
     if systemctl --user is-active --quiet "$unit.service"; then exit 0; fi
     exec bash "$script" start preview
     ;;
-  start-task)
+  start-task|reset-task)
     # ROS Humble 的环境脚本会读取尚未设置的变量。
     set +u
     source /opt/ros/humble/setup.bash
     source install/local_setup.bash
     set -u
-    exec timeout 8s ros2 service call /task/start std_srvs/srv/Trigger '{}'
+    service=/task/start
+    if [[ $1 == reset-task ]]; then service=/match/reset; fi
+    exec timeout 8s ros2 service call "$service" std_srvs/srv/Trigger '{}'
     ;;
   start)
     if [[ ! -f install/local_setup.bash ]]; then
@@ -82,7 +84,7 @@ case "${1:-start}" in
     systemctl --user status "$unit.service" --no-pager
     ;;
   *)
-    echo "用法: bash $script [start [preview|approach|camera_test|task red|task blue]|start-task|ensure-preview|stop|status]" >&2
+    echo "用法: bash $script [start [preview|approach|camera_test|task red|task blue]|start-task|reset-task|ensure-preview|stop|status]" >&2
     exit 2
     ;;
 esac

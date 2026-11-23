@@ -425,10 +425,12 @@ public:
     settings->addWidget(taskTeam_);
     settings->addWidget(prepareTask_);
     settings->addWidget(startTask_);
+    settings->addWidget(resetTask_);
     connect(prepareTask_, &QPushButton::clicked, this, [this] {
       runPreview(QStringLiteral("start task %1").arg(taskTeam_->currentData().toString()));
     });
     connect(startTask_, &QPushButton::clicked, this, [this] { runPreview("start-task"); });
+    connect(resetTask_, &QPushButton::clicked, this, [this] { runPreview("reset-task"); });
     settings->addStretch();
     auto *safetyMode = new QCheckBox("安全区调试");
     settings->addWidget(safetyMode);
@@ -649,7 +651,8 @@ private:
     previewStart_->setEnabled(shellReady_ && !pending_);
     taskTeam_->setEnabled(shellReady_ && !pending_);
     prepareTask_->setEnabled(shellReady_ && !pending_);
-    startTask_->setEnabled(shellReady_ && !pending_);
+    startTask_->setEnabled(shellReady_ && !pending_ && online_ && videoAvailable_ && taskStage_ == "waiting_start");
+    resetTask_->setEnabled(shellReady_ && !pending_ && online_ && taskStage_ != "preview");
     confidence_->setEnabled(online_ && hasDetector_);
     apply_->setEnabled(online_ && hasDetector_ && !setting_);
   }
@@ -751,11 +754,13 @@ private:
         if (!hasDetector_ && confidence.isDouble()) confidence_->setValue(confidence.toDouble());
         hasDetector_ = confidence.isDouble();
         online_ = true;
-        const auto stage = data.value("task").toObject().value("stage").toString("preview");
+        taskStage_ = data.value("task").toObject().value("stage").toString("preview");
         const auto testNode = data.value("test_node").toString();
-        stageLabel_->setText("阶段  " + (testNode.isEmpty() ? stage : testNode));
         showSerial(data.value("serial").toObject());
         videoAvailable_ = data.value("video_available").toBool();
+        const bool waiting = taskStage_ == "waiting_start" || taskStage_ == "waiting_ready";
+        const auto stage = waiting ? QString(videoAvailable_ ? "等待启动" : "等待启动 · 无视频输入") : taskStage_;
+        stageLabel_->setText("阶段  " + (testNode.isEmpty() ? stage : testNode));
         status_->setText(videoAvailable_ ? "已连接" : "已连接 · 最近 2 秒未收到新画面");
       }
       if (serialTest_) stageLabel_->setText("阶段  serial_test_node");
@@ -950,7 +955,9 @@ private:
 
   QComboBox *inputSource_{new QComboBox}, *mode_{new QComboBox};
   QComboBox *taskTeam_{new QComboBox};
-  QPushButton *prepareTask_{new QPushButton("准备任务")}, *startTask_{new QPushButton("启动任务")};
+  QPushButton *prepareTask_{new QPushButton("应用队伍")}, *startTask_{new QPushButton("启动任务")};
+  QPushButton *resetTask_{new QPushButton("复位任务")};
+  QString taskStage_{"preview"};
   QDoubleSpinBox *confidence_{new QDoubleSpinBox};
   QPushButton *connect_{new QPushButton("连接")}, *apply_{new QPushButton("应用置信度")};
   QToolButton *previewStart_{new QToolButton};
