@@ -12,7 +12,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QLabel>
-#include <QLineEdit>
 #include <QMouseEvent>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -185,17 +184,12 @@ SafetyTuning::SafetyTuning(QNetworkAccessManager &http) : http_(http) {
   auto *page = new QVBoxLayout(this);
   auto *source_bar = new QHBoxLayout;
   folder_ = new QPushButton("打开图片文件夹");
-  webcam_address_ = new QLineEdit(saved.value("input/webcam").toString());
-  webcam_address_->setPlaceholderText("手机 IP Webcam 显示的地址");
-  webcam_connect_ = new QPushButton("连接手机");
   previous_ = new QPushButton("← A");
   next_ = new QPushButton("D →");
   source_info_ = new QLabel;
   source_info_->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
   frame_info_ = new QLabel("等待原图");
   source_bar->addWidget(folder_);
-  source_bar->addWidget(webcam_address_, 2);
-  source_bar->addWidget(webcam_connect_);
   source_bar->addWidget(source_info_, 1);
   source_bar->addWidget(frame_info_);
   source_bar->addWidget(previous_);
@@ -264,12 +258,11 @@ SafetyTuning::SafetyTuning(QNetworkAccessManager &http) : http_(http) {
   connect(apply_, &QPushButton::clicked, this, [this] { syncHsv(true); });
   connect(&poll_, &QTimer::timeout, this, [this] {
     if (source_ == Source::Pi) fetchFrame();
-    if (!webcam_frame_.isEmpty()) {
-      QImage frame = QImage::fromData(webcam_frame_, "JPEG");
-      webcam_frame_.clear();
+    if (!mjpeg_frame_.isEmpty()) {
+      QImage frame = QImage::fromData(mjpeg_frame_, "JPEG");
+      mjpeg_frame_.clear();
       if (!frame.isNull()) {
-        source_info_->setText(source_ == Source::Pi ? "香橙派画面"
-          : (webcam_reply_ ? "手机画面" : "手机视频已结束"));
+        source_info_->setText("香橙派画面");
         acceptFrame(frame);
       }
     }
@@ -289,8 +282,6 @@ SafetyTuning::SafetyTuning(QNetworkAccessManager &http) : http_(http) {
     showFrame();
   });
   connect(folder_, &QPushButton::clicked, this, [this] { openFolder(); });
-  connect(webcam_connect_, &QPushButton::clicked, this, [this] { connectWebcam(); });
-  connect(webcam_address_, &QLineEdit::returnPressed, this, [this] { connectWebcam(); });
   connect(previous_, &QPushButton::clicked, this, [this] { browse(-1); });
   connect(next_, &QPushButton::clicked, this, [this] { browse(1); });
   for (auto *scope : {static_cast<QWidget *>(this), controls_page_}) {
@@ -378,42 +369,22 @@ void SafetyTuning::setSource(Source source) {
   folder_->setVisible(source == Source::Folder);
   previous_->setVisible(source == Source::Folder);
   next_->setVisible(source == Source::Folder);
-  webcam_address_->setVisible(source == Source::Webcam);
-  webcam_connect_->setVisible(source == Source::Webcam);
   acceptFrame({});
   updateFrameSource();
   if (source == Source::Folder) {
     source_info_->setText("请选择图片文件夹");
     loadFolder(QSettings().value("input/folder").toString());
-  } else if (source == Source::Webcam) {
-    if (webcam_address_->text().trimmed().isEmpty()) source_info_->setText("请输入手机地址");
-    else connectWebcam();
   } else {
     source_info_->setText(server_.isEmpty() ? "等待香橙派连接" : "等待香橙派画面");
   }
 }
 
-void SafetyTuning::connectWebcam() {
-  auto address = webcam_address_->text().trimmed();
-  if (!address.contains("://")) address.prepend("http://");
-  QUrl url(address, QUrl::StrictMode);
-  if (!url.isValid() || url.host().isEmpty() || (url.scheme() != "http" && url.scheme() != "https")) {
-    source_info_->setText("请输入有效的手机地址");
-    return;
-  }
-  if (url.path().isEmpty() || url.path() == "/") url.setPath("/video");
-  QSettings().setValue("input/webcam", webcam_address_->text().trimmed());
-  acceptFrame({});
-  source_info_->setText("正在连接手机…");
-  startMjpeg(url);
-}
-
 void SafetyTuning::stopMjpeg() {
-  auto *prior = webcam_reply_.data();
-  webcam_reply_.clear();
+  auto *prior = mjpeg_reply_.data();
+  mjpeg_reply_.clear();
   if (prior) prior->abort();
-  webcam_buffer_.clear();
-  webcam_frame_.clear();
+  mjpeg_buffer_.clear();
+  mjpeg_frame_.clear();
 }
 
 void SafetyTuning::startMjpeg(const QUrl &url) {
@@ -421,40 +392,34 @@ void SafetyTuning::startMjpeg(const QUrl &url) {
   QNetworkRequest request(url);
   request.setTransferTimeout(5000);
   auto *reply = http_.get(request);
-  webcam_reply_ = reply;
+  mjpeg_reply_ = reply;
   connect(reply, &QNetworkReply::readyRead, this, [this, reply] {
-    if (webcam_reply_ != reply) return;
-    webcam_buffer_ += reply->readAll();
+    if (mjpeg_reply_ != reply) return;
+    mjpeg_buffer_ += reply->readAll();
     const QByteArray soi("\xff\xd8", 2), eoi("\xff\xd9", 2);
     while (true) {
-      const auto start = webcam_buffer_.indexOf(soi);
+      const auto start = mjpeg_buffer_.indexOf(soi);
       if (start < 0) {
-        webcam_buffer_ = webcam_buffer_.right(1);
+        mjpeg_buffer_ = mjpeg_buffer_.right(1);
         break;
       }
-      if (start) webcam_buffer_.remove(0, start);
-      const auto end = webcam_buffer_.indexOf(eoi, 2);
+      if (start) mjpeg_buffer_.remove(0, start);
+      const auto end = mjpeg_buffer_.indexOf(eoi, 2);
       if (end < 0) break;
-      webcam_frame_ = webcam_buffer_.left(end + 2);
-      webcam_buffer_.remove(0, end + 2);
+      mjpeg_frame_ = mjpeg_buffer_.left(end + 2);
+      mjpeg_buffer_.remove(0, end + 2);
     }
-    if (webcam_buffer_.size() > 8 * 1024 * 1024) webcam_buffer_.clear();
+    if (mjpeg_buffer_.size() > 8 * 1024 * 1024) mjpeg_buffer_.clear();
   });
   connect(reply, &QNetworkReply::finished, this, [this, reply, url] {
     reply->deleteLater();
-    if (webcam_reply_ != reply) return;
-    webcam_reply_.clear();
-    if (source_ == Source::Pi) {
-      source_info_->setText("等待香橙派画面");
-      QTimer::singleShot(1000, this, [this, url] {
-        if (source_ == Source::Pi && legacy_video_ && !webcam_reply_ && server_.resolved(QUrl("/video")) == url)
-          startMjpeg(url);
-      });
-      return;
-    }
-    const auto code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    source_info_->setText(code >= 400 ? QString("手机连接失败 · HTTP %1").arg(code)
-      : image_.isNull() && webcam_frame_.isEmpty() ? "未收到手机画面" : "手机视频已结束");
+    if (mjpeg_reply_ != reply) return;
+    mjpeg_reply_.clear();
+    source_info_->setText("等待香橙派画面");
+    QTimer::singleShot(1000, this, [this, url] {
+      if (source_ == Source::Pi && legacy_video_ && !mjpeg_reply_ && server_.resolved(QUrl("/video")) == url)
+        startMjpeg(url);
+    });
   });
   poll_.start();
 }

@@ -365,7 +365,6 @@ public:
     inputSource_->setObjectName("inputSource");
     inputSource_->addItem("香橙派", "pi");
     inputSource_->addItem("文件夹", "folder");
-    inputSource_->addItem("IP Webcam", "webcam");
     mode_->addItems({"pio", "pio-relay", "pio-wired"});
     connect_->setObjectName("primary");
     status_->setObjectName("status");
@@ -636,7 +635,7 @@ private:
     const auto source = inputSource_->currentData().toString();
     QSettings().setValue("input/source", source);
     using Source = SafetyTuning::Source;
-    safety_->setSource(source == "folder" ? Source::Folder : source == "webcam" ? Source::Webcam : Source::Pi);
+    safety_->setSource(source == "folder" ? Source::Folder : Source::Pi);
     stageLabel_->setVisible(source == "pi");
     if (source == "pi" && !active_) connectServer();
   }

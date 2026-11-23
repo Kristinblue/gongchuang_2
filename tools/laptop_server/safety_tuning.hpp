@@ -13,7 +13,6 @@
 class QLabel;
 class QGridLayout;
 class QGroupBox;
-class QLineEdit;
 class QNetworkAccessManager;
 class QNetworkReply;
 class QPushButton;
@@ -23,7 +22,7 @@ class SafetyHistogram;
 
 class SafetyTuning : public QWidget {
 public:
-  enum class Source { Pi, Folder, Webcam };
+  enum class Source { Pi, Folder };
 
   explicit SafetyTuning(QNetworkAccessManager &http);
   void setSource(Source source);
@@ -35,7 +34,6 @@ private:
   void openFolder();
   void loadFolder(const QString &path);
   void browse(int step);
-  void connectWebcam();
   void startMjpeg(const QUrl &url);
   void stopMjpeg();
   void updateFrameSource();
@@ -48,11 +46,11 @@ private:
   QNetworkAccessManager &http_;
   Source source_{Source::Pi};
   QUrl server_;
-  QPointer<QNetworkReply> frame_reply_, hsv_reply_, webcam_reply_;
+  QPointer<QNetworkReply> frame_reply_, hsv_reply_, mjpeg_reply_;
   QTimer poll_, redraw_;
   QImage image_;
   QByteArray frame_tag_;
-  QByteArray webcam_buffer_, webcam_frame_;
+  QByteArray mjpeg_buffer_, mjpeg_frame_;
   QJsonObject overlays_;
   QRect selection_;
   QStringList files_;
@@ -71,8 +69,6 @@ private:
   QPushButton *previous_;
   QPushButton *next_;
   QPushButton *folder_;
-  QLineEdit *webcam_address_;
-  QPushButton *webcam_connect_;
   QPushButton *read_;
   QPushButton *apply_;
 };
