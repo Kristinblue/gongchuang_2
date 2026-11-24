@@ -6,16 +6,17 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy
 from rclpy.time import Time
-from std_msgs.msg import String
+from std_msgs.msg import String, UInt64
 from std_srvs.srv import Trigger
 
 from communication_pkg.my_cmd import MyCMD
 from robot_interfaces.msg import Command, Feedback, MatchState, Objects, State
 from ..task_controller import STOP, Task
+from ..utils.my_timer import MyTimer
 
 
 class TaskNode(Node):
-    """把 ROS 消息转给 Task。出发、搜寻和追踪的顺序由 Task 管。"""
+    """把 ROS 消息转给 Task。出发、搜寻、追踪和抓取的顺序由 Task 管。"""
     def __init__(self):
         super().__init__('task_node')
         # 从 robot.yaml 读取参数，再拼回原 Task 使用的 point / distribute / trans。
@@ -26,19 +27,33 @@ class TaskNode(Node):
             'search_camera_1':30, 'search_camera_2':20, 'first':True, 'confirm_frames':3, 'align_px':20,
             'camera_settle_ms':400, 'search_score_min':10, 'lost_move':200, 'lost_move_ms':1000,
             'track_gate_px':150, 'turn_only_px':80, 'turn_limit_px':100, 'move_limit_px':180,
+            'track_depth_weight':1.,
             'distance_reward':.002,
         }, 'trans.')
         trans['score'] = self.parameters({'green':5., 'black':5., 'orange':2., 'count_reward':4.,
                                           'our_safe':6.}, 'trans.score.')
+        grab = self.parameters({'width':1280, 'height':720, 'y_min':620, 'y_max':690, 'align_px':26,
+                                'forward_px':105, 'confirm_frames':3, 'settle_ms':500,
+                                'timeout_ms':9000}, 'grab.')
         # Task 调 MyCMD 的动作方法，MyCMD 发话题，SerialNode 才真正写串口。
         self.cmd = MyCMD(self.create_publisher(Command, 'robot/command', 10))
-        self.task = Task(self.cmd, {'point':point,'distribute':distribute,'trans':trans})
+        self.task = Task(self.cmd, {'point':point,'distribute':distribute,'trans':trans,'grab':grab})
         self.serial_open = False
+        self.vision_timeout_s = self.declare_parameter('vision_timeout_s', .5).value
+        if not 0 < self.vision_timeout_s <= 2.0:
+            raise ValueError('vision_timeout_s 必须大于 0 且不超过 2 秒')
         self.last_frame = float('-inf')
         self.last_stamp = 0
         self.last_status = None
         state_qos = QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL)
         frames_qos = QoSProfile(depth=1, reliability=ReliabilityPolicy.BEST_EFFORT)
+        self.use_sim_clock = self.declare_parameter('distribute.use_sim_clock', False).value
+        self.sim_ns, self.sim_clock_at = 0, float('-inf')
+        if self.use_sim_clock:
+            self.task.distributor.timer = MyTimer(lambda: self.sim_ns // 1_000_000)
+            self.task.grabber.timer = MyTimer(lambda: self.sim_ns // 1_000_000)
+            self.task.grabber.phase_timer = MyTimer(lambda: self.sim_ns // 1_000_000)
+            self.create_subscription(UInt64, 'sim/clock', self.sim_clock_callback, 10)
         self.status = self.create_publisher(String, 'task/state', state_qos)
         self.match_status = self.create_publisher(MatchState, 'match/state', state_qos)
         self.target = self.create_publisher(Objects, 'task/target', frames_qos)
@@ -62,7 +77,7 @@ class TaskNode(Node):
         self.task.go_to.team = self.task.team
         if not self.serial_open:
             self.cmd.angle = None
-        if not self.serial_open and self.task.state != STOP:
+        if not self.serial_open and self.task.running:
             self.task.stop()
         if self.task.state == STOP:
             self.publish_status()
@@ -76,15 +91,19 @@ class TaskNode(Node):
         elif message.value == 1:
             self.try_start()
 
+    def sim_clock_callback(self, message):
+        if message.data != self.sim_ns:
+            self.sim_ns, self.sim_clock_at = message.data, time.monotonic()
+
     def on_frame(self, message):
         """收到新感知帧时，推进 Task 一步，并把选中的目标发给预览。"""
         stamp = Time.from_msg(message.header.stamp).nanoseconds
         age = self.get_clock().now().nanoseconds - stamp
         # 跳过过期、时间戳在未来、或比上次还旧的帧。任务推进只用新数据。
-        if not 0 <= age <= 500_000_000 or stamp <= self.last_stamp:
+        if not 0 <= age <= self.vision_timeout_s * 1e9 or stamp <= self.last_stamp:
             return
         self.last_stamp, self.last_frame = stamp, time.monotonic() - age / 1e9
-        if self.task.state == STOP:
+        if not self.task.running:
             self.publish_status()
             return
         # 转回原工程的物块字典，Task 和 GoTo 就能继续用旧接口。
@@ -102,8 +121,11 @@ class TaskNode(Node):
                 goto.rank2_hits >= goto.config.get('confirm_frames',3)):
             selected = next((obj for obj in message.items if obj.observed and
                              obj.name == target['name'] and obj.id == target['id']), None)
-            if selected is not None:
-                self.target.publish(Objects(header=message.header, items=[selected]))
+        elif self.task.state == 'grab':
+            selected = next((obj for obj in message.items if obj.observed and not obj.in_safe_zone
+                             and (obj.name, obj.id) == self.task.grabber.target_key), None)
+        if selected is not None:
+            self.target.publish(Objects(header=message.header, items=[selected]))
 
         self.publish_status(selected)
 
@@ -124,7 +146,8 @@ class TaskNode(Node):
 
     def can_start(self):
         return (self.serial_open and self.task.team in ('red', 'blue') and
-                self.task.state == STOP and time.monotonic() - self.last_frame <= .5)
+                self.task.state == STOP and time.monotonic() - self.last_frame <= self.vision_timeout_s and
+                (not self.use_sim_clock or time.monotonic() - self.sim_clock_at <= 1.2))
 
     def try_start(self):
         if not self.can_start():
@@ -159,11 +182,16 @@ class TaskNode(Node):
         self.publish_status()
 
     def watchdog(self):
-        """半秒没有新检测帧就停车。"""
-        if self.task.state == STOP:
+        """检测帧超时就停车。"""
+        if not self.task.running:
             self.publish_status()
             return
-        if time.monotonic() - self.last_frame > .5:
+        if time.monotonic() - self.last_frame > self.vision_timeout_s:
+            self.get_logger().warning('[TaskNode] 检测画面超时，停车并等待启动')
+            self.task.stop()
+            self.publish_status()
+        elif self.use_sim_clock and self.task.state in ('distribute', 'grab') and time.monotonic() - self.sim_clock_at > 1.2:
+            self.get_logger().warning('[TaskNode] 仿真物理时间停滞，停车并等待启动')
             self.task.stop()
             self.publish_status()
 

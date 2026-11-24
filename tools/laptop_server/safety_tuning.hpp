@@ -4,6 +4,7 @@
 #include <QImage>
 #include <QJsonObject>
 #include <QPointer>
+#include <QProcess>
 #include <QStringList>
 #include <QTimer>
 #include <QUrl>
@@ -22,9 +23,10 @@ class SafetyHistogram;
 
 class SafetyTuning : public QWidget {
 public:
-  enum class Source { Pi, Folder };
+  enum class Source { Pi, Folder, Sim };
 
   explicit SafetyTuning(QNetworkAccessManager &http);
+  ~SafetyTuning() override;
   void setSource(Source source);
   void setServer(const QUrl &server);
   void setSafetyEnabled(bool enabled);
@@ -34,6 +36,11 @@ private:
   void openFolder();
   void loadFolder(const QString &path);
   void browse(int step);
+  void startSim();
+  void resetSim();
+  void runSimTask(const QString &action);
+  void openOverview();
+  void showSimConfig();
   void startMjpeg(const QUrl &url);
   void stopMjpeg();
   void updateFrameSource();
@@ -51,6 +58,10 @@ private:
   QImage image_;
   QByteArray frame_tag_;
   QByteArray mjpeg_buffer_, mjpeg_frame_;
+  QProcess sim_;
+  QProcess sim_task_;
+  bool sim_resetting_ = false;
+  QString sim_error_;
   QJsonObject overlays_;
   QRect selection_;
   QStringList files_;
@@ -69,6 +80,11 @@ private:
   QPushButton *previous_;
   QPushButton *next_;
   QPushButton *folder_;
+  QPushButton *sim_start_;
+  QPushButton *sim_task_start_;
+  QPushButton *sim_task_reset_;
+  QPushButton *sim_overview_;
+  QPushButton *sim_config_;
   QPushButton *read_;
   QPushButton *apply_;
 };

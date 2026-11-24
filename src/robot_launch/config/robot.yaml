@@ -80,6 +80,15 @@ task_node:
         orange: 2.0
         count_reward: 4.0
         our_safe: 6.0
+    grab:
+      # 沿用搜寻相机角度。720p 下检测框底边进入此范围才合爪，实机需标定。
+      y_min: 620
+      y_max: 690
+      align_px: 26
+      forward_px: 105
+      confirm_frames: 3
+      settle_ms: 500
+      timeout_ms: 9000
 
 approach_test_node:
   ros__parameters:

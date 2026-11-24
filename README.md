@@ -16,7 +16,7 @@ date modified: 2026-11-15  14：42
 ```text
 .
 ├─ src/
-│  ├─ action_pkg/          打散、GoTo 和任务流程
+│  ├─ action_pkg/          打散、GoTo、抓取和任务流程
 │  ├─ communication_pkg/   STM32 串口、协议和反馈
 │  ├─ desktop_server_pkg/  HTTP 画面、状态和设置
 │  ├─ robot_interfaces/    ROS 2 自定义消息

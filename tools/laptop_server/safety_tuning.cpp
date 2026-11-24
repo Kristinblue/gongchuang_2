@@ -2,8 +2,11 @@
 
 #include <algorithm>
 #include <functional>
+#include <QCoreApplication>
+#include <QDialog>
 #include <QDir>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QImageReader>
@@ -17,16 +20,23 @@
 #include <QNetworkReply>
 #include <QPainter>
 #include <QPainterPath>
+#include <QPlainTextEdit>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QSettings>
 #include <QShortcut>
 #include <QSignalBlocker>
 #include <QSpinBox>
+#include <QStandardPaths>
 #include <QToolTip>
 #include <QUrlQuery>
 #include <QVBoxLayout>
 #include <opencv2/imgproc.hpp>
+
+namespace {
+const QUrl sim_url("http://127.0.0.1:8090/");
+const QUrl sim_ros_video("http://127.0.0.1:18082/video");
+}
 
 class SafetyFrame : public QWidget {
 public:
@@ -184,12 +194,24 @@ SafetyTuning::SafetyTuning(QNetworkAccessManager &http) : http_(http) {
   auto *page = new QVBoxLayout(this);
   auto *source_bar = new QHBoxLayout;
   folder_ = new QPushButton("打开图片文件夹");
+  sim_start_ = new QPushButton("启动仿真");
+  sim_task_start_ = new QPushButton("运行仿真任务");
+  sim_task_reset_ = new QPushButton("复位");
+  sim_task_start_->setEnabled(false);
+  sim_task_reset_->setEnabled(false);
+  sim_overview_ = new QPushButton("3D 全景");
+  sim_config_ = new QPushButton("环境配置");
   previous_ = new QPushButton("← A");
   next_ = new QPushButton("D →");
   source_info_ = new QLabel;
   source_info_->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
   frame_info_ = new QLabel("等待原图");
   source_bar->addWidget(folder_);
+  source_bar->addWidget(sim_start_);
+  source_bar->addWidget(sim_task_start_);
+  source_bar->addWidget(sim_task_reset_);
+  source_bar->addWidget(sim_overview_);
+  source_bar->addWidget(sim_config_);
   source_bar->addWidget(source_info_, 1);
   source_bar->addWidget(frame_info_);
   source_bar->addWidget(previous_);
@@ -262,7 +284,14 @@ SafetyTuning::SafetyTuning(QNetworkAccessManager &http) : http_(http) {
       QImage frame = QImage::fromData(mjpeg_frame_, "JPEG");
       mjpeg_frame_.clear();
       if (!frame.isNull()) {
-        source_info_->setText("香橙派画面");
+        source_info_->setText(source_ == Source::Pi ? "香橙派画面" : "仿真车载画面");
+        if (source_ == Source::Sim) {
+          sim_start_->setEnabled(false);
+          const bool ready = !sim_resetting_ && sim_.state() == QProcess::Running &&
+                             sim_task_.state() == QProcess::NotRunning;
+          sim_task_start_->setEnabled(ready);
+          sim_task_reset_->setEnabled(ready);
+        }
         acceptFrame(frame);
       }
     }
@@ -282,6 +311,45 @@ SafetyTuning::SafetyTuning(QNetworkAccessManager &http) : http_(http) {
     showFrame();
   });
   connect(folder_, &QPushButton::clicked, this, [this] { openFolder(); });
+  connect(sim_start_, &QPushButton::clicked, this, [this] { startSim(); });
+  connect(sim_task_start_, &QPushButton::clicked, this, [this] { runSimTask("--start"); });
+  connect(sim_task_reset_, &QPushButton::clicked, this, [this] { resetSim(); });
+  sim_task_.setProcessChannelMode(QProcess::MergedChannels);
+  connect(&sim_task_, &QProcess::finished, this, [this](int code, QProcess::ExitStatus) {
+    const auto output = QString::fromUtf8(sim_task_.readAll()).trimmed();
+    if (source_ != Source::Sim) return;
+    sim_task_reset_->setEnabled(sim_.state() == QProcess::Running);
+    source_info_->setToolTip(output);
+    if (code || !output.contains("success=True"))
+      source_info_->setText("仿真任务请求失败");
+  });
+  connect(sim_overview_, &QPushButton::clicked, this, [this] { openOverview(); });
+  connect(sim_config_, &QPushButton::clicked, this, [this] { showSimConfig(); });
+  sim_.setProcessChannelMode(QProcess::MergedChannels);
+  connect(&sim_, &QProcess::readyRead, this, [this] {
+    sim_error_ = (sim_error_ + QString::fromUtf8(sim_.readAll())).right(4096);
+  });
+  connect(&sim_, &QProcess::errorOccurred, this, [this](QProcess::ProcessError error) {
+    if (error != QProcess::FailedToStart) return;
+    sim_start_->setEnabled(true);
+    source_info_->setToolTip(sim_.errorString());
+    source_info_->setText("仿真启动失败");
+  });
+  connect(&sim_, &QProcess::finished, this, [this](int code, QProcess::ExitStatus status) {
+    if (sim_resetting_) {
+      sim_resetting_ = false;
+      if (code == 0 && status == QProcess::NormalExit) {
+        startSim();
+        return;
+      }
+    }
+    sim_start_->setEnabled(true);
+    sim_task_start_->setEnabled(false);
+    sim_task_reset_->setEnabled(false);
+    if (source_ != Source::Sim) return;
+    source_info_->setToolTip(sim_error_);
+    source_info_->setText(code == 0 ? "仿真已退出" : "仿真退出，悬停查看日志");
+  });
   connect(previous_, &QPushButton::clicked, this, [this] { browse(-1); });
   connect(next_, &QPushButton::clicked, this, [this] { browse(1); });
   for (auto *scope : {static_cast<QWidget *>(this), controls_page_}) {
@@ -362,6 +430,9 @@ void SafetyTuning::setSource(Source source) {
   frame_reply_.clear();
   if (reply) reply->abort();
   stopMjpeg();
+  sim_task_start_->setEnabled(false);
+  sim_task_reset_->setEnabled(source == Source::Sim && !sim_resetting_ &&
+                             sim_.state() == QProcess::Running);
   files_.clear();
   frame_tag_.clear();
   legacy_video_ = false;
@@ -369,14 +440,110 @@ void SafetyTuning::setSource(Source source) {
   folder_->setVisible(source == Source::Folder);
   previous_->setVisible(source == Source::Folder);
   next_->setVisible(source == Source::Folder);
+  for (auto *button : {sim_start_, sim_task_start_, sim_task_reset_, sim_overview_, sim_config_})
+    button->setVisible(source == Source::Sim);
   acceptFrame({});
   updateFrameSource();
   if (source == Source::Folder) {
     source_info_->setText("请选择图片文件夹");
     loadFolder(QSettings().value("input/folder").toString());
+  } else if (source == Source::Sim) {
+    source_info_->setText(sim_resetting_ ? "正在复位场景" : "等待仿真画面");
+    if (!sim_resetting_)
+      startMjpeg(sim_.state() == QProcess::NotRunning ? sim_url.resolved(QUrl("video")) : sim_ros_video);
   } else {
     source_info_->setText(server_.isEmpty() ? "等待香橙派连接" : "等待香橙派画面");
   }
+}
+
+SafetyTuning::~SafetyTuning() {
+  sim_resetting_ = false;
+  if (sim_.state() != QProcess::NotRunning) {
+    sim_.closeWriteChannel();
+    sim_.waitForFinished(12000);
+  }
+}
+
+void SafetyTuning::startSim() {
+  QDir dir(QCoreApplication::applicationDirPath());
+  while (!dir.exists("tools/sim/stream.py") && dir.cdUp()) {}
+  auto python = qEnvironmentVariable("GC_SIM_PY");
+  if (python.isEmpty()) {
+    // 与原电脑仿真入口共用已安装依赖的 Python。
+    python = "D:/MySoftware/miniconda3/envs/yolov8/python.exe";
+    if (!QFileInfo::exists(python)) python = QStandardPaths::findExecutable("python");
+  }
+  if (!dir.exists("tools/sim/stream.py") || python.isEmpty()) {
+    source_info_->setText("启动仿真需要工程目录和 Python");
+    return;
+  }
+  if (sim_.state() != QProcess::NotRunning) return;
+  sim_error_.clear();
+  sim_start_->setEnabled(false);
+  sim_.setWorkingDirectory(dir.absolutePath());
+  sim_.start(python, {"-X", "utf8", dir.absoluteFilePath("tools/sim/stream.py"), "--client", "--ros"});
+  if (source_ == Source::Sim) {
+    source_info_->setToolTip({});
+    source_info_->setText("正在启动仿真");
+    startMjpeg(sim_ros_video);
+  }
+}
+
+void SafetyTuning::resetSim() {
+  if (sim_resetting_ || sim_.state() != QProcess::Running || sim_task_.state() != QProcess::NotRunning)
+    return;
+  sim_resetting_ = true;
+  sim_task_start_->setEnabled(false);
+  sim_task_reset_->setEnabled(false);
+  stopMjpeg();
+  acceptFrame({});
+  source_info_->setText("正在复位场景");
+  // 先让旧场景和 ROS 正常退出，finished 回调再加载初始场景。
+  sim_.closeWriteChannel();
+}
+
+void SafetyTuning::openOverview() {
+  QNetworkRequest request(sim_url.resolved(QUrl("overview")));
+  request.setTransferTimeout(2500);
+  request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+  auto *reply = http_.post(request, QByteArray());
+  connect(reply, &QNetworkReply::finished, this, [this, reply] {
+    if (reply->error() != QNetworkReply::NoError && source_ == Source::Sim)
+      source_info_->setText("全景尚未就绪");
+    reply->deleteLater();
+  });
+}
+
+void SafetyTuning::runSimTask(const QString &action) {
+  if (sim_.state() != QProcess::Running || sim_task_.state() != QProcess::NotRunning) return;
+  sim_task_start_->setEnabled(false);
+  sim_task_reset_->setEnabled(false);
+  sim_task_.setWorkingDirectory(sim_.workingDirectory());
+  sim_task_.start("wsl.exe", {"-d", "Ubuntu-22.04", "--", "bash", "tools/sim/run_sim.sh", action});
+}
+
+void SafetyTuning::showSimConfig() {
+  QNetworkRequest request(sim_url.resolved(QUrl("config")));
+  request.setTransferTimeout(2500);
+  auto *reply = http_.get(request);
+  connect(reply, &QNetworkReply::finished, this, [this, reply] {
+    const auto config = QJsonDocument::fromJson(reply->readAll());
+    reply->deleteLater();
+    if (source_ != Source::Sim) return;
+    if (!config.isObject()) {
+      source_info_->setText("请先启动仿真，再查看环境配置");
+      return;
+    }
+    auto *dialog = new QDialog(this);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->setWindowTitle("仿真环境配置");
+    auto *layout = new QVBoxLayout(dialog);
+    auto *text = new QPlainTextEdit(QString::fromUtf8(config.toJson()));
+    text->setReadOnly(true);
+    layout->addWidget(text);
+    dialog->resize(720, 560);
+    dialog->show();
+  });
 }
 
 void SafetyTuning::stopMjpeg() {
@@ -415,10 +582,23 @@ void SafetyTuning::startMjpeg(const QUrl &url) {
     reply->deleteLater();
     if (mjpeg_reply_ != reply) return;
     mjpeg_reply_.clear();
-    source_info_->setText("等待香橙派画面");
-    QTimer::singleShot(1000, this, [this, url] {
-      if (source_ == Source::Pi && legacy_video_ && !mjpeg_reply_ && server_.resolved(QUrl("/video")) == url)
-        startMjpeg(url);
+    if (source_ == Source::Pi) {
+      source_info_->setText("等待香橙派画面");
+      QTimer::singleShot(1000, this, [this, url] {
+        if (source_ == Source::Pi && legacy_video_ && !mjpeg_reply_ && server_.resolved(QUrl("/video")) == url)
+          startMjpeg(url);
+      });
+      return;
+    }
+    acceptFrame({});
+    sim_task_start_->setEnabled(false);
+    if (sim_.state() == QProcess::NotRunning) {
+      sim_start_->setEnabled(true);
+      if (sim_error_.isEmpty()) source_info_->setText("等待仿真，可点击启动仿真");
+    }
+    QTimer::singleShot(1000, this, [this] {
+      if (source_ == Source::Sim && !sim_resetting_ && !mjpeg_reply_)
+        startMjpeg(sim_.state() == QProcess::NotRunning ? sim_url.resolved(QUrl("video")) : sim_ros_video);
     });
   });
   poll_.start();

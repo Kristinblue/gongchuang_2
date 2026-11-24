@@ -16,15 +16,16 @@ def _ticks_ms() -> int:
 class MyTimer:
     """我的非阻塞式计时器。"""
 
-    def __init__(self) -> None:
+    def __init__(self, now_ms=_ticks_ms) -> None:
         """初始化一个尚未运行的计时器。"""
         self._start_time = 0
         self._is_running = False
+        self._now_ms = now_ms
 
     def start(self) -> None:
         """开始计时；已经运行时不覆盖原来的起始时间。"""
         if not self._is_running:
-            self._start_time = _ticks_ms()
+            self._start_time = self._now_ms()
             self._is_running = True
 
     def reset(self) -> None:
@@ -34,7 +35,7 @@ class MyTimer:
 
     def restart(self) -> None:
         """无论当前状态如何，都从现在重新开始计时。"""
-        self._start_time = _ticks_ms()
+        self._start_time = self._now_ms()
         self._is_running = True
 
     def get_elapsed(self) -> int:
@@ -45,7 +46,7 @@ class MyTimer:
         """
         if not self._is_running:
             return 0
-        return _ticks_ms() - self._start_time
+        return self._now_ms() - self._start_time
 
     def is_timeout(self, target_ms: int | float) -> bool:
         """判断是否达到目标时间。

@@ -5,13 +5,15 @@
 import time
 
 from .init_dis import InitDisributor
+from .grab.grabber import Grabber
 from .grab.go_to import GoTo
 
 STOP = 'stop'
+GRAB_CLOSED = 'grab_closed'
 
 
 class Task:
-    """逐帧调度出发、搜寻与追踪；已删除的抓放流程不恢复。"""
+    """逐帧调度出发、搜寻、追踪和抓取。"""
 
     def __init__(self, cmd, config):
         self.cmd = cmd
@@ -22,6 +24,7 @@ class Task:
         self.distributor = InitDisributor(cmd,config.get('distribute',{}))
         trans = config.get('trans',{})
         self.go_to = GoTo(self.x0,self.y0,first=trans.get('first',True),config=trans,cmd=cmd)
+        self.grabber = Grabber(cmd, self.x0, config.get('grab', {}))
         self.state, self.camera_deg = STOP, self.distributor.angle
         self.frame_count = 0
 
@@ -35,11 +38,16 @@ class Task:
         """结束当前任务并停车。"""
         self._change_state(STOP)
 
+    @property
+    def running(self):
+        return self.state not in (STOP, GRAB_CLOSED)
+
     def reset(self):
         """停车并清空上位机的本场进度。"""
         self.stop()
         self.distributor.reset()
         self.go_to.reset()
+        self.grabber.reset()
         self.camera_deg = self.distributor.angle
         self.frame_count = 0
         self.notes.clear()
@@ -47,7 +55,7 @@ class Task:
     def process_objects(self, objs, now=None):
         """接收当前帧的感知结果，不在任务内重新做推理。"""
         self._now = time.monotonic() if now is None else now
-        if self.state==STOP:
+        if not self.running:
             return self.status()
         self.frame_count += 1
         # 初次打散只按时间执行，不调用物块检测或计数。
@@ -58,11 +66,22 @@ class Task:
                 self._note(self.distributor.note)
             return self.status()
         try:
+            if self.state == 'grab':
+                state = self.grabber.run(objs)
+                self._note(self.grabber.note)
+                if state != self.state:
+                    self._change_state(state)
+                return self.status()
             # GoTo 的返回值表示有没有到位。还在运行时，用 GoTo 自己的状态更新当前阶段。
             result = self.go_to.run(objs,now=self._now)
             self.camera_deg = self.go_to.camera_value
-            self.state = STOP if result else self.go_to.state
-            self._note(self.go_to.note)
+            if result:
+                self.grabber.start(self.go_to.rank2_target)
+                self.state = 'grab'
+                self._note(self.grabber.note)
+            else:
+                self.state = self.go_to.state
+                self._note(self.go_to.note)
         except Exception:
             self.stop()
             raise
@@ -92,7 +111,7 @@ class Task:
             print('[Task] '+text)
 
     def status(self):
-        """显示已有任务状态，不再伪造被删掉的抓放阶段。"""
+        """显示已有任务状态。"""
         stage = 'init_dis' if self.state=='distribute' else 'goto' if self.state in ('search','track') else self.state
         goto_stage = {'search':'S1','track':'S2'}.get(self.state)
         return {'state':self.state,'stage':stage,'goto_stage':goto_stage,'team':self.team,'frames':self.frame_count,'camera_value':self.camera_deg,'note':self.notes[-1] if self.notes else '', 'rank1':round(self.go_to.rank1_score,2),'rank2':self.go_to.rank2_score}

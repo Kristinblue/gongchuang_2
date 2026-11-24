@@ -49,17 +49,22 @@ class Sim:
         self.distance_left = None
         self.received = 0
         self.last_report = 0.0
+        self.pose_known = False
 
-    def handle(self, command, value):
+    def handle(self, command, value, distributing=False):
         self.received += 1
         if command == 1:
             self.distance_left = None
+            gain = .0016 if distributing else self.speed_gain
+            limit = .3 if distributing else self.speed_limit
             self.speed = 0.0 if abs(value) <= self.speed_deadband else max(
-                -self.speed_limit, min(self.speed_limit, value * self.speed_gain))
+                -limit, min(limit, value * gain))
         elif command == 2:
             self.turn_target = None
+            gain = .0032 if distributing else self.turn_gain
+            limit = 1.2 if distributing else self.turn_limit
             self.turn = 0.0 if abs(value) <= self.turn_deadband else max(
-                -self.turn_limit, min(self.turn_limit, -value * self.turn_gain))
+                -limit, min(limit, -value * gain))
         elif command == 3:
             self.gripper = 1 if value else 0
         elif command == 4:
@@ -104,6 +109,33 @@ class Sim:
                 f'v={self.speed:+.3f} w={self.turn:+.2f} 相机={self.camera} 夹爪={self.gripper} '
                 f'收到={self.received}')
 
+    def update_pose(self, x, y, yaw):
+        """接实物理时以实际位姿完成相对转向和距离直行。"""
+        if self.pose_known and self.distance_left is not None:
+            shift = (x - self.x) * math.cos(self.yaw) + (y - self.y) * math.sin(self.yaw)
+            remaining = self.distance_left - shift
+            if abs(remaining) < .005 or remaining * self.distance_left <= 0:
+                self.distance_left = None
+                self.speed = 0.
+            else:
+                self.distance_left = remaining
+        if self.pose_known:
+            delta = yaw - self.yaw
+            self.yaw += math.atan2(math.sin(delta), math.cos(delta))
+        else:
+            if self.turn_target is not None:
+                self.turn_target += yaw - self.yaw
+            self.yaw = yaw
+        self.x, self.y = x, y
+        self.pose_known = True
+        if self.turn_target is not None:
+            error = self.turn_target - self.yaw
+            if abs(error) <= math.radians(1):
+                self.turn_target = None
+                self.turn = 0.
+            else:
+                self.turn = max(-.6, min(.6, 2 * error))
+
 
 class Link:
     """把假下位机的速度和镜头角转发给电脑仿真的控制端口。"""
@@ -111,6 +143,7 @@ class Link:
     def __init__(self, host, port):
         self.address = (host, port)
         self.socket = None
+        self.buffer = bytearray()
 
     def send(self, text):
         if self.socket is None and not self.connect():
@@ -132,6 +165,28 @@ class Link:
         if self.socket is not None:
             self.socket.close()
             self.socket = None
+        self.buffer.clear()
+
+    def read_pose(self):
+        if self.socket is None or not select.select([self.socket], [], [], 0)[0]:
+            return None
+        try:
+            data = self.socket.recv(2048)
+        except OSError:
+            self.close()
+            return None
+        if not data:
+            self.close()
+            return None
+        self.buffer.extend(data)
+        lines = self.buffer.split(b'\n')
+        self.buffer = lines.pop()
+        if not lines:
+            return None
+        fields = lines[-1].split()
+        if len(fields) in (4, 5) and fields[0] == b'P':
+            return (*map(float, fields[1:4]), int(fields[4]) if len(fields) == 5 else None)
+        return None
 
 
 def main():
@@ -139,6 +194,7 @@ def main():
     parser.add_argument('--device-only', action='store_true', help='标准输出只打印伪串口路径')
     parser.add_argument('--sim-host', default='', help='仿真控制地址，如 WSL 的 172.27.176.1 或派上的 192.168.60.1')
     parser.add_argument('--sim-port', type=int, default=8091, help='仿真控制端口')
+    parser.add_argument('--ros-clock', action='store_true', help='发布物理时间并读取打散阶段')
     parser.add_argument('--speed-gain', type=float, default=0.00015, help='前进像素误差→m/s')
     parser.add_argument('--turn-gain', type=float, default=0.0008, help='转向像素误差→rad/s')
     parser.add_argument('--speed-limit', type=float, default=0.1, help='前进速度上限 m/s')
@@ -146,6 +202,24 @@ def main():
     parser.add_argument('--speed-deadband', type=int, default=15, help='前进死区，像素')
     parser.add_argument('--turn-deadband', type=int, default=12, help='转向死区，像素')
     args = parser.parse_args()
+
+    ros = None
+    distributing = False
+    if args.ros_clock:
+        import rclpy
+        from rclpy.qos import DurabilityPolicy, QoSProfile
+        from robot_interfaces.msg import MatchState
+        from std_msgs.msg import UInt64
+
+        def match_state(message):
+            nonlocal distributing
+            distributing = message.stage == 'init_dis'
+
+        rclpy.init(args=[])
+        ros = rclpy.create_node('stm32_sim')
+        qos = QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL)
+        ros.create_subscription(MatchState, 'match/state', match_state, qos)
+        clock = ros.create_publisher(UInt64, 'sim/clock', 10)
 
     master, slave = pty.openpty()
     name = os.ttyname(slave)
@@ -168,11 +242,23 @@ def main():
     last = time.monotonic()
     last_forward = 0.0
     last_angle = 0.0
+    last_pose = float('-inf')
     try:
         while True:
+            if ros is not None:
+                rclpy.spin_once(ros, timeout_sec=0)
             ready, _, _ = select.select([master], [], [], 0.05)
             now = time.monotonic()
-            sim.step(now - last)
+            if link is None:
+                sim.step(now - last)
+            else:
+                pose = link.read_pose()
+                if pose is not None:
+                    x, y, yaw, sim_ns = pose
+                    sim.update_pose(x, y, yaw)
+                    if ros is not None and sim_ns is not None:
+                        clock.publish(UInt64(data=sim_ns))
+                    last_pose = now
             last = now
             if ready:
                 try:
@@ -192,7 +278,7 @@ def main():
                 raw = buffer[3] | (buffer[4] << 8)
                 value = raw - 65536 if raw >= 32768 else raw
                 opened = True
-                sim.handle(command, value)
+                sim.handle(command, value, distributing)
                 if link is not None:
                     if command == 4:
                         link.send(f'C {sim.camera}')
@@ -200,9 +286,11 @@ def main():
                         link.send(f'G {sim.gripper}')
                 del buffer[:6]
             if link is not None and now - last_forward > 0.1:
+                if now - last_pose > .5 and (sim.speed or sim.turn):
+                    sim.handle(8, 0)
                 last_forward = now
                 link.send(f'D {sim.speed:.4f} {sim.turn:.4f}')
-            if opened and now - last_angle >= 0.05:
+            if opened and (link is None or now - last_pose <= .5) and now - last_angle >= 0.05:
                 os.write(master, pack(1, round(math.degrees(sim.yaw)) % 360))
                 last_angle = now
             if now - sim.last_report > 1.0:
@@ -214,6 +302,9 @@ def main():
         if link is not None:
             link.close()
         os.close(master)
+        if ros is not None:
+            ros.destroy_node()
+            rclpy.try_shutdown()
         print('[Stm32Sim] 已退出', flush=True)
 
 

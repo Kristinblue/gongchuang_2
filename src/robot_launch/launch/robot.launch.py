@@ -46,8 +46,12 @@ def nodes(context):
                     parameters=[config, overrides])
 
     # 默认链路：相机 → 感知节点转发画面 → HTTP 服务。
+    preview = {}
+    for name in ('preview_width', 'preview_height'):
+        if value(name):
+            preview[name] = int(value(name))
     actions = [
-        node('desktop_server_pkg', 'desktop_server_node', camera_source=source, mode=mode, yolo_enabled=bool(model), port=int(value('port')), **{'point.x0': point_x, 'point.y0': point_y}),
+        node('desktop_server_pkg', 'desktop_server_node', camera_source=source, mode=mode, yolo_enabled=bool(model), port=int(value('port')), **{'point.x0': point_x, 'point.y0': point_y, **preview}),
         node('vision_pkg', 'perception_node', detect=bool(model), camera_settle_ms=trans.get('camera_settle_ms', 400)),
         node('vision_pkg', 'camera_node', device=value('camera_device'),
              url=url, FPS=fps, FOURCC=FOURCC),
@@ -67,7 +71,12 @@ def nodes(context):
     elif mode == 'camera_test':
         actions.append(node('tests_pkg', 'camera_test_node'))
     elif uart:
-        actions.append(node('action_pkg', 'task_node'))
+        task = {'vision_timeout_s': float(value('vision_timeout_s')),
+                'grab.width': int(camera.get('width', 1280)), 'grab.height': int(camera.get('height', 720))}
+        if value('sim_distribute') == 'true':
+            task.update({'distribute.use_sim_clock': True, 'distribute.move_ms': 8000,
+                         'distribute.scatter_ms': 0, 'trans.track_depth_weight': 2.})
+        actions.append(node('action_pkg', 'task_node', **task))
     return actions
 
 
@@ -81,9 +90,13 @@ def generate_launch_description():
         DeclareLaunchArgument('camera_fps', default_value=''),
         DeclareLaunchArgument('camera_fourcc', default_value=''),
         DeclareLaunchArgument('port', default_value='18080'),
+        DeclareLaunchArgument('preview_width', default_value=''),
+        DeclareLaunchArgument('preview_height', default_value=''),
         DeclareLaunchArgument('model', default_value=''),
         DeclareLaunchArgument('uart', default_value=''),
         DeclareLaunchArgument('team', default_value=''),
+        DeclareLaunchArgument('vision_timeout_s', default_value='0.5'),
+        DeclareLaunchArgument('sim_distribute', default_value='false'),
         DeclareLaunchArgument('simulate_uart', default_value='false'),
         DeclareLaunchArgument('mode', default_value='preview'),
         DeclareLaunchArgument('safety_detector', default_value='false'),

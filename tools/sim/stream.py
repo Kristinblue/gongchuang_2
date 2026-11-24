@@ -5,6 +5,7 @@ WSL 里用 tools/sim/run_sim.sh 启动，脚本会把 Windows 主机地址填进
 """
 
 import argparse
+from contextlib import suppress
 import json
 import os
 import socket
@@ -13,7 +14,7 @@ import sys
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from math import radians
+from math import atan2, radians
 from pathlib import Path
 
 import cv2
@@ -46,6 +47,8 @@ def parse_args():
     parser.add_argument('--pitch', type=float, default=24, help='镜头俯角，0 水平、向下为正')
     parser.add_argument('--quality', type=int, default=85, help='JPEG 质量')
     parser.add_argument('--only-block', default='', help='只显示这个物块，例如 block_green_01')
+    parser.add_argument('--client', action='store_true', help='客户端退出时一起关闭仿真')
+    parser.add_argument('--ros', action='store_true', help='同时启动 WSL 的 ROS 推理和模拟串口')
     return parser.parse_args()
 
 
@@ -64,9 +67,10 @@ class Frames:
             self.condition.notify_all()
 
     def latest(self, after):
-        """等一帧新的；超时就把现有帧原样返回。"""
+        """等一帧新的；超时不重复发送旧帧。"""
         with self.condition:
-            self.condition.wait_for(lambda: self.count != after, timeout=5)
+            if not self.condition.wait_for(lambda: self.count != after, timeout=5):
+                return None, after
             return self.jpeg, self.count
 
 
@@ -76,6 +80,7 @@ class Control:
     def __init__(self, port, client, mapping):
         self.client = client
         self.mapping = mapping
+        self.pose = None
         self.server = socket.socket()
         self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server.bind(('0.0.0.0', port))
@@ -85,12 +90,24 @@ class Control:
         while True:
             connection, _ = self.server.accept()
             with connection:
-                with connection.makefile('r', encoding='utf-8') as stream:
-                    for line in stream:
-                        self.handle(line.strip())
+                try:
+                    with connection.makefile('r', encoding='utf-8') as stream:
+                        for line in stream:
+                            line = line.strip()
+                            self.handle(line)
+                            pose = self.pose
+                            if line.startswith('D ') and pose is not None and time.monotonic() - pose[0] <= .5:
+                                connection.sendall(('P %.6f %.6f %.6f %d\n' % pose[1:]).encode('ascii'))
+                except OSError:
+                    pass
+                finally:
+                    with suppress(OSError):
+                        self.client.command('D 0 0')
 
     def handle(self, line):
         parts = line.split()
+        if not parts:
+            return
         try:
             if parts[0] == 'D' and len(parts) == 3:
                 self.client.command(f'D {float(parts[1]):.4f} {float(parts[2]):.4f}')
@@ -106,6 +123,8 @@ class Control:
 
 class Handler(BaseHTTPRequestHandler):
     frames = None
+    client = None
+    config = None
 
     def do_GET(self):
         if self.path == '/':
@@ -114,8 +133,32 @@ class Handler(BaseHTTPRequestHandler):
             self.reply_text(json.dumps({'frames': self.frames.count}) + '\n', 'application/json')
         elif self.path == '/video':
             self.stream()
+        elif self.path == '/config' and self.client_address[0] == '127.0.0.1':
+            config = dict(self.config['stream'])
+            for name in ('scene', 'gripper_manual', 'gripper_camera'):
+                path = self.config['root'] / 'config' / f'{name}.json'
+                try:
+                    config[name] = json.loads(path.read_text(encoding='utf-8'))
+                except (OSError, ValueError) as error:
+                    config[name] = str(error)
+            self.reply_text(json.dumps(config, ensure_ascii=False), 'application/json; charset=utf-8')
         else:
             self.send_error(404)
+
+    def do_POST(self):
+        if (self.path != '/overview' or self.client_address[0] != '127.0.0.1' or
+                self.headers.get_content_type() != 'application/json'):
+            self.send_error(404)
+            return
+        if self.client is None:
+            self.send_error(503)
+            return
+        try:
+            self.client.message('overview', visible=True)
+        except OSError:
+            self.send_error(503)
+            return
+        self.reply_text('3D 全景已打开\n')
 
     def reply_text(self, text, content_type='text/plain; charset=utf-8'):
         body = text.encode()
@@ -161,7 +204,7 @@ def host_address():
 def main():
     args = parse_args()
     sys.path.insert(0, str(args.app_root))
-    from tools.sim.gripper_backend import GripperBackend, camera_mapping
+    from tools.sim.gripper_backend import GripperBackend, SIM_ROOT, camera_mapping
 
     mapping = camera_mapping()
     pitch = max(0.0, min(args.pitch, mapping['camera_max_deg']))
@@ -171,28 +214,66 @@ def main():
     if args.only_block:
         # 给 Godot 侧开关用，只显示一个物块
         os.environ['GC_ONLY_BLOCK'] = args.only_block
-    stale = clean_stale()
+    stale = 0 if args.client else clean_stale()
     if stale:
         print(f'[SimStream] 清掉 {stale} 个上次残留的仿真进程', flush=True)
+    stop = threading.Event()
+    if args.client:
+        def wait_for_client():
+            os.read(sys.stdin.fileno(), 1)
+            stop.set()
+        threading.Thread(target=wait_for_client, daemon=True).start()
+    variant = 'gripper_1123_01'
+    new_world = SIM_ROOT / f'worlds/{variant}.sdf'
+    new_model = SIM_ROOT / f'native_render/assets/{variant}.glb'
+    use_new_jaws = new_world.is_file() and new_model.is_file()
+    if use_new_jaws:
+        backend = GripperBackend(stop, variant=variant)
+    else:
+        backend = GripperBackend(stop)
+    if args.ros and not args.only_block:
+        world = new_world if use_new_jaws else backend.root / 'worlds/gripper_manual.sdf'
+        if world.read_text(encoding='utf-8').count('<model name="block_') < 2:
+            raise RuntimeError('[SimStream] 物理场地仍是单物块测试版，请恢复完整场地后再运行任务')
+    Handler.config = {'root': backend.root,
+                      'stream': {'fps': args.fps, 'pitch': pitch, 'quality': args.quality,
+                                 'only_block': args.only_block}}
     server = ThreadingHTTPServer((args.bind, args.port), Handler)
     server.daemon_threads = True
     threading.Thread(target=server.serve_forever, daemon=True).start()
     print(f'[SimStream] 视频流 http://{args.bind}:{args.port}/video', flush=True)
-    backend = GripperBackend(threading.Event())
     print('[SimStream] 启动仿真，首次约 30 秒', flush=True)
-    client = backend.start()
+    ros = None
     try:
+        client = backend.start()
+        Handler.client = client
         # 中位看到的是白地面，先用固定俯角对准场上的物块。
         client.command(f'C {joint:.6f}')
         control = Control(args.control_port, client, mapping)
         threading.Thread(target=control.serve, daemon=True).start()
+        if args.ros:
+            ros = subprocess.Popen(
+                ['wsl', '-d', 'Ubuntu-22.04', '--', 'bash', 'tools/sim/run_sim.sh', '--desktop'],
+                cwd=Path(__file__).resolve().parents[2],
+                env={**os.environ, 'SIM_PORT': str(args.port), 'SIM_CONTROL_PORT': str(args.control_port),
+                     'WSLENV': os.environ.get('WSLENV', '') + ':SIM_PORT:SIM_CONTROL_PORT'},
+                stdin=subprocess.PIPE, creationflags=subprocess.CREATE_NO_WINDOW)
         print(f'[SimStream] 控制端口 {args.control_port}，相机俯角 {pitch:g} 度，'
               f'Windows 地址 {host_address() or "未知"}', flush=True)
         period = 1 / args.fps
         count = 0
-        while True:
+        while not stop.is_set():
+            if ros is not None and ros.poll() is not None:
+                raise RuntimeError(f'[SimStream] WSL 推理服务退出，状态 {ros.returncode}')
             start = time.monotonic()
-            _, image = client.frame()
+            meta, image = client.frame()
+            pose = meta.get('observer', {}).get('poses', {}).get('gc_chassis')
+            if meta.get('robot_valid') and pose and len(pose) == 7:
+                x, y, _, qx, qy, qz, qw = pose
+                yaw = atan2(2 * (qw * qz + qx * qy), 1 - 2 * (qy * qy + qz * qz))
+                control.pose = time.monotonic(), x, y, yaw, meta['sim_ns']
+            else:
+                control.pose = None
             ok, encoded = cv2.imencode('.jpg', image, [cv2.IMWRITE_JPEG_QUALITY, args.quality])
             if ok:
                 frames.put(encoded.tobytes())
@@ -205,8 +286,16 @@ def main():
     except KeyboardInterrupt:
         print('[SimStream] 手动停止', flush=True)
     finally:
+        Handler.client = None
+        if ros is not None:
+            ros.stdin.close()
+            try:
+                ros.wait(timeout=8)
+            except subprocess.TimeoutExpired:
+                ros.terminate()
         backend.close()
         server.shutdown()
+        server.server_close()
         print('[SimStream] 已关闭仿真', flush=True)
 
 

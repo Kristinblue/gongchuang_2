@@ -365,6 +365,7 @@ public:
     inputSource_->setObjectName("inputSource");
     inputSource_->addItem("香橙派", "pi");
     inputSource_->addItem("文件夹", "folder");
+    inputSource_->addItem("仿真", "sim");
     mode_->addItems({"pio", "pio-relay", "pio-wired"});
     connect_->setObjectName("primary");
     status_->setObjectName("status");
@@ -392,6 +393,8 @@ public:
     previewStart_->setMenu(tests);
     previewStart_->setPopupMode(QToolButton::InstantPopup);
     connection->addWidget(previewStart_);
+    auto *safetyMode = new QCheckBox("安全区调试");
+    connection->addWidget(safetyMode);
     connection->addSpacing(6);
     connection->addWidget(status_, 1);
     layout->addWidget(bar);
@@ -431,8 +434,6 @@ public:
     connect(startTask_, &QPushButton::clicked, this, [this] { runPreview("start-task"); });
     connect(resetTask_, &QPushButton::clicked, this, [this] { runPreview("reset-task"); });
     settings->addStretch();
-    auto *safetyMode = new QCheckBox("安全区调试");
-    settings->addWidget(safetyMode);
     preview->addLayout(settings);
 
     auto *right = new QFrame;
@@ -499,10 +500,16 @@ public:
     serialLayout->addWidget(serialFrames_, 1);
     rightTabs->addTab(serialPage, "串口");
     const int hsvTab = rightTabs->addTab(safety_->controlsPage(), "HSV 调色");
-    rightTabs->setTabVisible(hsvTab, false);
     connect(safetyMode, &QCheckBox::toggled, this, [this, rightTabs, hsvTab](bool enabled) {
       safety_->setSafetyEnabled(enabled);
-      rightTabs->setTabVisible(hsvTab, enabled);
+      QSettings().setValue("safety/enabled/" + inputSource_->currentData().toString(), enabled);
+      if (!enabled && rightTabs->currentIndex() == hsvTab) rightTabs->setCurrentIndex(0);
+    });
+    connect(safetyMode, &QCheckBox::clicked, rightTabs, [rightTabs, hsvTab](bool enabled) {
+      if (enabled) rightTabs->setCurrentIndex(hsvTab);
+    });
+    connect(rightTabs, &QTabWidget::currentChanged, safetyMode, [safetyMode, hsvTab](int index) {
+      if (index == hsvTab) safetyMode->setChecked(true);
     });
     split->addWidget(rightTabs);
     split->setStretchFactor(0, 3);
@@ -518,7 +525,15 @@ public:
     if (mode_->currentText().startsWith("pio"))
       term_->setPrompt("orangepi@orangepi5plus:~$");
     term_->showNotice("未连接");
-    connect(inputSource_, &QComboBox::currentIndexChanged, this, [this] { selectInputSource(); });
+    const auto loadSafetyMode = [this, safetyMode] {
+      const auto source = inputSource_->currentData().toString();
+      safetyMode->setChecked(QSettings().value("safety/enabled/" + source, source != "sim").toBool());
+    };
+    connect(inputSource_, &QComboBox::currentIndexChanged, this, [this, loadSafetyMode] {
+      selectInputSource();
+      loadSafetyMode();
+    });
+    loadSafetyMode();
     connect(mode_, &QComboBox::currentTextChanged, this, [](const QString &alias) {
       QSettings().setValue("connection/alias", alias);
     });
@@ -635,7 +650,11 @@ private:
     const auto source = inputSource_->currentData().toString();
     QSettings().setValue("input/source", source);
     using Source = SafetyTuning::Source;
-    safety_->setSource(source == "folder" ? Source::Folder : Source::Pi);
+    if (source != "pi" && active_) disconnectServer();
+    safety_->setSource(source == "folder" ? Source::Folder : source == "sim" ? Source::Sim : Source::Pi);
+    mode_->setVisible(source == "pi");
+    connect_->setVisible(source == "pi");
+    updateControls();
     stageLabel_->setVisible(source == "pi");
     if (source == "pi" && !active_) connectServer();
   }

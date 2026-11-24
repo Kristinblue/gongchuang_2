@@ -90,7 +90,7 @@ public:
         std::lock_guard lock(mutex_);
         stage_ = message.stage;
         frames_ = message.frames;
-        if (stage_ != "track") selected_.reset();
+        if (stage_ != "track" && stage_ != "grab") selected_.reset();
       });
     input_ = create_subscription<Image>("vision/preview", rclcpp::SensorDataQoS().keep_last(1),
       [this](Image::ConstSharedPtr image) {
@@ -284,7 +284,7 @@ private:
       }
       // 目标框和画面必须是同一帧，避免把前一帧的框画到新画面上。
       const int quality = quality_;
-      const bool has_target = image && stage == "track" && selected &&
+      const bool has_target = image && (stage == "track" || stage == "grab") && selected &&
         selected->header.stamp == image->header.stamp && !selected->items.empty();
       if (image && (image != last || quality != last_quality || has_target != last_target ||
           stage != last_stage || angle != last_angle) && image->encoding == "bgr8" &&
@@ -303,8 +303,9 @@ private:
             cv::circle(small, reference, 4, {80, 255, 80}, 1, cv::LINE_AA);
           }
           std::string display_stage = stage == "search" ? "goto / S1 search" : stage;
-          if (stage == "track") {
-            display_stage = "goto / S2 track";
+          if (stage == "track") display_stage = "goto / S2 track";
+          if (stage == "grab_closed") display_stage = "grab / claw closed";
+          if (stage == "track" || stage == "grab") {
             if (has_target) {
               const auto &item = selected->items.front();
               const cv::Point upper(cvRound(item.x1*scale), cvRound(item.y1*scale));
@@ -313,8 +314,12 @@ private:
               cv::putText(small, "target", {upper.x, std::max(15, upper.y-3)}, cv::FONT_HERSHEY_SIMPLEX, .48, {0,255,255}, 1);
             }
           }
-          if (!display_stage.empty()) cv::putText(small, display_stage, {8,18}, cv::FONT_HERSHEY_SIMPLEX, .5, {30,210,250}, 1, cv::LINE_AA);
-          if (angle) cv::putText(small, "cam_angle: " + std::to_string(*angle), {8,38},
+          if (!display_stage.empty()) {
+            const cv::Point origin(10, 31);
+            cv::putText(small, display_stage, origin, cv::FONT_HERSHEY_SIMPLEX, .95, {0,0,0}, 4, cv::LINE_AA);
+            cv::putText(small, display_stage, origin, cv::FONT_HERSHEY_SIMPLEX, .95, {30,210,250}, 2, cv::LINE_AA);
+          }
+          if (angle) cv::putText(small, "cam_angle: " + std::to_string(*angle), {10,52},
             cv::FONT_HERSHEY_SIMPLEX, .5, {30,210,250}, 1, cv::LINE_AA);
           // 新 JPEG 编好后再换掉缓存。正在发送上一张的客户端仍持有它自己的 shared_ptr。
           auto jpeg = std::make_shared<std::vector<uchar>>();

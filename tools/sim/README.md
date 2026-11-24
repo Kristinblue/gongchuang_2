@@ -30,6 +30,7 @@ bash tools/sim/run_sim.sh mode:=approach model:="$PWD/assets/models/train5.onnx"
 - 默认 24° 能看到近处物块，看不到就换 `--pitch 40`。
 - 默认请求 15 fps，实测约 13 fps；调到 10 fps 时只有约 8 fps，渲染是主要开销。
 - 不接假 STM32 时只提供画面，车不会自己动。
+- 本机同时有 `gripper_1123_01.sdf` 和 `gripper_1123_01.glb` 时，客户端仿真会一起加载新版双爪的物理和画面。新版沿用旧场地、底盘及开合限位。旧仿真资源仍可供原手动场景使用。
 
 ## 省 CPU
 
@@ -77,23 +78,21 @@ python3 tools/stm32_sim.py --sim-host 192.168.60.1   # 派看 PC 的有线地址
 
 转发的是 `D 速度 转向`、`C 俯角`、`G 开合`，`stream.py` 的控制端口默认 8091。
 
-## 电脑客户端（有线）
+## 电脑客户端
 
-客户端只会连 SSH 别名对应的派，而仿真是本机跑的。用一个反向隧道把派的 18080 让给本机：
+在客户端把输入源切到「仿真」，点「启动仿真」。Godot 的车载原图从 8090 送入 WSL，ROS 2 加载 `assets/models/train5.onnx`，客户端从 18082 显示处理后的预览。收到画面后可点「运行仿真任务」，也可点「复位」。当前客户端的仿真启动默认红方，调试用伪串口和独立 ROS 域 93。
 
-```powershell
-ssh -N -R 18080:127.0.0.1:18080 pio-wired
-```
+仿真预览为 1280×720。完整场地的初始打散沿用 8 秒直推方案，计时取 Gazebo 物理时间，打散速度沿用原电脑仿真的增益。单物块场地用于单项测试。
 
-再打开 `dist/GongchuangClient.exe`，模式选 `pio-wired` 连接，看到的就是本机仿真的实时画面。
-派上原来的 ROS 先停掉，不然 18080 被它占着。
+「3D 全景」打开同一场仿真的独立 Godot 窗口。「环境配置」可只读查看推流参数及原环境的 `scene.json`、`gripper_manual.json`、`gripper_camera.json`。直接运行 `stream.py` 时客户端也可预览 8090 的原图。
+
+客户端启动的仿真随客户端关闭。客户端优先用原电脑仿真入口使用的 yolov8 环境，其他电脑可用 `GC_SIM_PY` 指定已安装原工程的 Python。首次使用先在 WSL 运行 `bash tools/build.sh`，并确认现有 `tools/.venv` 可导入 ONNX Runtime。
 
 ## 一起跑
 
 ```powershell
 # Windows
 python tools/sim/stream.py
-ssh -N -R 18080:127.0.0.1:18080 pio-wired    # 要用客户端时再加
 ```
 
 ```bash

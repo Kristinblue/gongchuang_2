@@ -129,12 +129,18 @@ class GoTo:
             target = max(candidates,key=self._second_score,default=None)
         else:
             candidates = [obj for obj in candidates if obj['name']==self.rank2_target['name'] and pixel_distance(obj,self.rank2_target)<=self.config.get('track_gate_px',150)]
-            target = min(candidates,key=lambda obj:pixel_distance(obj,self.rank2_target),default=None)
+            target = min(candidates, key=lambda obj: (
+                obj.get('id') != self.rank2_target.get('id'),
+                pixel_distance(obj, self.rank2_target),
+            ), default=None)
         if target is None:
             self.rank2_hits = 0
-            self.rank2_target = self.target_point = None
-            self.rank2_score = None
+            self.rank2_misses += 1
+            if self.rank2_misses >= self.config.get('confirm_frames', 3):
+                self.rank2_target = self.target_point = None
+                self.rank2_score = None
             return None
+        self.rank2_misses = 0
         self.rank2_target = target
         self.rank2_score = self._second_score(target)
         self.rank2_hits += 1
@@ -145,15 +151,18 @@ class GoTo:
         """沿用原S2公式，数值同时提供给视频叠加层。"""
         score = self.config.get('score',{})
         values = {'green':score.get('green',5),'black':score.get('black',5),'orange':score.get('orange',2)}
-        distance = max(1.,math.dist(bottom_center(obj),(self.x0,self.y0)))
+        x, y = bottom_center(obj)
+        distance = max(1., math.hypot(x - self.x0, (y - self.y0) * self.config.get('track_depth_weight', 1.)))
         return values[obj['name']]+self.config.get('distance_reward',.002)/distance
 
     def start_track(self, now=None):
         """新一轮追踪不沿用上轮确认次数。"""
         self.state = 'track'
+        self._track_at = time.monotonic() if now is None else now
         self.rank2_target, self.target_point = None, None
         self.rank2_score = None
         self.rank2_hits = 0
+        self.rank2_misses = 0
 
     def reset(self):
         """下一次run从Search重新开始；不复位物理场景，不在每帧调用。"""
@@ -161,10 +170,12 @@ class GoTo:
         self.rank2_score = None
         self.rank1_target = self.rank2_target = self.target_point = None
         self.rank2_hits = 0
+        self.rank2_misses = 0
         self.state, self.note = 'search', '准备搜寻'
         self.search_step, self.search_turn_sent = -1, False
         self.camera_value = self.config.get('search_camera_1',70)
         self._step_at, self._camera_at = 0., None
+        self._track_at = float('-inf')
         self.align_hits = 0
 
     def run(self, objs, now=None, turn_done=None):
@@ -213,7 +224,7 @@ class GoTo:
             elif turn_done:
                 self._next_search(now)
             return False
-        if not self.view_ready(now):
+        if not self.view_ready(now) or now - self._track_at < .25:
             self.cmd.move_stop()
             return False
         target = self.second_rank(objs)
@@ -233,7 +244,7 @@ class GoTo:
             self.cmd.move_stop()
             self.align_hits += 1
             if self.align_hits>=self.config.get('confirm_frames',3):
-                self.state, self.note = 'done', '追踪到位，停车；本轮不进入抓取'
+                self.state, self.note = 'done', '追踪到位，停车'
                 return True
             return False
         self.align_hits = 0
@@ -257,11 +268,11 @@ class GoTo:
         """一条转角命令只发一次，步骤变化留在本类。"""
         self.search_step = (self.search_step+1)%5
         self.cmd.move_stop()
-        camera = self.config.get('search_camera_2',80) if self.search_step in (2,3) else self.config.get('search_camera_1',70)
+        camera = self.config.get('search_camera_1',70)
         if self.camera_value!=camera or self._camera_at is None:
             self._camera_at = now
-        self.camera_value = camera
-        self.cmd.camera(int(camera))
+            self.camera_value = camera
+            self.cmd.camera(int(camera))
         self.search_turn_sent = False
         self._step_at = now
         self.note = '搜寻救援目标'
