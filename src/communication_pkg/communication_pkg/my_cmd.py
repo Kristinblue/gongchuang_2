@@ -25,6 +25,8 @@ class MyCMD:
         # 相对旋转是否完成，由 read_feedback() 按连续角度回包判断。
         self.turn_done = False
         self.angle = None
+        self.straight_done = False
+        self._straight_pending = False
         self._turn_angle = 0
         self._turned = 0
 
@@ -32,6 +34,9 @@ class MyCMD:
         """发布 ROS2 命令消息，具体串口打包交给 SerialNode。"""
         # Command 中的具名常量本身就是整数，可以直接填入 command。
         # 协议里 value 是 int16，先夹到 -32768~32767，避免越界。
+        if command in (Command.STRAIGHT, Command.TURN, Command.TURN_ANGLE, Command.STRAIGHT_DIS, Command.STOP):
+            self.straight_done = False
+            self._straight_pending = command == Command.STRAIGHT_DIS
         self.publisher.publish(Command(command=command, value=max(-32768, min(32767, int(value)))))
 
     def move_straight(self, error: int):
@@ -59,7 +64,12 @@ class MyCMD:
         return True
 
     def read_feedback(self, feedback):
-        """收到 01 角度后，累计本次实际转过的角度。"""
+        """处理定距到位回包，或用 01 航向累计转角。"""
+        if feedback.command == Feedback.STRAIGHT_DONE:
+            if self._straight_pending:
+                self._straight_pending = False
+                self.straight_done = True
+            return
         if feedback.command != Feedback.ANGLE or not 0 <= feedback.value <= 360:
             return
         angle = feedback.value % 360

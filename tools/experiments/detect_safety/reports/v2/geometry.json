@@ -1,0 +1,38 @@
+[
+  {
+    "image": "demo_01_two_closed",
+    "expected": 2,
+    "found": 2,
+    "ok": true
+  },
+  {
+    "image": "demo_02_two_two_rails",
+    "expected": 2,
+    "found": 2,
+    "ok": true
+  },
+  {
+    "image": "demo_03_two_stacked",
+    "expected": 2,
+    "found": 2,
+    "ok": true
+  },
+  {
+    "image": "demo_04_two_nearby",
+    "expected": 2,
+    "found": 2,
+    "ok": true
+  },
+  {
+    "image": "demo_05_one_fragmented",
+    "expected": 1,
+    "found": 1,
+    "ok": true
+  },
+  {
+    "image": "demo_06_two_touching",
+    "expected": 2,
+    "found": 1,
+    "ok": true
+  }
+]

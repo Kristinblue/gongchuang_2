@@ -1,0 +1,5 @@
+2026-11-22 15:45:58 Windows 客户端默认只显示画面、终端和串口。安全区调试手动开启。
+优先读取同帧原图和 YOLO 坐标。旧派端返回 404 时，改用原 MJPEG 预览。普通模式跳过安全区分析与 HSV 请求。
+构建使用现有 Qt、MinGW 和 OpenCV 缓存。
+cmake --build tools/laptop_server/build --parallel 2
+本机 Qt 模拟验证默认单图、无 HSV 请求、手动切换四图及旧视频接口。已校验 dist EXE 与 build 一致。

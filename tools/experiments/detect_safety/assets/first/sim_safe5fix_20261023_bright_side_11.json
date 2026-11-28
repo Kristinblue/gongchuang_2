@@ -1,0 +1,156 @@
+{
+  "version": "4.0.0-beta.7",
+  "flags": {},
+  "checked": false,
+  "shapes": [
+    {
+      "label": "rsafe",
+      "score": null,
+      "points": [
+        [
+          12.0,
+          215.0
+        ],
+        [
+          1213.0,
+          215.0
+        ],
+        [
+          1213.0,
+          619.0
+        ],
+        [
+          12.0,
+          619.0
+        ]
+      ],
+      "group_id": null,
+      "description": "",
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "blue",
+      "score": null,
+      "points": [
+        [
+          201.0,
+          290.0
+        ],
+        [
+          320.0,
+          290.0
+        ],
+        [
+          320.0,
+          400.0
+        ],
+        [
+          201.0,
+          400.0
+        ]
+      ],
+      "group_id": null,
+      "description": "",
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "orange",
+      "score": null,
+      "points": [
+        [
+          453.0,
+          258.0
+        ],
+        [
+          612.0,
+          258.0
+        ],
+        [
+          612.0,
+          353.0
+        ],
+        [
+          453.0,
+          353.0
+        ]
+      ],
+      "group_id": null,
+      "description": "",
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "black",
+      "score": null,
+      "points": [
+        [
+          713.0,
+          256.0
+        ],
+        [
+          773.0,
+          256.0
+        ],
+        [
+          773.0,
+          311.0
+        ],
+        [
+          713.0,
+          311.0
+        ]
+      ],
+      "group_id": null,
+      "description": "",
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "green",
+      "score": null,
+      "points": [
+        [
+          854.0,
+          218.0
+        ],
+        [
+          936.0,
+          218.0
+        ],
+        [
+          936.0,
+          286.0
+        ],
+        [
+          854.0,
+          286.0
+        ]
+      ],
+      "group_id": null,
+      "description": "",
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    }
+  ],
+  "imagePath": "sim_safe5fix_20261023_bright_side_11.jpg",
+  "imageData": null,
+  "imageHeight": 720,
+  "imageWidth": 1280
+}

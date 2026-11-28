@@ -1,0 +1,7 @@
+2026-11-16 13:04:43
+安全区 v2 精简和补测
+删掉逐步打点与分步报表。窗口和 benchmark 只在 segment_safety 调用前后计时。
+轮廓面积只算一次，改用提前返回减少嵌套。用编辑前的 segment.py 在 72 张图上逐项核对，坐标、掩膜和判色均一致。
+从审批实拍和已有远景仿真复制 24 对原图与 JSON 到 assets/extra。新增样本 15 张判对颜色，9 张暂缓，无判反。72 张通过 Qt 离屏翻图。
+在 tools/experiments/detect_safety/v2 执行 & D:/MySoftware/miniconda3/envs/yolov8/python.exe benchmark.py。
+72 张各跑 20 次，总耗时中位数 2.75 ms、P95 8.12 ms。补测图和 CSV 见 v2 README。

@@ -1,0 +1,9 @@
+2026-11-17 20:35:53
+安全区接入 ROS 2
+在 vision_pkg 加 C++ safety_detector_node，用整图紫色轮廓和原图 ROI 做红蓝判色。
+开关服务 /vision/safety_detector/enable（std_srvs/srv/SetBool），结果话题 /vision/safety_detection（robot_interfaces/msg/SafetyDetection）。
+节点初始关闭，开启时订阅 camera/image，关闭时解除订阅。旧的安全区话题仍由原感知节点发布。
+启动：bash tools/run.sh safety_detector:=true
+开关：ros2 service call /vision/safety_detector/enable std_srvs/srv/SetBool '{data: true}'
+查看：ros2 topic echo /vision/safety_detection --qos-reliability best_effort
+WSL Ubuntu 22.04 / ROS 2 Humble，colcon build --base-paths src --packages-up-to robot_launch 完成 7 个包。独立 DDS 域测试了关、开、关、再开，确认空闲时未订阅相机。72 张图的类别、状态、原图多边形与 Python v2 完全一致。

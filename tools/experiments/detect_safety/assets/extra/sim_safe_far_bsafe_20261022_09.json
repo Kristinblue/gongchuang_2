@@ -1,0 +1,40 @@
+{
+  "version": "4.0.0-beta.7",
+  "flags": {},
+  "checked": false,
+  "shapes": [
+    {
+      "label": "bsafe",
+      "score": null,
+      "points": [
+        [
+          436,
+          0
+        ],
+        [
+          1149,
+          0
+        ],
+        [
+          1149,
+          93
+        ],
+        [
+          436,
+          93
+        ]
+      ],
+      "group_id": null,
+      "description": "",
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    }
+  ],
+  "imagePath": "sim_safe_far_bsafe_20261022_09.jpg",
+  "imageData": null,
+  "imageHeight": 720,
+  "imageWidth": 1280
+}

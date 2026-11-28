@@ -35,7 +35,7 @@
 
 namespace {
 const QUrl sim_url("http://127.0.0.1:8090/");
-const QUrl sim_ros_video("http://127.0.0.1:18082/video");
+const QUrl sim_ros_server("http://127.0.0.1:18082/");
 }
 
 class SafetyFrame : public QWidget {
@@ -46,7 +46,8 @@ public:
     selection_ = {};
     dragging_ = false;
   }
-  void setImage(const QImage &image, const QString &badge = {}) {
+  void setImage(const QImage &image, const QString &badge = {}, const QString &stage = {}) {
+    stage_ = stage;
     if (image.size() != image_.size()) clearSelection();
     image_ = image;
     badge_ = badge;
@@ -71,6 +72,17 @@ protected:
       painter.fillRect(box, Qt::white);
       painter.setPen(QColor("#263548"));
       painter.drawText(box, Qt::AlignCenter, metrics.elidedText(badge_, Qt::ElideRight, int(width) - 12));
+    }
+    if (!stage_.isEmpty()) {
+      auto font = painter.font();
+      font.setBold(true);
+      font.setPixelSize(20);
+      painter.setFont(font);
+      const auto metrics = painter.fontMetrics();
+      const QRectF box(target.left(), target.top(), std::min(target.width(), double(metrics.horizontalAdvance(stage_) + 16)), metrics.height() + 8);
+      painter.fillRect(box, QColor(15, 25, 40, 215));
+      painter.setPen(Qt::white);
+      painter.drawText(box, Qt::AlignCenter, metrics.elidedText(stage_, Qt::ElideRight, int(box.width()) - 10));
     }
     if (selection_.isEmpty()) return;
     const double scale = target.width() / image_.width();
@@ -115,7 +127,7 @@ private:
             std::clamp(int((p.y() - target.y()) * image_.height() / target.height()), 0, image_.height() - 1)};
   }
   QImage image_;
-  QString badge_;
+  QString badge_, stage_;
   QPoint start_;
   QRect selection_;
   bool dragging_{false};
@@ -279,7 +291,7 @@ SafetyTuning::SafetyTuning(QNetworkAccessManager &http) : http_(http) {
   connect(read_, &QPushButton::clicked, this, [this] { syncHsv(false); });
   connect(apply_, &QPushButton::clicked, this, [this] { syncHsv(true); });
   connect(&poll_, &QTimer::timeout, this, [this] {
-    if (source_ == Source::Pi) fetchFrame();
+    fetchFrame();
     if (!mjpeg_frame_.isEmpty()) {
       QImage frame = QImage::fromData(mjpeg_frame_, "JPEG");
       mjpeg_frame_.clear();
@@ -449,8 +461,10 @@ void SafetyTuning::setSource(Source source) {
     loadFolder(QSettings().value("input/folder").toString());
   } else if (source == Source::Sim) {
     source_info_->setText(sim_resetting_ ? "正在复位场景" : "等待仿真画面");
-    if (!sim_resetting_)
-      startMjpeg(sim_.state() == QProcess::NotRunning ? sim_url.resolved(QUrl("video")) : sim_ros_video);
+    if (!sim_resetting_) {
+      if (sim_.state() == QProcess::NotRunning) startMjpeg(sim_url.resolved(QUrl("video")));
+      else poll_.start();
+    }
   } else {
     source_info_->setText(server_.isEmpty() ? "等待香橙派连接" : "等待香橙派画面");
   }
@@ -485,7 +499,9 @@ void SafetyTuning::startSim() {
   if (source_ == Source::Sim) {
     source_info_->setToolTip({});
     source_info_->setText("正在启动仿真");
-    startMjpeg(sim_ros_video);
+    stopMjpeg();
+    frame_tag_.clear();
+    poll_.start();
   }
 }
 
@@ -495,6 +511,9 @@ void SafetyTuning::resetSim() {
   sim_resetting_ = true;
   sim_task_start_->setEnabled(false);
   sim_task_reset_->setEnabled(false);
+  auto *reply = frame_reply_.data();
+  frame_reply_.clear();
+  if (reply) reply->abort();
   stopMjpeg();
   acceptFrame({});
   source_info_->setText("正在复位场景");
@@ -598,7 +617,7 @@ void SafetyTuning::startMjpeg(const QUrl &url) {
     }
     QTimer::singleShot(1000, this, [this] {
       if (source_ == Source::Sim && !sim_resetting_ && !mjpeg_reply_)
-        startMjpeg(sim_.state() == QProcess::NotRunning ? sim_url.resolved(QUrl("video")) : sim_ros_video);
+        startMjpeg(sim_url.resolved(QUrl("video")));
     });
   });
   poll_.start();
@@ -639,13 +658,17 @@ void SafetyTuning::setServer(const QUrl &server) {
 }
 
 void SafetyTuning::fetchFrame() {
-  if (frame_reply_ || legacy_video_ || source_ != Source::Pi || server_.isEmpty()) return;
-  QNetworkRequest request(server_.resolved(QUrl("/safety/frame")));
+  const bool sim = source_ == Source::Sim;
+  if (frame_reply_ || legacy_video_) return;
+  if (sim ? (sim_resetting_ || sim_.state() != QProcess::Running)
+          : (source_ != Source::Pi || server_.isEmpty())) return;
+  const auto server = sim ? sim_ros_server : server_;
+  QNetworkRequest request(server.resolved(QUrl("/safety/frame?format=jpeg")));
   request.setTransferTimeout(3000);
   if (!frame_tag_.isEmpty()) request.setRawHeader("If-None-Match", frame_tag_);
   auto *reply = http_.get(request);
   frame_reply_ = reply;
-  connect(reply, &QNetworkReply::finished, this, [this, reply] {
+  connect(reply, &QNetworkReply::finished, this, [this, reply, sim, server] {
     reply->deleteLater();
     if (frame_reply_ != reply) return;
     frame_reply_.clear();
@@ -653,7 +676,7 @@ void SafetyTuning::fetchFrame() {
     const auto code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     if (code == 404) {
       legacy_video_ = true;
-      startMjpeg(server_.resolved(QUrl("/video")));
+      startMjpeg(server.resolved(QUrl("/video")));
       return;
     }
     if (code == 304) {
@@ -664,12 +687,17 @@ void SafetyTuning::fetchFrame() {
       return;
     }
     QImage next;
-    if (reply->error() != QNetworkReply::NoError || !next.loadFromData(reply->readAll(), "PNG")) {
+    if (reply->error() != QNetworkReply::NoError || !next.loadFromData(reply->readAll())) {
       frame_tag_.clear();
-      source_info_->setText("等待香橙派画面");
+      source_info_->setText(sim ? "等待仿真画面" : "等待香橙派画面");
     } else {
       frame_tag_ = reply->rawHeader("ETag");
-      source_info_->setText("香橙派画面");
+      source_info_->setText(sim ? "仿真车载画面" : "香橙派画面");
+      if (sim) {
+        const bool ready = !sim_resetting_ && sim_task_.state() == QProcess::NotRunning;
+        sim_task_start_->setEnabled(ready);
+        sim_task_reset_->setEnabled(ready);
+      }
     }
     acceptFrame(next, next.isNull() ? QJsonObject{} : overlays);
   });
@@ -754,20 +782,27 @@ void SafetyTuning::showFrame() {
   const cv::Mat bgr(image_.height(), image_.width(), CV_8UC3, image_.bits(), image_.bytesPerLine());
   const int thickness = std::max(2, bgr.cols / 480);
   const double font_size = std::max(.45, bgr.cols / 1800.);
-  const auto draw_box = [&](cv::Mat &canvas, const QJsonArray &box, const cv::Scalar &color, bool target) {
+  const auto draw_box = [&](cv::Mat &canvas, const QJsonArray &box, bool target) {
     if (box.size() != 5) return;
     const cv::Point upper(qRound(std::clamp(box[1].toDouble(), 0., double(canvas.cols - 1))),
                           qRound(std::clamp(box[2].toDouble(), 0., double(canvas.rows - 1))));
     const cv::Point lower(qRound(std::clamp(box[3].toDouble(), 0., double(canvas.cols - 1))),
                           qRound(std::clamp(box[4].toDouble(), 0., double(canvas.rows - 1))));
     if (lower.x <= upper.x || lower.y <= upper.y) return;
+    const auto name = box[0].toString();
+    cv::Scalar color(155, 120, 115);
+    if (name == "green") color = {40, 185, 35};
+    else if (name == "orange") color = {0, 125, 255};
+    else if (name == "blue") color = {255, 135, 35};
+    else if (name == "black") color = {25, 25, 25};
+    if (target) color = {0, 220, 255};
     cv::rectangle(canvas, upper, lower, color, thickness);
-    cv::putText(canvas, target ? "target" : box[0].toString().toStdString(),
+    cv::putText(canvas, target ? ("target " + name).toStdString() : name.toStdString(),
       {upper.x, std::max(18, upper.y - 4)}, cv::FONT_HERSHEY_SIMPLEX, font_size, color, thickness, cv::LINE_AA);
   };
   const auto boxes = overlays_.value("boxes").toArray();
   const auto draw_reference = [&](cv::Mat &canvas) {
-    draw_box(canvas, overlays_.value("target").toArray(), {0, 220, 255}, true);
+    draw_box(canvas, overlays_.value("target").toArray(), true);
     const auto point = overlays_.value("point").toArray();
     if (point.size() != 2) return;
     const cv::Point pixel(qRound(point[0].toDouble()), qRound(point[1].toDouble()));
@@ -777,10 +812,24 @@ void SafetyTuning::showFrame() {
   QImage preview = image_;
   if (!boxes.isEmpty() || (!safety_enabled_ && !overlays_.isEmpty())) {
     cv::Mat marked(preview.height(), preview.width(), CV_8UC3, preview.bits(), preview.bytesPerLine());
-    for (const auto &box : boxes) draw_box(marked, box.toArray(), {225, 105, 35}, false);
+    for (const auto &box : boxes) draw_box(marked, box.toArray(), false);
     if (!safety_enabled_) draw_reference(marked);
   }
-  views_[0]->setImage(preview);
+  const auto stage = overlays_.value("stage").toString();
+  static const QHash<QString, QString> labels{
+    {"waiting_start","等待启动"},{"waiting_ready","等待就绪"},{"init_dis","开局打散"},
+    {"search","搜寻"},{"track","追踪"},{"grab","抓取"},{"camera","低头确认目标"},
+    {"near_camera","低头看爪口"},{"approach","靠近"},{"near","对准爪口"},{"close","合爪"},
+    {"retreat","后退"},{"verify","检查爪内物块"},{"scatter","打散"},{"scatter_check","打散后重找"},
+    {"grab_closed","已确认单块"},{"seek","寻找本方安全区"},{"align_zone","对准安全区"},
+    {"clear_lane","绕开障碍"},{"deliver","投放"},{"drive","直行"},{"near_drive","近距直行"},
+    {"turn","转向"},{"bypass","绕行"},{"check","检查路线"},{"open","开爪"},
+    {"delivery_done","投放动作结束"},{"delivery_timeout","投放中止"}};
+  QStringList parts;
+  for (const auto &part : stage.split('/', Qt::SkipEmptyParts))
+    parts << labels.value(part == "near" && !stage.startsWith("grab/") ? QString("near_drive") : part, part);
+  const QString title = parts.isEmpty() ? QString("等待任务状态") : parts.join(" · ");
+  views_[0]->setImage(preview, {}, title);
   frame_info_->setText(QString("%1 × %2").arg(image_.width()).arg(image_.height()));
   if (!safety_enabled_) return;
   const QRect sample = selection_.isEmpty() ? image_.rect() : selection_.intersected(image_.rect());
@@ -798,6 +847,7 @@ void SafetyTuning::showFrame() {
   cv::Mat purple = cv::Mat::zeros(bgr.size(), CV_8UC1);
   cv::Mat colors = cv::Mat::zeros(bgr.size(), CV_8UC3);
   cv::Mat overlay = bgr.clone();
+  for (const auto &box : boxes) draw_box(overlay, box.toArray(), false);
   if (!debug.purple.empty()) debug.purple.copyTo(purple(debug.roi));
   if (!debug.red.empty()) {
     cv::insertChannel(debug.red, colors(debug.roi), 2);
@@ -810,5 +860,5 @@ void SafetyTuning::showFrame() {
   views_[1]->setImage(QImage(purple.data, purple.cols, purple.rows, purple.step, QImage::Format_Grayscale8).copy());
   views_[2]->setImage(QImage(colors.data, colors.cols, colors.rows, colors.step, QImage::Format_BGR888).copy());
   views_[3]->setImage(QImage(overlay.data, overlay.cols, overlay.rows, overlay.step, QImage::Format_BGR888).copy(),
-    QString::fromStdString(result.flag) + (result.status.full ? " · full=True" : " · full=False"));
+    QString::fromStdString(result.flag) + (result.status.full ? " · full=True" : " · full=False"), title);
 }

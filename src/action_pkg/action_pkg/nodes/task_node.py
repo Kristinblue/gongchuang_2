@@ -10,7 +10,7 @@ from std_msgs.msg import String, UInt64
 from std_srvs.srv import Trigger
 
 from communication_pkg.my_cmd import MyCMD
-from robot_interfaces.msg import Command, Feedback, MatchState, Objects, State
+from robot_interfaces.msg import Command, Feedback, MatchState, Objects, SafetyDetection, State
 from ..task_controller import STOP, Task
 from ..utils.my_timer import MyTimer
 
@@ -25,25 +25,35 @@ class TaskNode(Node):
                                       'scatter_forward':-125, 'base_turn':281}, 'distribute.')
         trans = self.parameters({
             'search_camera_1':30, 'search_camera_2':20, 'first':True, 'confirm_frames':3, 'align_px':20,
-            'camera_settle_ms':400, 'search_score_min':10, 'lost_move':200, 'lost_move_ms':1000,
+            'camera_settle_ms':400, 'search_near_y':360,
+            'lost_move':200, 'lost_move_ms':1000,
             'track_gate_px':150, 'turn_only_px':80, 'turn_limit_px':100, 'move_limit_px':180,
-            'track_depth_weight':1.,
-            'distance_reward':.002,
         }, 'trans.')
-        trans['score'] = self.parameters({'green':5., 'black':5., 'orange':2., 'count_reward':4.,
-                                          'our_safe':6.}, 'trans.score.')
-        grab = self.parameters({'width':1280, 'height':720, 'y_min':620, 'y_max':690, 'align_px':26,
-                                'forward_px':105, 'confirm_frames':3, 'settle_ms':500,
-                                'timeout_ms':9000}, 'grab.')
+        trans['score'] = self.parameters({'green':4., 'black':4., 'orange':2.}, 'trans.score.')
+        grab = self.parameters({'width':1280, 'height':720, 'camera_deg':55, 'camera_settle_ms':700,
+                                'near_camera_deg':67, 'near_y':575,
+                                'y_min':670, 'y_max':710,
+                                'align_px':20, 'forward_px':150,
+                                'confirm_frames':3, 'lost_frames':8, 'settle_ms':500,
+                                'timeout_ms':25000, 'verify_deg':72, 'scatter_attempts':3, 'scatter_angle_deg':28,
+                                'scatter_back_cm':8, 'scatter_push_cm':17,
+                                'scatter_drive_timeout_ms':3000, 'scatter_turn_timeout_ms':3000}, 'grab.')
         # Task 调 MyCMD 的动作方法，MyCMD 发话题，SerialNode 才真正写串口。
         self.cmd = MyCMD(self.create_publisher(Command, 'robot/command', 10))
-        self.task = Task(self.cmd, {'point':point,'distribute':distribute,'trans':trans,'grab':grab})
+        deliver = self.declare_parameter('delivery.enabled', False).value
+        self.task = Task(self.cmd, {'point':point,'distribute':distribute,'trans':trans,'grab':grab,'deliver':deliver})
+        self.safety = None
         self.serial_open = False
+        self.robot = State()
         self.vision_timeout_s = self.declare_parameter('vision_timeout_s', .5).value
         if not 0 < self.vision_timeout_s <= 2.0:
             raise ValueError('vision_timeout_s 必须大于 0 且不超过 2 秒')
         self.last_frame = float('-inf')
+        self.last_clock_offset = None
         self.last_stamp = 0
+        self.last_received_frame = float('-inf')
+        self.last_accepted_at = float('-inf')
+        self.frame_counts = dict(accepted=0, expired=0, future=0, out_of_order=0)
         self.last_status = None
         state_qos = QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL)
         frames_qos = QoSProfile(depth=1, reliability=ReliabilityPolicy.BEST_EFFORT)
@@ -53,6 +63,9 @@ class TaskNode(Node):
             self.task.distributor.timer = MyTimer(lambda: self.sim_ns // 1_000_000)
             self.task.grabber.timer = MyTimer(lambda: self.sim_ns // 1_000_000)
             self.task.grabber.phase_timer = MyTimer(lambda: self.sim_ns // 1_000_000)
+            if self.task.delivery:
+                self.task.delivery.timer = MyTimer(lambda: self.sim_ns // 1_000_000)
+                self.task.delivery.clock = MyTimer(lambda: self.sim_ns // 1_000_000)
             self.create_subscription(UInt64, 'sim/clock', self.sim_clock_callback, 10)
         self.status = self.create_publisher(String, 'task/state', state_qos)
         self.match_status = self.create_publisher(MatchState, 'match/state', state_qos)
@@ -61,6 +74,8 @@ class TaskNode(Node):
         self.create_subscription(State, 'robot/state', self.robot_state, state_qos)
         self.create_subscription(Feedback, 'robot/feedback', self.feedback_callback, 10)
         self.create_subscription(Objects, 'vision/objects', self.on_frame, frames_qos)
+        if self.task.delivery:
+            self.create_subscription(SafetyDetection, 'vision/safety_detection', self.safety_callback, frames_qos)
         # 服务 callback：等外部明确请求才开始任务。定时 callback watchdog 每 0.1 秒检查一次。
         self.create_service(Trigger, 'task/start', self.start)
         self.create_service(Trigger, 'task/stop', self.stop)
@@ -72,6 +87,7 @@ class TaskNode(Node):
         return {name:self.declare_parameter(prefix+name,value).value for name,value in defaults.items()}
 
     def robot_state(self, message):
+        self.robot = message
         self.serial_open = message.open
         self.task.team = message.team or None
         self.task.go_to.team = self.task.team
@@ -95,14 +111,32 @@ class TaskNode(Node):
         if message.data != self.sim_ns:
             self.sim_ns, self.sim_clock_at = message.data, time.monotonic()
 
+    def safety_callback(self, message):
+        self.safety = message
+
     def on_frame(self, message):
         """收到新感知帧时，推进 Task 一步，并把选中的目标发给预览。"""
         stamp = Time.from_msg(message.header.stamp).nanoseconds
-        age = self.get_clock().now().nanoseconds - stamp
+        now = self.get_clock().now().nanoseconds
+        received_at = time.monotonic()
+        if self.use_sim_clock:
+            # WSL 校时可能向前跳。跨过校时的旧帧无法算帧龄，等下一张新图。
+            offset = now / 1e9 - received_at
+            if self.last_clock_offset is not None and offset - self.last_clock_offset > .25:
+                self.last_stamp = now
+            self.last_clock_offset = offset
+        age = now - stamp
+        self.last_received_frame = received_at
         # 跳过过期、时间戳在未来、或比上次还旧的帧。任务推进只用新数据。
-        if not 0 <= age <= self.vision_timeout_s * 1e9 or stamp <= self.last_stamp:
+        if not 0 <= age <= self.vision_timeout_s * 1e9:
+            self.frame_counts['future' if age < 0 else 'expired'] += 1
             return
-        self.last_stamp, self.last_frame = stamp, time.monotonic() - age / 1e9
+        if stamp <= self.last_stamp:
+            self.frame_counts['out_of_order'] += 1
+            return
+        self.frame_counts['accepted'] += 1
+        self.last_accepted_at = received_at
+        self.last_stamp, self.last_frame = stamp, received_at - age / 1e9
         if not self.task.running:
             self.publish_status()
             return
@@ -112,16 +146,29 @@ class TaskNode(Node):
              'observed':obj.observed, 'in_safe_zone':obj.in_safe_zone, 'score':obj.score}
             for obj in message.items
         ]
-        self.task.process_objects(objs)
+        searching = self.task.state in ('search', 'track')
+        angle = self.task.go_to.camera_value if searching else self.task.camera_deg
+        config = self.task.go_to.config if searching else self.task.grabber.config
+        camera_ready = (self.robot.camera_known and self.robot.camera_deg == angle and
+                        stamp >= Time.from_msg(self.robot.camera_changed).nanoseconds + config['camera_settle_ms'] * 1_000_000)
+        safety = self.safety
+        if safety is not None:
+            capture = Time.from_msg(safety.header.stamp).nanoseconds
+            elapsed = self.get_clock().now().nanoseconds - capture
+            if (not self.robot.camera_known or self.robot.camera_deg != 25 or
+                    capture < Time.from_msg(self.robot.camera_changed).nanoseconds + 700_000_000 or
+                    not 0 <= elapsed <= self.vision_timeout_s * 1e9):
+                safety = None
+        now = self.sim_ns / 1e9 if self.use_sim_clock else received_at
+        self.task.process_objects(objs, now=now, camera_ready=camera_ready, safety=safety)
         selected = None
         goto = self.task.go_to
         target = goto.rank2_target
-        # 连续确认后才把追踪目标发给预览，并保留本帧的 header。
-        if (self.task.state == 'track' and target and target.get('observed', True) and
-                goto.rank2_hits >= goto.config.get('confirm_frames',3)):
-            selected = next((obj for obj in message.items if obj.observed and
+        # 锁定当帧就显示黄框，后续只显示同一目标的当前观测。
+        if self.task.state == 'track' and target and not goto.rank2_misses:
+            selected = next((obj for obj in message.items if obj.observed and not obj.in_safe_zone and
                              obj.name == target['name'] and obj.id == target['id']), None)
-        elif self.task.state == 'grab':
+        elif self.task.state == 'grab' and camera_ready:
             selected = next((obj for obj in message.items if obj.observed and not obj.in_safe_zone
                              and (obj.name, obj.id) == self.task.grabber.target_key), None)
         if selected is not None:
@@ -133,7 +180,10 @@ class TaskNode(Node):
         stage = 'init_dis' if self.task.state == 'distribute' else self.task.state
         if stage == STOP:
             stage = 'waiting_start' if self.can_start() else 'waiting_ready'
-        match = MatchState(stage=stage, frames=self.task.frame_count)
+        phase = self.task.grabber.phase if stage == 'grab' else ''
+        if stage in ('deliver', 'clear_lane', 'align_zone') and self.task.delivery.moves:
+            phase = self.task.delivery.moves[0][0]
+        match = MatchState(stage=stage, phase=phase, frames=self.task.frame_count)
         if selected is not None:
             match.target_known = True
             match.target_id = selected.id
@@ -179,6 +229,9 @@ class TaskNode(Node):
         self.task.reset()
         self.last_stamp = self.get_clock().now().nanoseconds
         self.last_frame = float('-inf')
+        self.last_received_frame = float('-inf')
+        self.last_accepted_at = float('-inf')
+        self.frame_counts = dict.fromkeys(self.frame_counts, 0)
         self.publish_status()
 
     def watchdog(self):
@@ -187,10 +240,19 @@ class TaskNode(Node):
             self.publish_status()
             return
         if time.monotonic() - self.last_frame > self.vision_timeout_s:
-            self.get_logger().warning('[TaskNode] 检测画面超时，停车并等待启动')
+            now = time.monotonic()
+            since_received = now - self.last_received_frame
+            since_accepted = now - self.last_accepted_at
+            accepted_age = self.last_accepted_at - self.last_frame
+            self.get_logger().warning(
+                f'[TaskNode] 检测画面超时，停车并等待启动，'
+                f'距最近一次收到检测 {since_received:.2f} s，'
+                f'距最近一次接受检测 {since_accepted:.2f} s，'
+                f'该帧到达时已过去 {accepted_age:.2f} s，帧统计 {self.frame_counts}'
+            )
             self.task.stop()
             self.publish_status()
-        elif self.use_sim_clock and self.task.state in ('distribute', 'grab') and time.monotonic() - self.sim_clock_at > 1.2:
+        elif self.use_sim_clock and time.monotonic() - self.sim_clock_at > 1.2:
             self.get_logger().warning('[TaskNode] 仿真物理时间停滞，停车并等待启动')
             self.task.stop()
             self.publish_status()

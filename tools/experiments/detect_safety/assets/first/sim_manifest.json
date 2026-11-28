@@ -1,0 +1,548 @@
+{
+  "created": "2026-11-12",
+  "purpose": "Add 16 existing simulation images for standalone safety segmentation comparison; no training or source label edits.",
+  "source_dataset": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train",
+  "source_batch": "sim_safe5fix_20261023; excludes quarantined sim_safe5 originals",
+  "counts": {
+    "rsafe": 8,
+    "bsafe": 8
+  },
+  "image_count": 16,
+  "copied_file_count": 48,
+  "existing_files_unchanged": true,
+  "original_files_sha256": {
+    "classes.txt": "b5af863d50cdf6b0ea13896dc6be68003cc0d86a1dfc2514ca9293efaf76afd9",
+    "frame_0142.jpg": "7bb8670cce5b7a10a3f7444b43487dc39dfa8b55ca21ad794e00b97c98e809ef",
+    "frame_0142.json": "644619a4665f0bacdb542a1b0d442736a9e95eb2709e5d603856d476115172a1",
+    "frame_0142.txt": "098ef551dda11ca1113d5e3d0aea28c3048ddde85911c5b7d062ca4eaf91cdd6",
+    "frame_0157.jpg": "3bbbd01280edd05d622bb81a0205cb40368f347f90e1bdb414656b2cdb056f40",
+    "frame_0157.json": "acb08d659837f0ded617234cc8b2ccfa6701c903c9a2f026a5a09f3737d4b1a1",
+    "frame_0157.txt": "25d774ab55a950db8380be76dfc42b5d7e7a1b68a587aa6087e23460c8765883",
+    "frame_0185.jpg": "df547622539ac5d7f43d00726c1e0c0daf4001f987c44d30e77f825b590961b0",
+    "frame_0185.json": "162db0eea2401178c80f9eae9f5c34a4ca9aa12229b0059a0a45ef8a3b6273d7",
+    "frame_0185.txt": "eea27d2cf879929bb8e61f18b7809c1c54273e2c4210db9ec7e5ccabe09bae99",
+    "frame_0227.jpg": "10b0df5a39a2814943cac28a7532a44529eeaac778436430f1b4d925e5e4f4a4",
+    "frame_0227.json": "c11ec2d58824416a3cba950a725689dc9fc5afa908583d0839912089d405333b",
+    "frame_0227.txt": "d8c6fed0d9af3eacaf98f978789fb545028f9cd094d627e247ff9edeaf75a19c",
+    "frame_0264.jpg": "8c132d9153c6b317151da7190a8ac76d6280d386dca99433ce07514c0cced128",
+    "frame_0264.json": "be237cc1cacc2d44b9f3c02da8926fda7221a1c9fd349f0000890fe2f2ddda17",
+    "frame_0264.txt": "cb784a408f5b6e9151c28f74e15b1ba3b24413bd21b489ba703b773dae00ec0a",
+    "frame_0298.jpg": "9f2c322190a1e73e925d9dce7d9528ccce838762f92542271d4d03b8475e8ccc",
+    "frame_0298.json": "d3020340753d548435e6748c566596245fb2f1eb30f01edc3b4d774ebb8755dc",
+    "frame_0298.txt": "35a681bd65b2a3bff5b944295af1dc2251712affc4a83658b1f41776133ca911",
+    "frame_0320.jpg": "4c9c1386c801c2c5f37640d0a47fbbdde090e8accf285fc63d7c6d87d4ac20be",
+    "frame_0320.json": "c3a11e9d8b32c6fe36437c3adf588f03253f8cd9c9e6f14794dfbee0c8976b57",
+    "frame_0320.txt": "3c679fe5712257815116365e5b533da5607a07586c7f875a65c49ddcd097480c",
+    "frame_0362.jpg": "c4b5d91e14fb16b5433571228327036f6ab7984fe449ff16e0b7a4f5a6766323",
+    "frame_0362.json": "5997e6900e1d80578f4cb86699cb5b70a69efa5ba2afad9638172fb282934061",
+    "frame_0362.txt": "1e42133bcbea3aebdca5aab16deb40fec1cf5a76d6da5b0e047587939c9ed296",
+    "frame_0608.jpg": "e42f80ca62b5c133ce8bb7bffcb9e1af27e4e9a7ee5f0cf63c97d7ee3eddb62f",
+    "frame_0608.json": "0813374c2cbe379e65af436b145cda0cc05d9d05a6d2bfa4f83842f4a2add1c2",
+    "frame_0608.txt": "89d82954b4ee73515a94470ac6335fb4c616c75096cd0a320357d07e174a3580",
+    "frame_0663.jpg": "bd79bd28980156146ecc07af7bb57a3cf61748ee6624a5de76f7e36c3f180e39",
+    "frame_0663.json": "7e2a20cdc9fe6b17d8efd2fb3e4f7eb4dddc8e8f92c5243430be6003ffa3b52d",
+    "frame_0663.txt": "5566234beebd554de4781d5d220d04e83cb30657894c97e0227de87fb55d1811",
+    "frame_0679.jpg": "b4e65643e5007cb59109f9c9224efc677470763e194c3a5cc5fc159adc2ef177",
+    "frame_0679.json": "9503e23c4610dc3bfeeefb8496573b1f00b2072c0ffcae3f718ef23a822eef90",
+    "frame_0679.txt": "41459b174cb3f754853a2dd6aa8cc0f50a2e87e7f91ba70c981a8c1613ce721e",
+    "frame_0699.jpg": "1b040aa8ec394af8dd976f5fb795aeb5e3a2ef9820d75716352bc88240e2eac8",
+    "frame_0699.json": "ea478c9e2259f71787bea9528f4d32067fb9f689d52be50eac79321c156e3dd2",
+    "frame_0699.txt": "a58a95e26d38be0785207a8b65b0c7d703b19aef68a7c447a0dc2c82fa6b5e09",
+    "frame_0724.jpg": "14394ca44c9da734dfd7454817812971ba0abe6c6150e3cc1c4de7efb2982ccf",
+    "frame_0724.json": "d93eefb25b4080e8bc0eb30b129cc31604981da18df18de5824aaa7090ebae5e",
+    "frame_0724.txt": "3d513b4f69ef9a98849cb5323b6bbf6917d67a7fc4d328b076a4d9d47aa6f046",
+    "frame_0765.jpg": "925e946353258cabed0a0a577a45f1db4c32f7291d7a40b7c586f1fd11263ad4",
+    "frame_0765.json": "b33765506f1241867f76350a43c281177e946eaf2504bb941602e5bbfb9909c0",
+    "frame_0765.txt": "b7213d83ea19aec67c80c0eb9a14ceee23f93f31d544485d1308ae67bbdcd78d",
+    "frame_0819.jpg": "b8c67b5d19bf250e6581b1a9277f6692e8f7a4fb42c969f10d1cef7961be8ce6",
+    "frame_0819.json": "469de9ba6037dab85557afde7a139f3794ec005edd123c3c8a2065e0ca84cec2",
+    "frame_0819.txt": "6c97a32c5a29a87cce1c433e393d037ceea28fdd660c6735428314cc504df8d7",
+    "frame_0830.jpg": "6762f3e14f1237c38f21e77743d0afe3231fbbe11d98dc74d6b19a6cb27609be",
+    "frame_0830.json": "7a1502c63d4d2ec2bbde2d663dd3edb988e1af9c08a98d33732771de33f9d406",
+    "frame_0830.txt": "05166c21b7d218aab2d4c7af46343079c5bec3d522c6bede4aa4203164fc0dd7",
+    "frame_0857.jpg": "232709209faaa57f9f7523c7f96cc8aee389de87ff7f5e0a62722488ab3924bb",
+    "frame_0857.json": "95ad323ca311348c1fa045d878f74c9a869f3ffdc398f5e456d4a9eec097f74a",
+    "frame_0857.txt": "701c3a6340eac1410e6a5e8199ea30dc8fee92354001632901361437cfacdab8",
+    "frame_0868.jpg": "3c6da5acfda30726397f4b13d960291e2d5bc86f2ad1d331b63f3cafda09c959",
+    "frame_0868.json": "ed654135b9f14dfbbf0d6615f26e8fb5d9a918a3a6acb4088f77e052a7177e49",
+    "frame_0868.txt": "99fc9e68c3e0ca8b8d75d8e78709d807aee79f57eb879434fbbdd439396d18fa",
+    "frame_0884.jpg": "9488cd23c622d448d9ebc826d6a16e59759fc6ccbea1385957ff10e793a41711",
+    "frame_0884.json": "e9bfe13dab16b03a24c98deec586f57959947102d131076722bc833fc7261f42",
+    "frame_0884.txt": "ac258eb2cd7ee04621258bc5ccfb1891a1e7c16a09da08028fbe21ae866cd81d",
+    "frame_0902.jpg": "80d1c57eb27de953a1389d02757a463010b5ea9df18827778c216e1a525804f3",
+    "frame_0902.json": "4523d149e99b9dd0a232114274ac488bc86db12d7d9ebccce28ce5bce06eb954",
+    "frame_0902.txt": "33eda28d7c930371aa756524d8a416a598ee4bb9f13c5aaf9d5e09446ca81f97",
+    "frame_0918.jpg": "d17e8386dcc04ca6229ba0f755f67db9d21e965709b8affb0463ebcaa3689ea3",
+    "frame_0918.json": "ca459508f270f2446b1e2040a94188e45996fbdcf58f0438d38c655a4ac53e6b",
+    "frame_0918.txt": "b1fe75b111a566f843239926dbb6635a7d65860d7803ab2b39a12d3273a4a189",
+    "frame_0937.jpg": "ebdc22a1f0839b3ef7ba1ca25b8b5d8a427a35d50e1d6adcf4a3aa28bc682494",
+    "frame_0937.json": "9bba45f3f52eb92daa8121d516df75748adfb0e0cd9dd690282a4ce09c7d6517",
+    "frame_0937.txt": "6f1fdca1b17e629532085833a3de07a3198ac4dab4ad5f505de5018f7784d60b",
+    "frame_0945.jpg": "de71ba37cef06f71153b1e69021543298f6a232164ce313cf1225a0b7dd19ab2",
+    "frame_0945.json": "6e81e1ce627674c01e97bebd05afcc8a96b93059ae5b162b3fac45ac286bd1e6",
+    "frame_0945.txt": "5dfb75abc80d871a042dfb1ce4550d29bd8d9acc0bf55fb62a371cfe7f936016",
+    "frame_0973.jpg": "b41ded6503d45fdeca276b7f115cdab381f6399a6e407bcb56b1e371c5890ded",
+    "frame_0973.json": "2d159ad0f6b5f8415a130b08c8a1c9ee52a7174f88b7f044967e9ee615789013",
+    "frame_0973.txt": "2ee55cf0169974da7ce20bf1f46a92df3aad206f35c993512af50b5ad895f664",
+    "frame_1054.jpg": "9e7d678483afb1b606a2b7e63c6bc4c79df984a23dc0f897fde29c87969b377c",
+    "frame_1054.json": "fa69d2106a95f24bf24c6265227affeaeae479ca59ae3a0f1381fb7b80c2ae1e",
+    "frame_1054.txt": "002a99e0765285dee1732b19b03e44160b1605836dda94f51a9cbde7d38f1dd7",
+    "frame_1074.jpg": "8463ae5a22a918f7c1b2002ef347c6d235910d9ce9af866396e14ac125fbcabf",
+    "frame_1074.json": "1389bf19e8324ba90441d0b32ac4d2ad840bff18289bb3511e56cfaefe0ec362",
+    "frame_1074.txt": "b6fd0118dd1ecd37c2fa7ea7e5cc139e1b50ab087830d78e1824c8f289e856b0",
+    "frame_1083.jpg": "9c82e43ed64e1fc6bb36c386862476ca774ce1140c27edf1392ac2a1dcad598e",
+    "frame_1083.json": "538737d01f18db06b0292f425d306b20cc61e2892dc32a17b8ff77d318dc46cd",
+    "frame_1083.txt": "8033664e4dc2c61187b4eaee42424b37068e285bd7cc44917939a7e96e8ff938",
+    "frame_1109.jpg": "193371c3d3b5e5d634c248504676433b5471e2dbf271de81db57a483de516144",
+    "frame_1109.json": "9fc8bf5a5caaa4a3e4c985644a581e1bad0bb61e2e30d4ce5858542b4974005a",
+    "frame_1109.txt": "2710e994a14bc0d7f8dab2e3cc47ce43ae8e02988ae6857cae7279b4140319ab",
+    "frame_1189.jpg": "b8aacea83a20ce290693da24e56ff926cd920ed4c709f90e3aea396b75208e27",
+    "frame_1189.json": "a13bdcaa192f3198a76c069cdfc64c953b6caa8050bbe7296c3c9fec2b6ef6c2",
+    "frame_1189.txt": "ac9a925324dfaca96e0eea7e4f4febf688bcc0e1ee5b014c390bf02f9d9bda33",
+    "frame_1197.jpg": "65c017ce600cbfad143910313029dc7b297ef03823d2137dda5dccfe27c216df",
+    "frame_1197.json": "be5191ba1f0ebc91affd0dfd99e3271b57db2a97f30853dc38275c746bec4282",
+    "frame_1197.txt": "5987963763afd47feb157e8a925212897658534e4d229d9aef9f40c3675e083b",
+    "frame_1205.jpg": "a1b8dcc61a4f95633cc665a85879479d2f65ab748e552d91115a3901a716096f",
+    "frame_1205.json": "0b71950e0d99764229585c6936539e4d553db71111dffa6e2b8906a4024a293a",
+    "frame_1205.txt": "fe5e01d3dbae0d05895e5dde8574a27855c8f8bb331ec3230f05295f85006121",
+    "frame_1219.jpg": "6249c1b8ecc4635af596c7c8606f04b1b972bd4dc1153366256732d841e5f978",
+    "frame_1219.json": "b039467c2451b2401569a36e29d5aed816811dc651b39890c6419dedd9cf179d",
+    "frame_1219.txt": "5331e4b605533f180f36384a44a32a3028ab9b5058e3214135770e119ebdf27b",
+    "manifest.json": "fb18383113cdfcca075b76ec36de5e2c156cfa5cc3b9e7365089929c1c1af401",
+    "_review_contact_sheet.jpg": "3ba05d66bee98c0beeb5f34d9bdecf9332744c7ae643e51bff2f9c8dd2a35bbe"
+  },
+  "samples": [
+    {
+      "image": "sim_safe5fix_20261023_neutral_01.jpg",
+      "label": "rsafe",
+      "light": "neutral",
+      "view": "near_empty",
+      "dataset_split": "val",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\val\\sim_safe5fix_20261023_neutral_01.jpg",
+          "file": "sim_safe5fix_20261023_neutral_01.jpg",
+          "sha256": "52fa4aeb8ddbcc49660dd3d13db5d134aa949dd932192b4179423acbdf42bafd"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\val\\sim_safe5fix_20261023_neutral_01.json",
+          "file": "sim_safe5fix_20261023_neutral_01.json",
+          "sha256": "7441d4fca3072bba9d6b8f07f113a0cff85764fba74b1b3de2e0d40262983201"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\val\\sim_safe5fix_20261023_neutral_01.txt",
+          "file": "sim_safe5fix_20261023_neutral_01.txt",
+          "sha256": "87009eed4983168bdea62443f3b7de211ba4060fd6dc3ec160e9d88b83c4e9d4"
+        }
+      ]
+    },
+    {
+      "image": "sim_safe5fix_20261023_neutral_02.jpg",
+      "label": "bsafe",
+      "light": "neutral",
+      "view": "near_empty",
+      "dataset_split": "train",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\sim_safe5fix_20261023_neutral_02.jpg",
+          "file": "sim_safe5fix_20261023_neutral_02.jpg",
+          "sha256": "bfc17e3c3a0b2f92b9071ed290eb4311a75eb23ece57764e52905e757547d729"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\sim_safe5fix_20261023_neutral_02.json",
+          "file": "sim_safe5fix_20261023_neutral_02.json",
+          "sha256": "7107cb618432985957adbde3fc601ae348bba625d4c1a833e1571fdf907bb669"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\sim_safe5fix_20261023_neutral_02.txt",
+          "file": "sim_safe5fix_20261023_neutral_02.txt",
+          "sha256": "6d5e2cc3badbaadae153f8a608cba5707ae1368a18a58565706993544c9c7d25"
+        }
+      ]
+    },
+    {
+      "image": "sim_safe5fix_20261023_warm_03.jpg",
+      "label": "rsafe",
+      "light": "warm",
+      "view": "near_objects",
+      "dataset_split": "train",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\sim_safe5fix_20261023_warm_03.jpg",
+          "file": "sim_safe5fix_20261023_warm_03.jpg",
+          "sha256": "de7e0f848704d0b49c6c50d3248207478a4f19d2bbda65f06637f19e4ca2a759"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\sim_safe5fix_20261023_warm_03.json",
+          "file": "sim_safe5fix_20261023_warm_03.json",
+          "sha256": "86d2dd3e038a37a660019a9d9cd50d063c4dbf237b111a73b912c2afa8a97a69"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\sim_safe5fix_20261023_warm_03.txt",
+          "file": "sim_safe5fix_20261023_warm_03.txt",
+          "sha256": "ab2e085b759e13e6b399e71fa70a0400d31b541d7f18d9154c009bb2264951a3"
+        }
+      ]
+    },
+    {
+      "image": "sim_safe5fix_20261023_warm_04.jpg",
+      "label": "bsafe",
+      "light": "warm",
+      "view": "near_objects",
+      "dataset_split": "val",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\val\\sim_safe5fix_20261023_warm_04.jpg",
+          "file": "sim_safe5fix_20261023_warm_04.jpg",
+          "sha256": "e863951aa16107e9c0e3b311ed2b1957c2a9feb2b440641e90a5640059c28570"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\val\\sim_safe5fix_20261023_warm_04.json",
+          "file": "sim_safe5fix_20261023_warm_04.json",
+          "sha256": "a65b4d7e8a87e33677a952d28b00944c39e4c17e252ea3f9f528786a7681dcd7"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\val\\sim_safe5fix_20261023_warm_04.txt",
+          "file": "sim_safe5fix_20261023_warm_04.txt",
+          "sha256": "b57ecfb5ebe7b350cc5b66127a8abebd0c6a7419aa08985c6f1231aae6346068"
+        }
+      ]
+    },
+    {
+      "image": "sim_safe5fix_20261023_bright_side_11.jpg",
+      "label": "rsafe",
+      "light": "bright_side",
+      "view": "oblique_objects",
+      "dataset_split": "val",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\val\\sim_safe5fix_20261023_bright_side_11.jpg",
+          "file": "sim_safe5fix_20261023_bright_side_11.jpg",
+          "sha256": "0c4fcc07d8ad050321fff598332e241d14722b0b0c0ca92fac0843e5928c3396"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\val\\sim_safe5fix_20261023_bright_side_11.json",
+          "file": "sim_safe5fix_20261023_bright_side_11.json",
+          "sha256": "761adbbc30799137dd527210d87a20fa0f1deefc1240d54a6e98ea0d1d9be79d"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\val\\sim_safe5fix_20261023_bright_side_11.txt",
+          "file": "sim_safe5fix_20261023_bright_side_11.txt",
+          "sha256": "14f475e56cb63eb4df41fa7084fc2f2680b98733521f89458ba7acf820b6416e"
+        }
+      ]
+    },
+    {
+      "image": "sim_safe5fix_20261023_bright_side_12.jpg",
+      "label": "bsafe",
+      "light": "bright_side",
+      "view": "oblique_objects",
+      "dataset_split": "train",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\sim_safe5fix_20261023_bright_side_12.jpg",
+          "file": "sim_safe5fix_20261023_bright_side_12.jpg",
+          "sha256": "01f647d5a790d1e3ac21dad521aa8c15a92cd0da5bc6d9f4bf2d1dae7d878c8b"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\sim_safe5fix_20261023_bright_side_12.json",
+          "file": "sim_safe5fix_20261023_bright_side_12.json",
+          "sha256": "d3732c27bc2394479e113f24ee2f5019f35f3e26aab9d30868ce4311d7ee53c1"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\sim_safe5fix_20261023_bright_side_12.txt",
+          "file": "sim_safe5fix_20261023_bright_side_12.txt",
+          "sha256": "86996e1e5b16c2330ad703faeea87ed6b84c9cefdcf458fcc5b3c20994e54604"
+        }
+      ]
+    },
+    {
+      "image": "sim_safe5fix_20261023_cool_15.jpg",
+      "label": "rsafe",
+      "light": "cool",
+      "view": "far_objects",
+      "dataset_split": "train",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\sim_safe5fix_20261023_cool_15.jpg",
+          "file": "sim_safe5fix_20261023_cool_15.jpg",
+          "sha256": "656cf9e6e3c4604ab988706d0e8c534e012c0af4f8ee734d79d927c722b9ff72"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\sim_safe5fix_20261023_cool_15.json",
+          "file": "sim_safe5fix_20261023_cool_15.json",
+          "sha256": "59f6337fcd4fb46a8f1b463396cdf8407c88f79051bcd831d96052d2945682da"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\sim_safe5fix_20261023_cool_15.txt",
+          "file": "sim_safe5fix_20261023_cool_15.txt",
+          "sha256": "c376519246585171bf684b6bc79c5d147a85a8c96bbf67a6a4aa36d59e5a97e4"
+        }
+      ]
+    },
+    {
+      "image": "sim_safe5fix_20261023_cool_16.jpg",
+      "label": "bsafe",
+      "light": "cool",
+      "view": "far_objects",
+      "dataset_split": "val",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\val\\sim_safe5fix_20261023_cool_16.jpg",
+          "file": "sim_safe5fix_20261023_cool_16.jpg",
+          "sha256": "203f0e4018ae6fd2bbe9db83af7dbca9d7a253ce115ab8f48335a7ec305621a7"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\val\\sim_safe5fix_20261023_cool_16.json",
+          "file": "sim_safe5fix_20261023_cool_16.json",
+          "sha256": "d5b2abfef87cc4549978e313c1f8f63ee451ae4b03de63742123453268137ec8"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\val\\sim_safe5fix_20261023_cool_16.txt",
+          "file": "sim_safe5fix_20261023_cool_16.txt",
+          "sha256": "39c133823e51a393524b4740e7d4efa3ab737b97168020d8934a6e4d92a47652"
+        }
+      ]
+    },
+    {
+      "image": "sim_safe5fix_20261023_dim_cross_25.jpg",
+      "label": "rsafe",
+      "light": "dim_cross",
+      "view": "near_front_empty",
+      "dataset_split": "train",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\sim_safe5fix_20261023_dim_cross_25.jpg",
+          "file": "sim_safe5fix_20261023_dim_cross_25.jpg",
+          "sha256": "cf441afa84fbb4c2df171febd005bfb34dad4414029b128f7ca933790067e757"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\sim_safe5fix_20261023_dim_cross_25.json",
+          "file": "sim_safe5fix_20261023_dim_cross_25.json",
+          "sha256": "32eaca1b83d22adc703e411027d910d29edca8a4ee3e7e98af96561541be1be4"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\sim_safe5fix_20261023_dim_cross_25.txt",
+          "file": "sim_safe5fix_20261023_dim_cross_25.txt",
+          "sha256": "0c0c31e727936cdb69c7e37833d71d674fab52f40a4d3e03d7a4887757dcd20d"
+        }
+      ]
+    },
+    {
+      "image": "sim_safe5fix_20261023_dim_cross_26.jpg",
+      "label": "bsafe",
+      "light": "dim_cross",
+      "view": "near_front_empty",
+      "dataset_split": "train",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\sim_safe5fix_20261023_dim_cross_26.jpg",
+          "file": "sim_safe5fix_20261023_dim_cross_26.jpg",
+          "sha256": "3b7c3cab908a6dab2d15e2deb7fdad67711136bcf8737069ddedede72e996cf8"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\sim_safe5fix_20261023_dim_cross_26.json",
+          "file": "sim_safe5fix_20261023_dim_cross_26.json",
+          "sha256": "ac96ea9b1a09453c1241d941de52af5a976d8bf8f1ff039998e79ea153f34185"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\sim_safe5fix_20261023_dim_cross_26.txt",
+          "file": "sim_safe5fix_20261023_dim_cross_26.txt",
+          "sha256": "8885c6d0503278d604c3521c62a0aeeec55560afa43e68632dee117f8e1e8fac"
+        }
+      ]
+    },
+    {
+      "image": "sim_safe5fix_20261023_warm_27.jpg",
+      "label": "rsafe",
+      "light": "warm",
+      "view": "front_objects",
+      "dataset_split": "train",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\sim_safe5fix_20261023_warm_27.jpg",
+          "file": "sim_safe5fix_20261023_warm_27.jpg",
+          "sha256": "53b5d7d9f8e2f62ca15af82037a9508694631b628c4ea9f723ff1b503efeb076"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\sim_safe5fix_20261023_warm_27.json",
+          "file": "sim_safe5fix_20261023_warm_27.json",
+          "sha256": "e4f6dd57486b767acced373bcd783163c5dc0c254540f13f9831dac5f1bddf9b"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\sim_safe5fix_20261023_warm_27.txt",
+          "file": "sim_safe5fix_20261023_warm_27.txt",
+          "sha256": "8d2eeff9af25d756a5f2d0b7ee06fae196a0dd4afeef013be3505a3463a5c75f"
+        }
+      ]
+    },
+    {
+      "image": "sim_safe5fix_20261023_warm_28.jpg",
+      "label": "bsafe",
+      "light": "warm",
+      "view": "front_objects",
+      "dataset_split": "train",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\sim_safe5fix_20261023_warm_28.jpg",
+          "file": "sim_safe5fix_20261023_warm_28.jpg",
+          "sha256": "ecbe16420ee12df23ffba3f561fa644d9cd280b37d999643d2e1858373eef79d"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\sim_safe5fix_20261023_warm_28.json",
+          "file": "sim_safe5fix_20261023_warm_28.json",
+          "sha256": "71d020f9e4313d802a7884f073fecfdaf624c8f3bc2dcb8b27796fc778394942"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\sim_safe5fix_20261023_warm_28.txt",
+          "file": "sim_safe5fix_20261023_warm_28.txt",
+          "sha256": "820a6dfae6ed0420e40a8284251e9760d4c9a7c4b73468f8ca90ff3b0435f95e"
+        }
+      ]
+    },
+    {
+      "image": "sim_safe5fix_20261023_cool_39.jpg",
+      "label": "rsafe",
+      "light": "cool",
+      "view": "steep_near_objects",
+      "dataset_split": "train",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\sim_safe5fix_20261023_cool_39.jpg",
+          "file": "sim_safe5fix_20261023_cool_39.jpg",
+          "sha256": "0200d15dc900da96aa15ca016133aa4aab751e6725e571e868751902b9a89cd6"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\sim_safe5fix_20261023_cool_39.json",
+          "file": "sim_safe5fix_20261023_cool_39.json",
+          "sha256": "5ff8e9a9e286d5858d5e4eb3a9ca8f9cdb9e5dea9f71c2676496cf3c7aa9689d"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\sim_safe5fix_20261023_cool_39.txt",
+          "file": "sim_safe5fix_20261023_cool_39.txt",
+          "sha256": "9d42c1490dec61f1410b6ab6ac76c9ec2aa3a210524166b8a085e0543429a81c"
+        }
+      ]
+    },
+    {
+      "image": "sim_safe5fix_20261023_cool_40.jpg",
+      "label": "bsafe",
+      "light": "cool",
+      "view": "steep_near_objects",
+      "dataset_split": "val",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\val\\sim_safe5fix_20261023_cool_40.jpg",
+          "file": "sim_safe5fix_20261023_cool_40.jpg",
+          "sha256": "1e1668eb02f126fcd0c171d690e130c9cf285a52efec4c78aafa8342b06a7c53"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\val\\sim_safe5fix_20261023_cool_40.json",
+          "file": "sim_safe5fix_20261023_cool_40.json",
+          "sha256": "d7a01afd6f673ccec638c8faa3732223653e038c5eb4679214de58b968d6e639"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\val\\sim_safe5fix_20261023_cool_40.txt",
+          "file": "sim_safe5fix_20261023_cool_40.txt",
+          "sha256": "a4c428dfa6d70390e42f604989eb80a936ebaaf29c276b13f5da72b1490ac039"
+        }
+      ]
+    },
+    {
+      "image": "sim_safe5fix_20261023_bright_side_05.jpg",
+      "label": "rsafe",
+      "light": "bright_side",
+      "view": "distant_oblique_objects",
+      "dataset_split": "train",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\sim_safe5fix_20261023_bright_side_05.jpg",
+          "file": "sim_safe5fix_20261023_bright_side_05.jpg",
+          "sha256": "8fbd7c04033a27945a65a5986ac2cfa50fd33288920752668cf01197fe56bd7f"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\sim_safe5fix_20261023_bright_side_05.json",
+          "file": "sim_safe5fix_20261023_bright_side_05.json",
+          "sha256": "c3b6b9698ab3f15ade7d866f004907918b1054beb3b828ff05d8df488a1ae4b4"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\sim_safe5fix_20261023_bright_side_05.txt",
+          "file": "sim_safe5fix_20261023_bright_side_05.txt",
+          "sha256": "572ee8ff3ad344ee4a1980f8a8652b39b55e33f05036209f34bf04398f56f41a"
+        }
+      ]
+    },
+    {
+      "image": "sim_safe5fix_20261023_bright_side_06.jpg",
+      "label": "bsafe",
+      "light": "bright_side",
+      "view": "distant_oblique_objects",
+      "dataset_split": "train",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\sim_safe5fix_20261023_bright_side_06.jpg",
+          "file": "sim_safe5fix_20261023_bright_side_06.jpg",
+          "sha256": "0f229517e5c293ed36a563e2cc6b8627d81a7bde27e4c2cf3ebf2447c9619b0e"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\sim_safe5fix_20261023_bright_side_06.json",
+          "file": "sim_safe5fix_20261023_bright_side_06.json",
+          "sha256": "9d814ef5b5469e59bfb51bea15783cf45e34819726ca2e0b1c3f257175f037ca"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\sim_safe5fix_20261023_bright_side_06.txt",
+          "file": "sim_safe5fix_20261023_bright_side_06.txt",
+          "sha256": "efe9f8180b77059402d9bacd591aa1749cf3d8b756be454f4a0431a24a14c551"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "version": "4.0.0-beta.7",
+  "flags": {},
+  "shapes": [
+    {
+      "label": "bsafe",
+      "score": 0.9008949398994446,
+      "points": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          185.49818420410156,
+          0.0
+        ],
+        [
+          185.49818420410156,
+          148.20346069335938
+        ],
+        [
+          0.0,
+          148.20346069335938
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    }
+  ],
+  "imagePath": "frame_1205.jpg",
+  "imageData": null,
+  "imageHeight": 720,
+  "imageWidth": 1280,
+  "description": ""
+}

@@ -1,0 +1,7 @@
+2026-11-15 11:39:25
+安全区 v2 HSV 采样对照
+原图取自 detect_safety/assets/first，共四张实拍、四张仿真。
+在原图上手选蓝底、蓝块、红底、橙块的可见面。用 cv2.fillPoly 生成取样掩膜，cv2.cvtColor 转 OpenCV HSV，numpy.bincount 按每个通道的整数值计数，用 Matplotlib 绘图。
+图和原始计数位于 detect_safety/reports/v2/hsv_samples，查看入口在 detect_safety/v2/README.md 的统计段落。
+用原图和 JSON 内存的取样坐标重算 16 组取样，各通道的全部计数与图表数据一致。
+运行环境 D:/MySoftware/miniconda3/envs/yolov8/python.exe，OpenCV 4.13.0，Matplotlib 3.10.9。

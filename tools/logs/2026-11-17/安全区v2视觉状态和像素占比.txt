@@ -1,0 +1,26 @@
+2026-11-17 10:10:02
+安全区 v2 视觉状态和像素占比
+README 简化为流程、属性和状态。保留效果图，去掉 CSV 链接。
+segment_safety 返回 detected、full、ok。红蓝紫的分母统一为多边形像素总数，用 countNonZero 统计。暂用主色至少 12%、另一色最多 8%。同阈值取消紫色排除时会判反一张，保留排除。
+72 张实拍/仿真，53 张判对、19 张保留 safety。离屏加载 72 张，并验证了空白、仅紫边、看全但无颜色、看全且有颜色。
+在 v2 执行 & D:/MySoftware/miniconda3/envs/yolov8/python.exe benchmark.py，单帧识别总耗时中位数 3.66 ms，P95 10.55 ms。
+
+2026-11-17 10:17:26
+红蓝各自过滤低于 12% 的像素票，再比较数量。平局或都没过线时保留 safety。
+窗口首格改称「紫边搜索范围」，v2 启动 CMD 换成已有 my_opencv 环境。检查 v2 文件与代码，无权重或模型调用。
+六种合成判色用例通过；my_opencv 环境离屏加载原有 72 张图通过。57 张判对、13 张保留 safety、两张判反（frame_0973, frame_1230），判反帧的 full 与 ok 均为 False。
+在 v2 用已有 Matplotlib 的 Python 运行 benchmark.py，重生成效果图和总耗时。单帧识别中位数 3.44 ms，P95 11.18 ms。
+
+2026-11-17 10:32:43
+原图直接取安全区 ROI
+在整张原图做一次紫色掩膜和一次 findContours。最大紫块为基准，附近且面积达门槛的轮廓一起取凸包和外接框。
+删掉缩图、坐标换算、两套碎片间距和 ROI 内重复分割。窗口仍显示绿色外接框。
+旧版基于 72 张图交替测 20 次，整体中位数 2.81 ms，原图版 4.46 ms。旧框不到整图四分之一的样本，2.09 → 3.87 ms。其余样本 5.12 → 5.33 ms。
+72 张图新旧 full/ok 一致。新版 57 张判对、14 张保留 safety、1 张判反。
+在 v2 目录执行 python benchmark.py（使用已有 Matplotlib 的解释器），重生成效果图。用 my_opencv 做离屏加载 72 张，以及近远紫块、空图、完整和截断的合成样例。
+
+2026-11-17 11:07:14
+安全区 v2 类封装
+SafetyDetector.detect(frame) 返回 Safety，flag 只有 safety、r_safety、b_safety。status 包含 detected、full、ok。窗口和效果图只标 full。
+保留整图轮廓、紫边与判色逻辑。合并同一个搜索框和红蓝工作的外接框。72 帧与重构前的坐标、掩膜、占比和判色逐项一致。离屏验证 72 帧、空图和 HSV 默认值恢复。
+在 v2 运行 python benchmark.py（带 Matplotlib 的解释器）刷新效果图。

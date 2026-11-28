@@ -70,7 +70,6 @@ S2，计算每个救援目标的
 二级只选一个目标
 
 """
-import math
 import time
 
 from vision_pkg.detect.objs import bottom_center, pixel_distance
@@ -89,13 +88,9 @@ class GoTo:
 
     def _materials(self, objs):
         """只计当前可见、尚未存入两方安全区的物块。"""
-        safe = [obj for obj in objs if obj['name'] in ('rsafe','bsafe') and obj.get('observed',True)]
         result = []
         for obj in objs:
             if obj['name'] not in ('green','black','orange','blue') or not obj.get('observed',True) or obj.get('in_safe_zone',False):
-                continue
-            x,y = bottom_center(obj)
-            if any(zone['box'][0]<=x<=zone['box'][2] and zone['box'][1]<=y<=zone['box'][3] for zone in safe):
                 continue
             result.append(obj)
         return result
@@ -105,69 +100,72 @@ class GoTo:
         return [obj for obj in material if obj['name'] in kinds]
 
     def first_rank(self, objs, now=None):
-        """没有救援目标则S1=0；类别每类一次，数量包括蓝色。"""
-        material = self._materials(objs)
-        candidates = self._targets(material)
-        self.rank1_score = 0.
-        self.rank1_target = candidates[0] if candidates else None
-        if not candidates:
-            return None
-        score = self.config.get('score',{})
-        values = {'green':score.get('green',5),'black':score.get('black',5),'orange':score.get('orange',2)}
-        for name in {obj['name'] for obj in candidates}:
-            self.rank1_score += values[name]
-        self.rank1_score += score.get('count_reward',4)/len(material)
-        own = 'rsafe' if self.team=='red' else 'bsafe' if self.team=='blue' else None
-        if any(obj['name']==own and obj.get('observed',True) for obj in objs):
-            self.rank1_score += score.get('our_safe',6)
+        """在本帧可见、无遮挡的目标中选一次，达到门槛才停车。"""
+        weights = {'green':4., 'black':4., 'orange':2.}
+        weights.update(self.config.get('score', {}))
+        highest = max(1., max(weights.values()))
+        visible = [obj for obj in objs if obj.get('observed', True)
+                   and obj['name'] in ('green','black','orange','blue')]
+        self.rank1_target, self.rank1_score = None, 0.
+        best = (0., 0.)
+        near_y = self.config.get('search_near_y', 360)
+        for obj in self._targets(self._materials(visible)):
+            x1, y1, x2, y2 = obj['box']
+            if x2 <= x1 or y2 <= y1 or y2 < near_y:
+                continue
+            # 转动时，物块刚从左右边缘露出一条就停车，还看不清旁边有什么。
+            at_side = x1 <= 5 or x2 >= self.width-1-5
+            if at_side and x2-x1 < (y2-y1)/2:
+                continue
+            # 两框相交、旁块底边更低，说明旁块可能挡在目标前方。
+            if any(other['box'][3] > y2 and other['box'][1] < y2
+                   and other['box'][2] > x1 and other['box'][0] < x2 for other in visible):
+                continue
+            # 同一条进爪路线上的近块，即使框与远块不相交，也会挡住远块。
+            x = (x1+x2)/2
+            if any(other['box'][3] >= y2 + .06*self.height
+                   and other['box'][0] <= x <= other['box'][2] for other in visible):
+                continue
+            score = y2/self.height * (.75 + .25*weights[obj['name']]/highest)
+            rank = (score, -abs((x1+x2)/2-self.x0))
+            if rank > best:
+                best = rank
+                self.rank1_target, self.rank1_score = obj, score
         return self.rank1_target
 
     def second_rank(self, objs):
-        """初选按S2最大；锁定后同类近邻，短暂丢失停车等新帧。"""
-        candidates = self._targets(self._materials(objs))
-        if self.rank2_target is None:
-            target = max(candidates,key=self._second_score,default=None)
-        else:
-            candidates = [obj for obj in candidates if obj['name']==self.rank2_target['name'] and pixel_distance(obj,self.rank2_target)<=self.config.get('track_gate_px',150)]
-            target = min(candidates, key=lambda obj: (
-                obj.get('id') != self.rank2_target.get('id'),
-                pixel_distance(obj, self.rank2_target),
-            ), default=None)
+        """追踪已锁定的类别和 ID，短暂丢失时原地等。"""
+        locked = self.rank2_target
+        target = next((obj for obj in self._targets(self._materials(objs))
+                       if locked and obj['name']==locked['name'] and obj['id']==locked['id']
+                       and pixel_distance(obj,locked)<=self.config.get('track_gate_px',150)), None)
+        confirm_frames = self.config.get('confirm_frames',3)
         if target is None:
-            self.rank2_hits = 0
             self.rank2_misses += 1
-            if self.rank2_misses >= self.config.get('confirm_frames', 3):
+            if self.rank2_misses >= confirm_frames:
+                self.rank2_hits = 0
                 self.rank2_target = self.target_point = None
-                self.rank2_score = None
+            elif self.rank2_hits < confirm_frames:
+                self.rank2_hits = 0
+            # 本帧仍停车。已确认的同一 ID 短暂消失后，可以在新帧直接续上。
             return None
         self.rank2_misses = 0
         self.rank2_target = target
-        self.rank2_score = self._second_score(target)
         self.rank2_hits += 1
         self.target_point = bottom_center(target)
-        return target if self.rank2_hits>=self.config.get('confirm_frames',3) else None
-
-    def _second_score(self, obj):
-        """沿用原S2公式，数值同时提供给视频叠加层。"""
-        score = self.config.get('score',{})
-        values = {'green':score.get('green',5),'black':score.get('black',5),'orange':score.get('orange',2)}
-        x, y = bottom_center(obj)
-        distance = max(1., math.hypot(x - self.x0, (y - self.y0) * self.config.get('track_depth_weight', 1.)))
-        return values[obj['name']]+self.config.get('distance_reward',.002)/distance
+        return target if self.rank2_hits>=confirm_frames else None
 
     def start_track(self, now=None):
         """新一轮追踪不沿用上轮确认次数。"""
         self.state = 'track'
         self._track_at = time.monotonic() if now is None else now
         self.rank2_target, self.target_point = None, None
-        self.rank2_score = None
         self.rank2_hits = 0
         self.rank2_misses = 0
 
     def reset(self):
         """下一次run从Search重新开始；不复位物理场景，不在每帧调用。"""
         self.rank1_score = 0.
-        self.rank2_score = None
         self.rank1_target = self.rank2_target = self.target_point = None
         self.rank2_hits = 0
         self.rank2_misses = 0
@@ -203,26 +201,30 @@ class GoTo:
             if not self.view_ready(now):
                 return False
             target = self.first_rank(objs)
-            threshold = self.config.get('search_score_min',10) if self.search_step in (0,2) else 0
-            passed = self.rank1_score>=threshold if threshold else self.rank1_score>0
-            if target is not None and passed:
+            if target is not None:
                 self.cmd.move_stop()
                 self.start_track(now)
+                self.rank2_target = target
                 self.note = '发现可用画面，停车进入追踪'
-            elif self.search_step==4:
+            elif self.search_step==1:
                 self.cmd.move_straight(-int(self.config.get('lost_move',200)))
                 self.cmd.move_turn(0)
                 duration = self.config.get('camera_settle_ms',400)+self.config.get('lost_move_ms',1000)
                 if (now-self._step_at)*1000>=duration:
                     self._next_search(now)
             elif not self.search_turn_sent:
-                self.search_turn_sent = self.cmd.move_turn_angle(180 if self.search_step in (0,2) else 360)
+                self.search_turn_sent = self.cmd.move_turn_angle(360)
                 if self.search_turn_sent:
                     self._step_at = now
                 else:
                     self.note = '等待 STM32 上报导航角度'
             elif turn_done:
                 self._next_search(now)
+            elif now - self._step_at >= 15:
+                # 未收到角度到位时先停车，留在原地重新搜寻。
+                self.reset()
+                self._next_search(now)
+                self.note = '搜寻转向未收到到位角度，停车重新搜寻'
             return False
         if not self.view_ready(now) or now - self._track_at < .25:
             self.cmd.move_stop()
@@ -240,7 +242,9 @@ class GoTo:
         x,y = bottom_center(target)
         dx,dy = x-self.x0,y-self.y0
         tolerance = self.config.get('align_px',20)
-        if abs(dx)<=tolerance and abs(dy)<=tolerance:
+        # 搜寻视角只要够近、方向大致对准就低头。精确合爪位置由 Grabber 判断。
+        facing = abs(dx)<=self.config.get('turn_only_px',80)
+        if facing and dy>=-tolerance:
             self.cmd.move_stop()
             self.align_hits += 1
             if self.align_hits>=self.config.get('confirm_frames',3):
@@ -252,7 +256,7 @@ class GoTo:
         move_limit = self.config.get('move_limit_px',180)
         turn = 0 if abs(dx)<=tolerance else int(max(-turn_limit,min(turn_limit,dx)))
         forward = 0
-        if abs(dx)<=self.config.get('turn_only_px',80) and abs(dy)>tolerance:
+        if facing and dy < -tolerance:
             forward = int(max(-move_limit,min(move_limit,dy)))
         self.cmd.move_turn(turn)
         # 图像纵向误差前负后正，发给 STM32 时取反。
@@ -266,7 +270,7 @@ class GoTo:
 
     def _next_search(self, now):
         """一条转角命令只发一次，步骤变化留在本类。"""
-        self.search_step = (self.search_step+1)%5
+        self.search_step = (self.search_step+1)%2
         self.cmd.move_stop()
         camera = self.config.get('search_camera_1',70)
         if self.camera_value!=camera or self._camera_at is None:

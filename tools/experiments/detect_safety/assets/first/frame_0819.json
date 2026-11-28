@@ -1,0 +1,29 @@
+{
+  "version": "4.0.0-beta.7",
+  "flags": {},
+  "checked": false,
+  "shapes": [
+    {
+      "label": "rsafe",
+      "score": null,
+      "points": [
+        [0, 48],
+        [883, 48],
+        [883, 460],
+        [0, 460]
+      ],
+      "group_id": null,
+      "description": "紫围栏外沿+内部红垫可见外沿（红垫=rsafe）。左侧被画面截断（贴边 0），后端上沿 y≈48（左端约 72），右前端外角 x≈883，前端下沿到 y≈460。",
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    }
+  ],
+  "imagePath": "frame_0819.jpg",
+  "imageData": null,
+  "imageHeight": 720,
+  "imageWidth": 1280,
+  "description": "已看过全图。本帧只有安全区（红垫→rsafe），区内外均无 orange/blue/green 物块。区左侧被左边缘截断处那条斜放的灰黑色长条是挡板（与 frame_0688 中部同物），按口径5不标 black。"
+}

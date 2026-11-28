@@ -25,8 +25,9 @@ class SafetyHttp {
 
 public:
   SafetyHttp(rclcpp::Node &node, httplib::Server &server, bool yolo_enabled, double point_x, double point_y,
-             std::function<Objects::ConstSharedPtr()> target)
-    : node_(node), yolo_enabled_(yolo_enabled), point_x_(point_x), point_y_(point_y), target_(std::move(target)) {
+             std::function<Objects::ConstSharedPtr()> target, std::function<std::string()> stage)
+    : node_(node), yolo_enabled_(yolo_enabled), point_x_(point_x), point_y_(point_y),
+      target_(std::move(target)), stage_(std::move(stage)) {
     read_ = node_.create_client<Read>("safety_detector_node/get_parameters");
     write_ = node_.create_client<Write>("safety_detector_node/set_parameters_atomically");
     server.Get("/safety/hsv", [this](const auto &, auto &response) { read_hsv(response); });
@@ -179,7 +180,7 @@ private:
         write_box(json, box);
       }
     }
-    json << '}';
+    json << ",\"stage\":" << std::quoted(stage_()) << '}';
     return json.str();
   }
 
@@ -202,8 +203,9 @@ private:
       response.status = 503;
       return;
     }
+    const bool jpeg = request.get_param_value("format") == "jpeg";
     const auto etag = "\"" + std::to_string(image->header.stamp.sec) + '-' +
-      std::to_string(image->header.stamp.nanosec) + '-' + std::to_string(serial) + "\"";
+      std::to_string(image->header.stamp.nanosec) + '-' + std::to_string(serial) + (jpeg ? "-jpeg\"" : "-png\"");
     response.set_header("Cache-Control", "no-store");
     response.set_header("ETag", etag);
     response.set_header("X-Gongchuang-Vision", frame_overlays(*image, boxes));
@@ -213,18 +215,21 @@ private:
     }
     const cv::Mat pixels(image->height, image->width, CV_8UC3,
                          const_cast<unsigned char *>(image->data.data()), image->step);
-    std::vector<unsigned char> png;
-    if (!cv::imencode(".png", pixels, png, {cv::IMWRITE_PNG_COMPRESSION, 1})) {
+    std::vector<unsigned char> encoded;
+    const std::vector<int> params = jpeg ? std::vector<int>{cv::IMWRITE_JPEG_QUALITY, 65}
+                                         : std::vector<int>{cv::IMWRITE_PNG_COMPRESSION, 1};
+    if (!cv::imencode(jpeg ? ".jpg" : ".png", pixels, encoded, params)) {
       response.status = 500;
       return;
     }
-    response.set_content(reinterpret_cast<const char *>(png.data()), png.size(), "image/png");
+    response.set_content(reinterpret_cast<const char *>(encoded.data()), encoded.size(), jpeg ? "image/jpeg" : "image/png");
   }
 
   rclcpp::Node &node_;
   bool yolo_enabled_;
   double point_x_, point_y_;
   std::function<Objects::ConstSharedPtr()> target_;
+  std::function<std::string()> stage_;
   rclcpp::Client<Read>::SharedPtr read_;
   rclcpp::Client<Write>::SharedPtr write_;
   rclcpp::Subscription<Image>::SharedPtr camera_;

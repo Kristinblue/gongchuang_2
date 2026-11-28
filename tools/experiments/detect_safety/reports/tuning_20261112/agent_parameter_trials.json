@@ -1,0 +1,116 @@
+{
+  "configs": {
+    "base": {},
+    "long12": {
+      "min_length_ratio": 0.12
+    },
+    "wide06": {
+      "merge_distance_ratio": 0.06
+    },
+    "longwide": {
+      "min_length_ratio": 0.12,
+      "merge_distance_ratio": 0.06
+    },
+    "strict6": {
+      "min_length_ratio": 0.12,
+      "merge_distance_ratio": 0.06,
+      "merge_angle_deg": 6
+    },
+    "angle15": {
+      "min_length_ratio": 0.12,
+      "merge_distance_ratio": 0.06,
+      "merge_angle_deg": 15
+    },
+    "long16": {
+      "min_length_ratio": 0.16,
+      "merge_distance_ratio": 0.06
+    },
+    "close5": {
+      "min_length_ratio": 0.12,
+      "merge_distance_ratio": 0.06,
+      "close_size": 5
+    }
+  },
+  "counts": {
+    "frame_0227.jpg": {
+      "base": 4,
+      "long12": 3,
+      "wide06": 3,
+      "longwide": 3,
+      "strict6": 3,
+      "angle15": 3,
+      "long16": 3,
+      "close5": 4
+    },
+    "frame_0298.jpg": {
+      "base": 6,
+      "long12": 4,
+      "wide06": 6,
+      "longwide": 4,
+      "strict6": 4,
+      "angle15": 4,
+      "long16": 4,
+      "close5": 5
+    },
+    "frame_0679.jpg": {
+      "base": 6,
+      "long12": 4,
+      "wide06": 5,
+      "longwide": 4,
+      "strict6": 4,
+      "angle15": 4,
+      "long16": 4,
+      "close5": 4
+    },
+    "frame_0884.jpg": {
+      "base": 4,
+      "long12": 3,
+      "wide06": 4,
+      "longwide": 3,
+      "strict6": 3,
+      "angle15": 3,
+      "long16": 3,
+      "close5": 3
+    },
+    "frame_0142.jpg": {
+      "base": 3,
+      "long12": 3,
+      "wide06": 3,
+      "longwide": 3,
+      "strict6": 3,
+      "angle15": 3,
+      "long16": 3,
+      "close5": 4
+    },
+    "frame_0362.jpg": {
+      "base": 3,
+      "long12": 3,
+      "wide06": 2,
+      "longwide": 2,
+      "strict6": 2,
+      "angle15": 2,
+      "long16": 2,
+      "close5": 2
+    },
+    "frame_0945.jpg": {
+      "base": 8,
+      "long12": 6,
+      "wide06": 8,
+      "longwide": 5,
+      "strict6": 5,
+      "angle15": 5,
+      "long16": 4,
+      "close5": 6
+    },
+    "frame_1083.jpg": {
+      "base": 6,
+      "long12": 5,
+      "wide06": 4,
+      "longwide": 3,
+      "strict6": 3,
+      "angle15": 3,
+      "long16": 3,
+      "close5": 3
+    }
+  }
+}

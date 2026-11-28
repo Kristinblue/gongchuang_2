@@ -1,0 +1,371 @@
+{
+  "settings": {
+    "h_min": 125,
+    "h_max": 155,
+    "s_min": 100,
+    "s_max": 255,
+    "v_min": 25,
+    "v_max": 255,
+    "second_enabled": false,
+    "close_size": 3,
+    "min_length_ratio": 0.12,
+    "merge_angle_deg": 10.0,
+    "merge_distance_ratio": 0.06,
+    "second_range": {
+      "h_min": 0,
+      "s_min": 20,
+      "v_min": 25,
+      "h_max": 20,
+      "s_max": 200,
+      "v_max": 255
+    }
+  },
+  "roi_source": "48 images inferred with train5 ONNX confidence .35; cached detections for parameter comparison and GUI check",
+  "checks": {
+    "syntax": true,
+    "all_48_segmentation": true,
+    "input_unchanged": true,
+    "empty_roi_no_detection": true,
+    "original_assets_hash_unchanged": true,
+    "copied_48_files_match_sources": true,
+    "qt_offscreen_48_images_real_sim_A_D": true
+  },
+  "records": [
+    {
+      "image": "frame_0142.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 19,
+      "merged_count": 3
+    },
+    {
+      "image": "frame_0157.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 10,
+      "merged_count": 1
+    },
+    {
+      "image": "frame_0185.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 17,
+      "merged_count": 5
+    },
+    {
+      "image": "frame_0227.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 20,
+      "merged_count": 3
+    },
+    {
+      "image": "frame_0264.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 11,
+      "merged_count": 3
+    },
+    {
+      "image": "frame_0298.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 15,
+      "merged_count": 4
+    },
+    {
+      "image": "frame_0320.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 15,
+      "merged_count": 3
+    },
+    {
+      "image": "frame_0362.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 7,
+      "merged_count": 2
+    },
+    {
+      "image": "frame_0608.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 15,
+      "merged_count": 4
+    },
+    {
+      "image": "frame_0663.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 8,
+      "merged_count": 1
+    },
+    {
+      "image": "frame_0679.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 23,
+      "merged_count": 4
+    },
+    {
+      "image": "frame_0699.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 15,
+      "merged_count": 4
+    },
+    {
+      "image": "frame_0724.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 29,
+      "merged_count": 5
+    },
+    {
+      "image": "frame_0765.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 16,
+      "merged_count": 5
+    },
+    {
+      "image": "frame_0819.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 18,
+      "merged_count": 3
+    },
+    {
+      "image": "frame_0830.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 20,
+      "merged_count": 4
+    },
+    {
+      "image": "frame_0857.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 22,
+      "merged_count": 4
+    },
+    {
+      "image": "frame_0868.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 12,
+      "merged_count": 4
+    },
+    {
+      "image": "frame_0884.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 11,
+      "merged_count": 3
+    },
+    {
+      "image": "frame_0902.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 12,
+      "merged_count": 5
+    },
+    {
+      "image": "frame_0918.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 12,
+      "merged_count": 5
+    },
+    {
+      "image": "frame_0937.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 15,
+      "merged_count": 5
+    },
+    {
+      "image": "frame_0945.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 16,
+      "merged_count": 5
+    },
+    {
+      "image": "frame_0973.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 18,
+      "merged_count": 8
+    },
+    {
+      "image": "frame_1054.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 21,
+      "merged_count": 7
+    },
+    {
+      "image": "frame_1074.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 14,
+      "merged_count": 3
+    },
+    {
+      "image": "frame_1083.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 18,
+      "merged_count": 3
+    },
+    {
+      "image": "frame_1109.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 16,
+      "merged_count": 4
+    },
+    {
+      "image": "frame_1189.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 25,
+      "merged_count": 4
+    },
+    {
+      "image": "frame_1197.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 21,
+      "merged_count": 5
+    },
+    {
+      "image": "frame_1205.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 8,
+      "merged_count": 3
+    },
+    {
+      "image": "frame_1219.jpg",
+      "kind": "real",
+      "roi_count": 1,
+      "candidate_count": 22,
+      "merged_count": 5
+    },
+    {
+      "image": "sim_safe5fix_20261023_bright_side_05.jpg",
+      "kind": "sim",
+      "roi_count": 1,
+      "candidate_count": 12,
+      "merged_count": 4
+    },
+    {
+      "image": "sim_safe5fix_20261023_bright_side_06.jpg",
+      "kind": "sim",
+      "roi_count": 1,
+      "candidate_count": 13,
+      "merged_count": 4
+    },
+    {
+      "image": "sim_safe5fix_20261023_bright_side_11.jpg",
+      "kind": "sim",
+      "roi_count": 1,
+      "candidate_count": 19,
+      "merged_count": 5
+    },
+    {
+      "image": "sim_safe5fix_20261023_bright_side_12.jpg",
+      "kind": "sim",
+      "roi_count": 1,
+      "candidate_count": 23,
+      "merged_count": 5
+    },
+    {
+      "image": "sim_safe5fix_20261023_cool_15.jpg",
+      "kind": "sim",
+      "roi_count": 1,
+      "candidate_count": 10,
+      "merged_count": 4
+    },
+    {
+      "image": "sim_safe5fix_20261023_cool_16.jpg",
+      "kind": "sim",
+      "roi_count": 1,
+      "candidate_count": 12,
+      "merged_count": 5
+    },
+    {
+      "image": "sim_safe5fix_20261023_cool_39.jpg",
+      "kind": "sim",
+      "roi_count": 1,
+      "candidate_count": 17,
+      "merged_count": 4
+    },
+    {
+      "image": "sim_safe5fix_20261023_cool_40.jpg",
+      "kind": "sim",
+      "roi_count": 1,
+      "candidate_count": 16,
+      "merged_count": 4
+    },
+    {
+      "image": "sim_safe5fix_20261023_dim_cross_25.jpg",
+      "kind": "sim",
+      "roi_count": 1,
+      "candidate_count": 17,
+      "merged_count": 3
+    },
+    {
+      "image": "sim_safe5fix_20261023_dim_cross_26.jpg",
+      "kind": "sim",
+      "roi_count": 1,
+      "candidate_count": 19,
+      "merged_count": 3
+    },
+    {
+      "image": "sim_safe5fix_20261023_neutral_01.jpg",
+      "kind": "sim",
+      "roi_count": 1,
+      "candidate_count": 18,
+      "merged_count": 5
+    },
+    {
+      "image": "sim_safe5fix_20261023_neutral_02.jpg",
+      "kind": "sim",
+      "roi_count": 1,
+      "candidate_count": 17,
+      "merged_count": 5
+    },
+    {
+      "image": "sim_safe5fix_20261023_warm_03.jpg",
+      "kind": "sim",
+      "roi_count": 1,
+      "candidate_count": 17,
+      "merged_count": 5
+    },
+    {
+      "image": "sim_safe5fix_20261023_warm_04.jpg",
+      "kind": "sim",
+      "roi_count": 1,
+      "candidate_count": 23,
+      "merged_count": 6
+    },
+    {
+      "image": "sim_safe5fix_20261023_warm_27.jpg",
+      "kind": "sim",
+      "roi_count": 1,
+      "candidate_count": 22,
+      "merged_count": 7
+    },
+    {
+      "image": "sim_safe5fix_20261023_warm_28.jpg",
+      "kind": "sim",
+      "roi_count": 1,
+      "candidate_count": 19,
+      "merged_count": 4
+    }
+  ]
+}

@@ -60,6 +60,8 @@ class InferenceNode(Node):
         for box, index, score in zip(boxes, classes, scores):
             if not 0 <= index < len(self.labels):
                 continue
+            if self.labels[index] not in ('orange', 'blue', 'green', 'black'):
+                continue
             x1, y1, x2, y2 = map(float, box)
             result.items.append(Object(name=self.labels[index], score=float(score), x1=x1, y1=y1,
                                        x2=x2, y2=y2, observed=True))

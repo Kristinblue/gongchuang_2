@@ -52,12 +52,13 @@ def nodes(context):
             preview[name] = int(value(name))
     actions = [
         node('desktop_server_pkg', 'desktop_server_node', camera_source=source, mode=mode, yolo_enabled=bool(model), port=int(value('port')), **{'point.x0': point_x, 'point.y0': point_y, **preview}),
-        node('vision_pkg', 'perception_node', detect=bool(model), camera_settle_ms=trans.get('camera_settle_ms', 400)),
+        node('vision_pkg', 'perception_node', detect=bool(model), pair_safety=bool(model),
+             camera_settle_ms=trans.get('camera_settle_ms', 400)),
         node('vision_pkg', 'camera_node', device=value('camera_device'),
              url=url, FPS=fps, FOURCC=FOURCC),
     ]
-    if value('safety_detector') == 'true':
-        actions.append(node('vision_pkg', 'safety_detector_node'))
+    if model or value('safety_detector') == 'true':
+        actions.append(node('vision_pkg', 'safety_detector_node', paired=bool(model)))
     # 有模型才做推理。串口由 uart 启用，靠近测试和正式任务只选其中一个。
     if model:
         actions.append(node('vision_pkg', 'inference_node', **{'yolo.model_path': model}))
@@ -74,8 +75,11 @@ def nodes(context):
         task = {'vision_timeout_s': float(value('vision_timeout_s')),
                 'grab.width': int(camera.get('width', 1280)), 'grab.height': int(camera.get('height', 720))}
         if value('sim_distribute') == 'true':
-            task.update({'distribute.use_sim_clock': True, 'distribute.move_ms': 8000,
-                         'distribute.scatter_ms': 0, 'trans.track_depth_weight': 2.})
+            task.update({'distribute.use_sim_clock': True, 'delivery.enabled': value('safety_detector') == 'true',
+                         'distribute.move_ms': 6200,
+                         'distribute.scatter_ms': 1800, 'distribute.scatter_forward': -100,
+                         'distribute.base_turn': 170,
+                         'grab.camera_deg': 50, 'grab.near_y': 650})
         actions.append(node('action_pkg', 'task_node', **task))
     return actions
 

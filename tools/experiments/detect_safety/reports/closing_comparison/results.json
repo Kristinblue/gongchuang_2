@@ -1,0 +1,396 @@
+{
+  "roi_count": 48,
+  "open_quads": 48,
+  "open_close_quads": 48,
+  "identical_hulls": 11,
+  "iou_min": 0.918823,
+  "iou_median": 0.999061,
+  "iou_ge_99": 38,
+  "iou_ge_95": 46,
+  "records": [
+    {
+      "name": "frame_0142.jpg",
+      "same_hull": false,
+      "iou": 0.9926744805070863,
+      "added_fraction": 0.002066927701197945,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_0157.jpg",
+      "same_hull": false,
+      "iou": 0.9966114702762586,
+      "added_fraction": 0.0034410358101014814,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_0185.jpg",
+      "same_hull": false,
+      "iou": 0.9957861016592424,
+      "added_fraction": 0.003982748522442894,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_0227.jpg",
+      "same_hull": true,
+      "iou": 0.9999999320430272,
+      "added_fraction": 0.005018030151627058,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_0264.jpg",
+      "same_hull": false,
+      "iou": 0.9994101637467552,
+      "added_fraction": 0.0052709136250283384,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_0298.jpg",
+      "same_hull": false,
+      "iou": 0.9979714021640116,
+      "added_fraction": 0.0023581016457240858,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_0320.jpg",
+      "same_hull": false,
+      "iou": 0.9974370055159412,
+      "added_fraction": 0.0023849017071293087,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_0362.jpg",
+      "same_hull": false,
+      "iou": 0.9188227246268821,
+      "added_fraction": 0.0014017472943017343,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_0608.jpg",
+      "same_hull": false,
+      "iou": 1.0,
+      "added_fraction": 0.004560819874443312,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_0663.jpg",
+      "same_hull": false,
+      "iou": 0.9786882853358223,
+      "added_fraction": 0.009524665288884895,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_0679.jpg",
+      "same_hull": false,
+      "iou": 0.9953539845172922,
+      "added_fraction": 0.02321360177182728,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_0699.jpg",
+      "same_hull": true,
+      "iou": 1.0,
+      "added_fraction": 0.0017010747699682982,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_0724.jpg",
+      "same_hull": false,
+      "iou": 0.9837173344134476,
+      "added_fraction": 0.01764171747308341,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_0765.jpg",
+      "same_hull": true,
+      "iou": 1.0,
+      "added_fraction": 0.0037503400567408963,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_0819.jpg",
+      "same_hull": true,
+      "iou": 1.0,
+      "added_fraction": 0.0007043090910753976,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_0830.jpg",
+      "same_hull": false,
+      "iou": 1.0,
+      "added_fraction": 0.0014408544223969489,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_0857.jpg",
+      "same_hull": false,
+      "iou": 1.0,
+      "added_fraction": 0.0006682258603407952,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_0868.jpg",
+      "same_hull": false,
+      "iou": 0.9997810135392541,
+      "added_fraction": 0.0039765514151295644,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_0884.jpg",
+      "same_hull": false,
+      "iou": 0.999999946894048,
+      "added_fraction": 0.0026763776763776763,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_0902.jpg",
+      "same_hull": false,
+      "iou": 0.9999999917052583,
+      "added_fraction": 0.00675838039168569,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_0918.jpg",
+      "same_hull": true,
+      "iou": 1.0,
+      "added_fraction": 0.006124552786368322,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_0937.jpg",
+      "same_hull": false,
+      "iou": 0.9987112917499982,
+      "added_fraction": 0.003241321622751987,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_0945.jpg",
+      "same_hull": true,
+      "iou": 0.9999999497721561,
+      "added_fraction": 0.0021751389672117942,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_0973.jpg",
+      "same_hull": true,
+      "iou": 1.0,
+      "added_fraction": 0.0037904212895329093,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_1054.jpg",
+      "same_hull": false,
+      "iou": 0.9999999393853256,
+      "added_fraction": 0.007925296300730276,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_1074.jpg",
+      "same_hull": true,
+      "iou": 1.0,
+      "added_fraction": 0.06619959965684873,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_1083.jpg",
+      "same_hull": false,
+      "iou": 1.0,
+      "added_fraction": 0.008889949583842965,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_1109.jpg",
+      "same_hull": true,
+      "iou": 1.0,
+      "added_fraction": 0.0023956303702047464,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_1189.jpg",
+      "same_hull": false,
+      "iou": 0.9999998871755456,
+      "added_fraction": 0.009784913113595594,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_1197.jpg",
+      "same_hull": true,
+      "iou": 0.9999998974725517,
+      "added_fraction": 0.0037451472939027176,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_1205.jpg",
+      "same_hull": false,
+      "iou": 0.9874257377349822,
+      "added_fraction": 0.0161542980223223,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "frame_1219.jpg",
+      "same_hull": false,
+      "iou": 0.9762760823145537,
+      "added_fraction": 0.004620784644777181,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "sim_safe5fix_20261023_bright_side_05.jpg",
+      "same_hull": false,
+      "iou": 0.9816899671193688,
+      "added_fraction": 0.0040210233029381965,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "sim_safe5fix_20261023_bright_side_06.jpg",
+      "same_hull": false,
+      "iou": 0.9838888066612558,
+      "added_fraction": 0.004180064308681672,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "sim_safe5fix_20261023_bright_side_11.jpg",
+      "same_hull": false,
+      "iou": 0.9885207540501554,
+      "added_fraction": 0.0012799271305290103,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "sim_safe5fix_20261023_bright_side_12.jpg",
+      "same_hull": true,
+      "iou": 0.9999999658579911,
+      "added_fraction": 0.000433597621407334,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "sim_safe5fix_20261023_cool_15.jpg",
+      "same_hull": false,
+      "iou": 0.9805477890335436,
+      "added_fraction": 0.015920029618659754,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "sim_safe5fix_20261023_cool_16.jpg",
+      "same_hull": false,
+      "iou": 0.9315284632398838,
+      "added_fraction": 0.019742883379247015,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "sim_safe5fix_20261023_cool_39.jpg",
+      "same_hull": false,
+      "iou": 0.9965855858363856,
+      "added_fraction": 0.00030384875084402433,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "sim_safe5fix_20261023_cool_40.jpg",
+      "same_hull": false,
+      "iou": 0.9964440549662801,
+      "added_fraction": 0.00035477994055038833,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "sim_safe5fix_20261023_dim_cross_25.jpg",
+      "same_hull": false,
+      "iou": 0.9920896921044597,
+      "added_fraction": 0.0004219941405871054,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "sim_safe5fix_20261023_dim_cross_26.jpg",
+      "same_hull": false,
+      "iou": 0.9912709924576645,
+      "added_fraction": 0.00035817659073968306,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "sim_safe5fix_20261023_neutral_01.jpg",
+      "same_hull": false,
+      "iou": 0.9954972475955361,
+      "added_fraction": 0.0005516962360524295,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "sim_safe5fix_20261023_neutral_02.jpg",
+      "same_hull": false,
+      "iou": 0.9914139705344273,
+      "added_fraction": 0.0005995618586417618,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "sim_safe5fix_20261023_warm_03.jpg",
+      "same_hull": false,
+      "iou": 0.9980563823988602,
+      "added_fraction": 0.0013008767552926083,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "sim_safe5fix_20261023_warm_04.jpg",
+      "same_hull": false,
+      "iou": 1.0,
+      "added_fraction": 0.014193746444791563,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "sim_safe5fix_20261023_warm_27.jpg",
+      "same_hull": false,
+      "iou": 0.9999999698272443,
+      "added_fraction": 0.01913010898431904,
+      "open_quad": true,
+      "open_close_quad": true
+    },
+    {
+      "name": "sim_safe5fix_20261023_warm_28.jpg",
+      "same_hull": false,
+      "iou": 1.0,
+      "added_fraction": 0.01817636366844901,
+      "open_quad": true,
+      "open_close_quad": true
+    }
+  ]
+}

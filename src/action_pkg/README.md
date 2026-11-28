@@ -4,7 +4,9 @@
 
 通信包里的 [MyCMD](../communication_pkg/communication_pkg/my_cmd.py) 用 `move_straight()`、`move_straight_dis()`、`move_turn()` 和 `move_turn_angle()` 将命令发到 `/robot/command`。角度回包从 `/robot/feedback` 交给 `MyCMD.read_feedback()`。
 
-`task_node` 执行打散 → GoTo → 停车。单项靠近测试已拆到 [tests_pkg](../tests_pkg/README.md)。
+`task_node` 开场打散一次。GoTo 选定并靠近目标，Grabber 低头对准、合爪并复查。启用投放时，Delivery 把单块送往本方对应格，退回后再搜寻。首趟只选绿，后续可选绿、黑、橙；整场复位后恢复 YAML 的首趟设置。单项靠近测试见 [tests_pkg](../tests_pkg/README.md)。
+
+抓取时可以先合爪、后退。爪口被挡住，或后退后看到多块，就开爪从堆边斜推。退开后先转回目标，再靠近试夹。开爪后按顺序后退、转向、前推、后退、回转。距离和角度见 YAML 的 `grab.scatter_back_cm`、`grab.scatter_push_cm` 和 `grab.scatter_angle_deg`。转向靠航向回包确认完成。直行段等 STM32 的 07 到位回包。超过 `grab.scatter_drive_timeout_ms` 就停车并重新搜寻。
 
 ## GoTo 和 STM32
 

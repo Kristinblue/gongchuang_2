@@ -1,0 +1,443 @@
+{
+  "frame_edge_margin_px": 3,
+  "counts": {
+    "partial": 37,
+    "partial_quads": 37,
+    "full": 11,
+    "full_quads": 11
+  },
+  "images": {
+    "frame_0142.jpg": {
+      "ok": false,
+      "center": [
+        708.7988891601562,
+        175.6746368408203
+      ],
+      "hull_vertices": 25,
+      "quads": 1
+    },
+    "frame_0157.jpg": {
+      "ok": false,
+      "center": [
+        543.6034545898438,
+        76.85717010498047
+      ],
+      "hull_vertices": 18,
+      "quads": 1
+    },
+    "frame_0185.jpg": {
+      "ok": false,
+      "center": [
+        480.76812744140625,
+        382.432373046875
+      ],
+      "hull_vertices": 24,
+      "quads": 1
+    },
+    "frame_0227.jpg": {
+      "ok": true,
+      "center": [
+        621.073974609375,
+        232.9890594482422
+      ],
+      "hull_vertices": 29,
+      "quads": 1
+    },
+    "frame_0264.jpg": {
+      "ok": false,
+      "center": [
+        643.2000732421875,
+        117.72830200195312
+      ],
+      "hull_vertices": 18,
+      "quads": 1
+    },
+    "frame_0298.jpg": {
+      "ok": false,
+      "center": [
+        661.9189453125,
+        347.7440185546875
+      ],
+      "hull_vertices": 18,
+      "quads": 1
+    },
+    "frame_0320.jpg": {
+      "ok": false,
+      "center": [
+        640.0,
+        420.6946105957031
+      ],
+      "hull_vertices": 18,
+      "quads": 1
+    },
+    "frame_0362.jpg": {
+      "ok": false,
+      "center": [
+        270.24249267578125,
+        49.48613739013672
+      ],
+      "hull_vertices": 17,
+      "quads": 1
+    },
+    "frame_0608.jpg": {
+      "ok": false,
+      "center": [
+        1141.5740966796875,
+        65.43206787109375
+      ],
+      "hull_vertices": 21,
+      "quads": 1
+    },
+    "frame_0663.jpg": {
+      "ok": false,
+      "center": [
+        354.56475830078125,
+        24.97575569152832
+      ],
+      "hull_vertices": 14,
+      "quads": 1
+    },
+    "frame_0679.jpg": {
+      "ok": true,
+      "center": [
+        684.7611083984375,
+        214.22015380859375
+      ],
+      "hull_vertices": 22,
+      "quads": 1
+    },
+    "frame_0699.jpg": {
+      "ok": false,
+      "center": [
+        279.9822998046875,
+        416.5439453125
+      ],
+      "hull_vertices": 29,
+      "quads": 1
+    },
+    "frame_0724.jpg": {
+      "ok": false,
+      "center": [
+        1070.04931640625,
+        178.09645080566406
+      ],
+      "hull_vertices": 18,
+      "quads": 1
+    },
+    "frame_0765.jpg": {
+      "ok": false,
+      "center": [
+        314.66748046875,
+        74.91834259033203
+      ],
+      "hull_vertices": 30,
+      "quads": 1
+    },
+    "frame_0819.jpg": {
+      "ok": false,
+      "center": [
+        333.52728271484375,
+        205.9481964111328
+      ],
+      "hull_vertices": 22,
+      "quads": 1
+    },
+    "frame_0830.jpg": {
+      "ok": false,
+      "center": [
+        664.5192260742188,
+        360.49945068359375
+      ],
+      "hull_vertices": 12,
+      "quads": 1
+    },
+    "frame_0857.jpg": {
+      "ok": false,
+      "center": [
+        639.5,
+        440.6746826171875
+      ],
+      "hull_vertices": 13,
+      "quads": 1
+    },
+    "frame_0868.jpg": {
+      "ok": false,
+      "center": [
+        505.5453186035156,
+        486.7882080078125
+      ],
+      "hull_vertices": 15,
+      "quads": 1
+    },
+    "frame_0884.jpg": {
+      "ok": false,
+      "center": [
+        841.5762939453125,
+        224.38519287109375
+      ],
+      "hull_vertices": 27,
+      "quads": 1
+    },
+    "frame_0902.jpg": {
+      "ok": false,
+      "center": [
+        343.8498840332031,
+        50.855430603027344
+      ],
+      "hull_vertices": 18,
+      "quads": 1
+    },
+    "frame_0918.jpg": {
+      "ok": false,
+      "center": [
+        1113.1343994140625,
+        107.0564956665039
+      ],
+      "hull_vertices": 19,
+      "quads": 1
+    },
+    "frame_0937.jpg": {
+      "ok": false,
+      "center": [
+        936.247802734375,
+        129.60032653808594
+      ],
+      "hull_vertices": 19,
+      "quads": 1
+    },
+    "frame_0945.jpg": {
+      "ok": false,
+      "center": [
+        1194.7279052734375,
+        220.9130096435547
+      ],
+      "hull_vertices": 18,
+      "quads": 1
+    },
+    "frame_0973.jpg": {
+      "ok": false,
+      "center": [
+        1170.422607421875,
+        278.9119567871094
+      ],
+      "hull_vertices": 15,
+      "quads": 1
+    },
+    "frame_1054.jpg": {
+      "ok": false,
+      "center": [
+        1065.312255859375,
+        156.56600952148438
+      ],
+      "hull_vertices": 19,
+      "quads": 1
+    },
+    "frame_1074.jpg": {
+      "ok": false,
+      "center": [
+        240.30661010742188,
+        308.86572265625
+      ],
+      "hull_vertices": 13,
+      "quads": 1
+    },
+    "frame_1083.jpg": {
+      "ok": true,
+      "center": [
+        762.1871948242188,
+        232.19166564941406
+      ],
+      "hull_vertices": 28,
+      "quads": 1
+    },
+    "frame_1109.jpg": {
+      "ok": false,
+      "center": [
+        1072.2698974609375,
+        93.24983978271484
+      ],
+      "hull_vertices": 22,
+      "quads": 1
+    },
+    "frame_1189.jpg": {
+      "ok": true,
+      "center": [
+        489.46795654296875,
+        238.56080627441406
+      ],
+      "hull_vertices": 30,
+      "quads": 1
+    },
+    "frame_1197.jpg": {
+      "ok": true,
+      "center": [
+        317.39013671875,
+        157.74221801757812
+      ],
+      "hull_vertices": 21,
+      "quads": 1
+    },
+    "frame_1205.jpg": {
+      "ok": false,
+      "center": [
+        79.12855529785156,
+        68.69427490234375
+      ],
+      "hull_vertices": 14,
+      "quads": 1
+    },
+    "frame_1219.jpg": {
+      "ok": false,
+      "center": [
+        942.56005859375,
+        54.71377944946289
+      ],
+      "hull_vertices": 21,
+      "quads": 1
+    },
+    "sim_safe5fix_20261023_bright_side_05.jpg": {
+      "ok": true,
+      "center": [
+        591.0430908203125,
+        282.710693359375
+      ],
+      "hull_vertices": 25,
+      "quads": 1
+    },
+    "sim_safe5fix_20261023_bright_side_06.jpg": {
+      "ok": true,
+      "center": [
+        694.0206909179688,
+        282.6409912109375
+      ],
+      "hull_vertices": 21,
+      "quads": 1
+    },
+    "sim_safe5fix_20261023_bright_side_11.jpg": {
+      "ok": true,
+      "center": [
+        522.7752685546875,
+        357.0655212402344
+      ],
+      "hull_vertices": 20,
+      "quads": 1
+    },
+    "sim_safe5fix_20261023_bright_side_12.jpg": {
+      "ok": true,
+      "center": [
+        763.6677856445312,
+        357.2275085449219
+      ],
+      "hull_vertices": 29,
+      "quads": 1
+    },
+    "sim_safe5fix_20261023_cool_15.jpg": {
+      "ok": true,
+      "center": [
+        621.629638671875,
+        355.1241760253906
+      ],
+      "hull_vertices": 23,
+      "quads": 1
+    },
+    "sim_safe5fix_20261023_cool_16.jpg": {
+      "ok": true,
+      "center": [
+        662.661865234375,
+        355.316650390625
+      ],
+      "hull_vertices": 20,
+      "quads": 1
+    },
+    "sim_safe5fix_20261023_cool_39.jpg": {
+      "ok": false,
+      "center": [
+        783.4208984375,
+        322.5994873046875
+      ],
+      "hull_vertices": 21,
+      "quads": 1
+    },
+    "sim_safe5fix_20261023_cool_40.jpg": {
+      "ok": false,
+      "center": [
+        499.0390625,
+        323.96173095703125
+      ],
+      "hull_vertices": 25,
+      "quads": 1
+    },
+    "sim_safe5fix_20261023_dim_cross_25.jpg": {
+      "ok": false,
+      "center": [
+        640.5,
+        464.85638427734375
+      ],
+      "hull_vertices": 18,
+      "quads": 1
+    },
+    "sim_safe5fix_20261023_dim_cross_26.jpg": {
+      "ok": false,
+      "center": [
+        640.0,
+        465.5667419433594
+      ],
+      "hull_vertices": 16,
+      "quads": 1
+    },
+    "sim_safe5fix_20261023_neutral_01.jpg": {
+      "ok": false,
+      "center": [
+        485.4306640625,
+        418.4046936035156
+      ],
+      "hull_vertices": 18,
+      "quads": 1
+    },
+    "sim_safe5fix_20261023_neutral_02.jpg": {
+      "ok": false,
+      "center": [
+        815.2245483398438,
+        398.4045715332031
+      ],
+      "hull_vertices": 20,
+      "quads": 1
+    },
+    "sim_safe5fix_20261023_warm_03.jpg": {
+      "ok": false,
+      "center": [
+        520.4022827148438,
+        414.49114990234375
+      ],
+      "hull_vertices": 22,
+      "quads": 1
+    },
+    "sim_safe5fix_20261023_warm_04.jpg": {
+      "ok": false,
+      "center": [
+        819.864990234375,
+        437.2507019042969
+      ],
+      "hull_vertices": 29,
+      "quads": 1
+    },
+    "sim_safe5fix_20261023_warm_27.jpg": {
+      "ok": false,
+      "center": [
+        703.0054931640625,
+        337.1335754394531
+      ],
+      "hull_vertices": 25,
+      "quads": 1
+    },
+    "sim_safe5fix_20261023_warm_28.jpg": {
+      "ok": false,
+      "center": [
+        579.621337890625,
+        337.385498046875
+      ],
+      "hull_vertices": 26,
+      "quads": 1
+    }
+  }
+}

@@ -7,7 +7,6 @@ import numpy as np
 
 from ..my_filter.bg_filter import BackgroundFilter
 from .objs import Objs, to_targets
-from .split_safety import SafetySplitter
 
 
 class GetObjs:
@@ -21,7 +20,6 @@ class GetObjs:
         tracking = config.get('tracking',{})
         self.objects = Objs(width,height,tracking.get('max_dist_px',150),tracking.get('lost_frames',6))
         self.background_filter = BackgroundFilter(**config.get('background_filter',{}))
-        self.splitter = SafetySplitter(config.get('safe_split',{}))
         self.detections = (np.empty((0,4)),np.empty(0,dtype=int),np.empty(0))
 
     def run(self, frame, team=None, ready=True, camera_deg=None):
@@ -41,10 +39,9 @@ class GetObjs:
         if not ready:
             self.reset()
         self.detections = self.background_filter.filter(boxes,classes,scores,frame.shape,camera_deg if ready else None)
-        # Objs 在帧之间保留物块 ID，SafetySplitter 用画面和物块列表更新安全区。
-        objs = self.objects.update(to_targets(*self.detections,self.labels))
-        regions = self.splitter.observe_regions(frame,objs,team)
-        return objs, regions
+        # Objs 在帧之间保留物块 ID。ROS 感知节点另用同帧的 OpenCV 轮廓标出区内物块。
+        targets = to_targets(*self.detections,self.labels)
+        return self.objects.update([obj for obj in targets if obj['name'] in ('orange','blue','green','black')]), []
 
     def _load_model(self):
         """只在实机第一次推理时加载已有RKNN封装。"""

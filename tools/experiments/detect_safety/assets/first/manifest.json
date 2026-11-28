@@ -1,0 +1,1878 @@
+{
+  "date": "2026-11-12",
+  "source_images": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images",
+  "purpose": "Real safety-zone colour and line debug; existing train/val images, not an independent evaluation set. No training or annotation edits.",
+  "excluded_name_contains": "sim (case insensitive, anywhere in relative image path)",
+  "selection": "frame_* real captures only; 16 per safety class, frame gap >=8; near/far, cropped and unclipped variety",
+  "inventory": {
+    "all_images": 1229,
+    "excluded_non_frame_names": 168,
+    "real_frame_images": 813,
+    "no_safe_in_json": 410,
+    "safe_in_json": 403,
+    "excluded_sim": 248
+  },
+  "selected": 32,
+  "class_counts": {
+    "bsafe": 16,
+    "rsafe": 16
+  },
+  "items": [
+    {
+      "kind": "bsafe",
+      "frame": 142,
+      "area": 0.40901457531900914,
+      "aspect": 2.689352360043908,
+      "edges": 1,
+      "center": [
+        0.5915025684931507,
+        0.2599885844748858
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "bsafe",
+          "points": [
+            [
+              253.69863013698628,
+              0.0
+            ],
+            [
+              1260.5479452054794,
+              0.0
+            ],
+            [
+              1260.5479452054794,
+              374.3835616438356
+            ],
+            [
+              253.69863013698628,
+              374.3835616438356
+            ]
+          ]
+        }
+      ],
+      "image": "frame_0142.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0142.jpg",
+          "name": "frame_0142.jpg",
+          "sha256": "7bb8670cce5b7a10a3f7444b43487dc39dfa8b55ca21ad794e00b97c98e809ef"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0142.json",
+          "name": "frame_0142.json",
+          "sha256": "644619a4665f0bacdb542a1b0d442736a9e95eb2709e5d603856d476115172a1"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_0142.txt",
+          "name": "frame_0142.txt",
+          "sha256": "098ef551dda11ca1113d5e3d0aea28c3048ddde85911c5b7d062ca4eaf91cdd6"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "bsafe",
+      "frame": 157,
+      "area": 0.20061104097013513,
+      "aspect": 7.196200346935772,
+      "edges": 2,
+      "center": [
+        0.45056796073913574,
+        0.11131008995903863
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "bsafe",
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              1153.4539794921875,
+              0.0
+            ],
+            [
+              1153.4539794921875,
+              160.28652954101562
+            ],
+            [
+              0.0,
+              160.28652954101562
+            ]
+          ]
+        }
+      ],
+      "image": "frame_0157.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0157.jpg",
+          "name": "frame_0157.jpg",
+          "sha256": "3bbbd01280edd05d622bb81a0205cb40368f347f90e1bdb414656b2cdb056f40"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0157.json",
+          "name": "frame_0157.json",
+          "sha256": "acb08d659837f0ded617234cc8b2ccfa6701c903c9a2f026a5a09f3737d4b1a1"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_0157.txt",
+          "name": "frame_0157.txt",
+          "sha256": "25d774ab55a950db8380be76dfc42b5d7e7a1b68a587aa6087e23460c8765883"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "bsafe",
+      "frame": 185,
+      "area": 0.32122115194538814,
+      "aspect": 4.2149423455508375,
+      "edges": 1,
+      "center": [
+        0.4363441467285156,
+        0.5660692003038195
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "bsafe",
+          "points": [
+            [
+              0.0,
+              275.0601806640625
+            ],
+            [
+              1117.041015625,
+              275.0601806640625
+            ],
+            [
+              1117.041015625,
+              540.0794677734375
+            ],
+            [
+              0.0,
+              540.0794677734375
+            ]
+          ]
+        }
+      ],
+      "image": "frame_0185.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0185.jpg",
+          "name": "frame_0185.jpg",
+          "sha256": "df547622539ac5d7f43d00726c1e0c0daf4001f987c44d30e77f825b590961b0"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0185.json",
+          "name": "frame_0185.json",
+          "sha256": "162db0eea2401178c80f9eae9f5c34a4ca9aa12229b0059a0a45ef8a3b6273d7"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_0185.txt",
+          "name": "frame_0185.txt",
+          "sha256": "eea27d2cf879929bb8e61f18b7809c1c54273e2c4210db9ec7e5ccabe09bae99"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "bsafe",
+      "frame": 227,
+      "area": 0.25743572902983675,
+      "aspect": 6.097222222222221,
+      "edges": 0,
+      "center": [
+        0.5214041095890412,
+        0.3259132420091324
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "bsafe",
+          "points": [
+            [
+              66.02739726027394,
+              136.02739726027397
+            ],
+            [
+              1268.7671232876712,
+              136.02739726027397
+            ],
+            [
+              1268.7671232876712,
+              333.28767123287673
+            ],
+            [
+              66.02739726027394,
+              333.28767123287673
+            ]
+          ]
+        }
+      ],
+      "image": "frame_0227.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0227.jpg",
+          "name": "frame_0227.jpg",
+          "sha256": "10b0df5a39a2814943cac28a7532a44529eeaac778436430f1b4d925e5e4f4a4"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0227.json",
+          "name": "frame_0227.json",
+          "sha256": "c11ec2d58824416a3cba950a725689dc9fc5afa908583d0839912089d405333b"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_0227.txt",
+          "name": "frame_0227.txt",
+          "sha256": "d8c6fed0d9af3eacaf98f978789fb545028f9cd094d627e247ff9edeaf75a19c"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "bsafe",
+      "frame": 264,
+      "area": 0.3455307291666667,
+      "aspect": 5.136064257028113,
+      "edges": 3,
+      "center": [
+        0.4995625,
+        0.17291666666666666
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "bsafe",
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              1278.88,
+              0
+            ],
+            [
+              1278.88,
+              249.0
+            ],
+            [
+              0,
+              249.0
+            ]
+          ]
+        }
+      ],
+      "image": "frame_0264.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0264.jpg",
+          "name": "frame_0264.jpg",
+          "sha256": "8c132d9153c6b317151da7190a8ac76d6280d386dca99433ce07514c0cced128"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0264.json",
+          "name": "frame_0264.json",
+          "sha256": "be237cc1cacc2d44b9f3c02da8926fda7221a1c9fd349f0000890fe2f2ddda17"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_0264.txt",
+          "name": "frame_0264.txt",
+          "sha256": "cb784a408f5b6e9151c28f74e15b1ba3b24413bd21b489ba703b773dae00ec0a"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "bsafe",
+      "frame": 298,
+      "area": 0.42495940755208333,
+      "aspect": 4.176872081251428,
+      "edges": 2,
+      "center": [
+        0.499609375,
+        0.5109652777777778
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "bsafe",
+          "points": [
+            [
+              0,
+              214.79
+            ],
+            [
+              1279,
+              214.79
+            ],
+            [
+              1279,
+              521.0
+            ],
+            [
+              0,
+              521.0
+            ]
+          ]
+        }
+      ],
+      "image": "frame_0298.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0298.jpg",
+          "name": "frame_0298.jpg",
+          "sha256": "9f2c322190a1e73e925d9dce7d9528ccce838762f92542271d4d03b8475e8ccc"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0298.json",
+          "name": "frame_0298.json",
+          "sha256": "d3020340753d548435e6748c566596245fb2f1eb30f01edc3b4d774ebb8755dc"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_0298.txt",
+          "name": "frame_0298.txt",
+          "sha256": "35a681bd65b2a3bff5b944295af1dc2251712affc4a83658b1f41776133ca911"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "bsafe",
+      "frame": 320,
+      "area": 0.8548871527777778,
+      "aspect": 2.0762987012987013,
+      "edges": 3,
+      "center": [
+        0.499609375,
+        0.5708333333333333
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "bsafe",
+          "points": [
+            [
+              0.0,
+              103.0
+            ],
+            [
+              1279.0,
+              103.0
+            ],
+            [
+              1279.0,
+              719.0
+            ],
+            [
+              0.0,
+              719.0
+            ]
+          ]
+        }
+      ],
+      "image": "frame_0320.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0320.jpg",
+          "name": "frame_0320.jpg",
+          "sha256": "4c9c1386c801c2c5f37640d0a47fbbdde090e8accf285fc63d7c6d87d4ac20be"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0320.json",
+          "name": "frame_0320.json",
+          "sha256": "c3a11e9d8b32c6fe36437c3adf588f03253f8cd9c9e6f14794dfbee0c8976b57"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_0320.txt",
+          "name": "frame_0320.txt",
+          "sha256": "3c679fe5712257815116365e5b533da5607a07586c7f875a65c49ddcd097480c"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "bsafe",
+      "frame": 362,
+      "area": 0.10071239934653325,
+      "aspect": 3.4593275931613516,
+      "edges": 2,
+      "center": [
+        0.22148938179016114,
+        0.11375077565511067
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "bsafe",
+          "points": [
+            [
+              0.185546875,
+              0.0
+            ],
+            [
+              566.8272705078125,
+              0.0
+            ],
+            [
+              566.8272705078125,
+              163.80111694335938
+            ],
+            [
+              0.185546875,
+              163.80111694335938
+            ]
+          ]
+        }
+      ],
+      "image": "frame_0362.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0362.jpg",
+          "name": "frame_0362.jpg",
+          "sha256": "c4b5d91e14fb16b5433571228327036f6ab7984fe449ff16e0b7a4f5a6766323"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0362.json",
+          "name": "frame_0362.json",
+          "sha256": "5997e6900e1d80578f4cb86699cb5b70a69efa5ba2afad9638172fb282934061"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_0362.txt",
+          "name": "frame_0362.txt",
+          "sha256": "1e42133bcbea3aebdca5aab16deb40fec1cf5a76d6da5b0e047587939c9ed296"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "bsafe",
+      "frame": 608,
+      "area": 0.06106951644304747,
+      "aspect": 2.595348837209303,
+      "edges": 1,
+      "center": [
+        0.849422089041096,
+        0.1313736681887367
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "bsafe",
+          "points": [
+            [
+              896.1643835616438,
+              20.958904109589056
+            ],
+            [
+              1278.3561643835617,
+              20.958904109589056
+            ],
+            [
+              1278.3561643835617,
+              168.21917808219177
+            ],
+            [
+              896.1643835616438,
+              168.21917808219177
+            ]
+          ]
+        }
+      ],
+      "image": "frame_0608.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0608.jpg",
+          "name": "frame_0608.jpg",
+          "sha256": "e42f80ca62b5c133ce8bb7bffcb9e1af27e4e9a7ee5f0cf63c97d7ee3eddb62f"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0608.json",
+          "name": "frame_0608.json",
+          "sha256": "0813374c2cbe379e65af436b145cda0cc05d9d05a6d2bfa4f83842f4a2add1c2"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_0608.txt",
+          "name": "frame_0608.txt",
+          "sha256": "89d82954b4ee73515a94470ac6335fb4c616c75096cd0a320357d07e174a3580"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "rsafe",
+      "frame": 663,
+      "area": 0.047310112847222224,
+      "aspect": 12.525423728813559,
+      "edges": 2,
+      "center": [
+        0.288671875,
+        0.04097222222222222
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "rsafe",
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              739,
+              0
+            ],
+            [
+              739,
+              59
+            ],
+            [
+              0,
+              59
+            ]
+          ]
+        }
+      ],
+      "image": "frame_0663.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0663.jpg",
+          "name": "frame_0663.jpg",
+          "sha256": "bd79bd28980156146ecc07af7bb57a3cf61748ee6624a5de76f7e36c3f180e39"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0663.json",
+          "name": "frame_0663.json",
+          "sha256": "7e2a20cdc9fe6b17d8efd2fb3e4f7eb4dddc8e8f92c5243430be6003ffa3b52d"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_0663.txt",
+          "name": "frame_0663.txt",
+          "sha256": "5566234beebd554de4781d5d220d04e83cb30657894c97e0227de87fb55d1811"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "rsafe",
+      "frame": 679,
+      "area": 0.1824053454564646,
+      "aspect": 6.803311546840958,
+      "edges": 0,
+      "center": [
+        0.563505993150685,
+        0.2866723744292238
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "rsafe",
+          "points": [
+            [
+              186.5753424657534,
+              127.80821917808221
+            ],
+            [
+              1256.0,
+              127.80821917808221
+            ],
+            [
+              1256.0,
+              285.0
+            ],
+            [
+              186.5753424657534,
+              285.0
+            ]
+          ]
+        }
+      ],
+      "image": "frame_0679.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\val\\frame_0679.jpg",
+          "name": "frame_0679.jpg",
+          "sha256": "b4e65643e5007cb59109f9c9224efc677470763e194c3a5cc5fc159adc2ef177"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\val\\frame_0679.json",
+          "name": "frame_0679.json",
+          "sha256": "9503e23c4610dc3bfeeefb8496573b1f00b2072c0ffcae3f718ef23a822eef90"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\val\\frame_0679.txt",
+          "name": "frame_0679.txt",
+          "sha256": "41459b174cb3f754853a2dd6aa8cc0f50a2e87e7f91ba70c981a8c1613ce721e"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "rsafe",
+      "frame": 699,
+      "area": 0.14956986401941524,
+      "aspect": 3.395130403174507,
+      "edges": 1,
+      "center": [
+        0.26856689453125,
+        0.6069695366753473
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "rsafe",
+          "points": [
+            [
+              1.714111328125,
+              336.2703857421875
+            ],
+            [
+              685.817138671875,
+              336.2703857421875
+            ],
+            [
+              685.817138671875,
+              537.7657470703125
+            ],
+            [
+              1.714111328125,
+              537.7657470703125
+            ]
+          ]
+        }
+      ],
+      "image": "frame_0699.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0699.jpg",
+          "name": "frame_0699.jpg",
+          "sha256": "1b040aa8ec394af8dd976f5fb795aeb5e3a2ef9820d75716352bc88240e2eac8"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0699.json",
+          "name": "frame_0699.json",
+          "sha256": "ea478c9e2259f71787bea9528f4d32067fb9f689d52be50eac79321c156e3dd2"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_0699.txt",
+          "name": "frame_0699.txt",
+          "sha256": "a58a95e26d38be0785207a8b65b0c7d703b19aef68a7c447a0dc2c82fa6b5e09"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "rsafe",
+      "frame": 724,
+      "area": 0.08825629340277778,
+      "aspect": 3.061349693251534,
+      "edges": 1,
+      "center": [
+        0.804296875,
+        0.22430555555555556
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "rsafe",
+          "points": [
+            [
+              780.0,
+              80.0
+            ],
+            [
+              1279.0,
+              80.0
+            ],
+            [
+              1279.0,
+              243.0
+            ],
+            [
+              780.0,
+              243.0
+            ]
+          ]
+        }
+      ],
+      "image": "frame_0724.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\val\\frame_0724.jpg",
+          "name": "frame_0724.jpg",
+          "sha256": "14394ca44c9da734dfd7454817812971ba0abe6c6150e3cc1c4de7efb2982ccf"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\val\\frame_0724.json",
+          "name": "frame_0724.json",
+          "sha256": "d93eefb25b4080e8bc0eb30b129cc31604981da18df18de5824aaa7090ebae5e"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\val\\frame_0724.txt",
+          "name": "frame_0724.txt",
+          "sha256": "3d513b4f69ef9a98849cb5323b6bbf6917d67a7fc4d328b076a4d9d47aa6f046"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "rsafe",
+      "frame": 765,
+      "area": 0.15625801824819063,
+      "aspect": 3.9711882953170883,
+      "edges": 2,
+      "center": [
+        0.2954014778137207,
+        0.13398208618164062
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "rsafe",
+          "points": [
+            [
+              0.0,
+              1.2528076171875
+            ],
+            [
+              756.227783203125,
+              1.2528076171875
+            ],
+            [
+              756.227783203125,
+              191.681396484375
+            ],
+            [
+              0.0,
+              191.681396484375
+            ]
+          ]
+        }
+      ],
+      "image": "frame_0765.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0765.jpg",
+          "name": "frame_0765.jpg",
+          "sha256": "925e946353258cabed0a0a577a45f1db4c32f7291d7a40b7c586f1fd11263ad4"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0765.json",
+          "name": "frame_0765.json",
+          "sha256": "b33765506f1241867f76350a43c281177e946eaf2504bb941602e5bbfb9909c0"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_0765.txt",
+          "name": "frame_0765.txt",
+          "sha256": "b7213d83ea19aec67c80c0eb9a14ceee23f93f31d544485d1308ae67bbdcd78d"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "rsafe",
+      "frame": 819,
+      "area": 0.3947439236111111,
+      "aspect": 2.1432038834951457,
+      "edges": 1,
+      "center": [
+        0.344921875,
+        0.3527777777777778
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "rsafe",
+          "points": [
+            [
+              0,
+              48
+            ],
+            [
+              883,
+              48
+            ],
+            [
+              883,
+              460
+            ],
+            [
+              0,
+              460
+            ]
+          ]
+        }
+      ],
+      "image": "frame_0819.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0819.jpg",
+          "name": "frame_0819.jpg",
+          "sha256": "b8c67b5d19bf250e6581b1a9277f6692e8f7a4fb42c969f10d1cef7961be8ce6"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0819.json",
+          "name": "frame_0819.json",
+          "sha256": "469de9ba6037dab85557afde7a139f3794ec005edd123c3c8a2065e0ca84cec2"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_0819.txt",
+          "name": "frame_0819.txt",
+          "sha256": "6c97a32c5a29a87cce1c433e393d037ceea28fdd660c6735428314cc504df8d7"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "rsafe",
+      "frame": 830,
+      "area": 0.7771701388888889,
+      "aspect": 2.2839285714285715,
+      "edges": 2,
+      "center": [
+        0.499609375,
+        0.5208333333333334
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "rsafe",
+          "points": [
+            [
+              0.0,
+              95.0
+            ],
+            [
+              1279.0,
+              95.0
+            ],
+            [
+              1279.0,
+              655.0
+            ],
+            [
+              0.0,
+              655.0
+            ]
+          ]
+        }
+      ],
+      "image": "frame_0830.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\val\\frame_0830.jpg",
+          "name": "frame_0830.jpg",
+          "sha256": "6762f3e14f1237c38f21e77743d0afe3231fbbe11d98dc74d6b19a6cb27609be"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\val\\frame_0830.json",
+          "name": "frame_0830.json",
+          "sha256": "7a1502c63d4d2ec2bbde2d663dd3edb988e1af9c08a98d33732771de33f9d406"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\val\\frame_0830.txt",
+          "name": "frame_0830.txt",
+          "sha256": "05166c21b7d218aab2d4c7af46343079c5bec3d522c6bede4aa4203164fc0dd7"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "rsafe",
+      "frame": 857,
+      "area": 0.7724786365279255,
+      "aspect": 2.120215793435233,
+      "edges": 2,
+      "center": [
+        0.5183256149291993,
+        0.5975963168674046
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "rsafe",
+          "points": [
+            [
+              49.165283203125,
+              140.5386962890625
+            ],
+            [
+              1277.748291015625,
+              140.5386962890625
+            ],
+            [
+              1277.748291015625,
+              720.0
+            ],
+            [
+              49.165283203125,
+              720.0
+            ]
+          ]
+        }
+      ],
+      "image": "frame_0857.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0857.jpg",
+          "name": "frame_0857.jpg",
+          "sha256": "232709209faaa57f9f7523c7f96cc8aee389de87ff7f5e0a62722488ab3924bb"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0857.json",
+          "name": "frame_0857.json",
+          "sha256": "95ad323ca311348c1fa045d878f74c9a869f3ffdc398f5e456d4a9eec097f74a"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_0857.txt",
+          "name": "frame_0857.txt",
+          "sha256": "701c3a6340eac1410e6a5e8199ea30dc8fee92354001632901361437cfacdab8"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "rsafe",
+      "frame": 868,
+      "area": 0.762239149558239,
+      "aspect": 2.327810427163741,
+      "edges": 3,
+      "center": [
+        0.5004825115203857,
+        0.6185122807820638
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "rsafe",
+          "points": [
+            [
+              1.2352294921875,
+              170.65768432617188
+            ],
+            [
+              1280.0,
+              170.65768432617188
+            ],
+            [
+              1280.0,
+              720.0
+            ],
+            [
+              1.2352294921875,
+              720.0
+            ]
+          ]
+        }
+      ],
+      "image": "frame_0868.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0868.jpg",
+          "name": "frame_0868.jpg",
+          "sha256": "3c6da5acfda30726397f4b13d960291e2d5bc86f2ad1d331b63f3cafda09c959"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0868.json",
+          "name": "frame_0868.json",
+          "sha256": "ed654135b9f14dfbbf0d6615f26e8fb5d9a918a3a6acb4088f77e052a7177e49"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_0868.txt",
+          "name": "frame_0868.txt",
+          "sha256": "99fc9e68c3e0ca8b8d75d8e78709d807aee79f57eb879434fbbdd439396d18fa"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "rsafe",
+      "frame": 884,
+      "area": 0.2780130509318163,
+      "aspect": 3.019385237383253,
+      "edges": 1,
+      "center": [
+        0.6537829399108886,
+        0.3085118611653646
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "rsafe",
+          "points": [
+            [
+              397.0645751953125,
+              76.4771728515625
+            ],
+            [
+              1276.6197509765625,
+              76.4771728515625
+            ],
+            [
+              1276.6197509765625,
+              367.7799072265625
+            ],
+            [
+              397.0645751953125,
+              367.7799072265625
+            ]
+          ]
+        }
+      ],
+      "image": "frame_0884.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0884.jpg",
+          "name": "frame_0884.jpg",
+          "sha256": "9488cd23c622d448d9ebc826d6a16e59759fc6ccbea1385957ff10e793a41711"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0884.json",
+          "name": "frame_0884.json",
+          "sha256": "e9bfe13dab16b03a24c98deec586f57959947102d131076722bc833fc7261f42"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_0884.txt",
+          "name": "frame_0884.txt",
+          "sha256": "ac258eb2cd7ee04621258bc5ccfb1891a1e7c16a09da08028fbe21ae866cd81d"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "rsafe",
+      "frame": 902,
+      "area": 0.10174845703125002,
+      "aspect": 4.9670305676855895,
+      "edges": 2,
+      "center": [
+        0.26658984375,
+        0.09541666666666668
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "rsafe",
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              682.47,
+              0
+            ],
+            [
+              682.47,
+              137.4
+            ],
+            [
+              0,
+              137.4
+            ]
+          ]
+        }
+      ],
+      "image": "frame_0902.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0902.jpg",
+          "name": "frame_0902.jpg",
+          "sha256": "80d1c57eb27de953a1389d02757a463010b5ea9df18827778c216e1a525804f3"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0902.json",
+          "name": "frame_0902.json",
+          "sha256": "4523d149e99b9dd0a232114274ac488bc86db12d7d9ebccce28ce5bce06eb954"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_0902.txt",
+          "name": "frame_0902.txt",
+          "sha256": "33eda28d7c930371aa756524d8a416a598ee4bb9f13c5aaf9d5e09446ca81f97"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "rsafe",
+      "frame": 918,
+      "area": 0.17633246757743312,
+      "aspect": 1.282324637534059,
+      "edges": 1,
+      "center": [
+        0.8216435432434082,
+        0.2786917792426215
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "rsafe",
+          "points": [
+            [
+              823.4560546875,
+              22.662841796875
+            ],
+            [
+              1279.951416015625,
+              22.662841796875
+            ],
+            [
+              1279.951416015625,
+              378.6533203125
+            ],
+            [
+              823.4560546875,
+              378.6533203125
+            ]
+          ]
+        }
+      ],
+      "image": "frame_0918.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0918.jpg",
+          "name": "frame_0918.jpg",
+          "sha256": "d17e8386dcc04ca6229ba0f755f67db9d21e965709b8affb0463ebcaa3689ea3"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0918.json",
+          "name": "frame_0918.json",
+          "sha256": "ca459508f270f2446b1e2040a94188e45996fbdcf58f0438d38c655a4ac53e6b"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_0918.txt",
+          "name": "frame_0918.txt",
+          "sha256": "b1fe75b111a566f843239926dbb6635a7d65860d7803ab2b39a12d3273a4a189"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "rsafe",
+      "frame": 937,
+      "area": 0.3527305859133776,
+      "aspect": 2.1349891680939757,
+      "edges": 2,
+      "center": [
+        0.6740285396575928,
+        0.2709770202636719
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "rsafe",
+          "points": [
+            [
+              446.2127685546875,
+              0.0
+            ],
+            [
+              1279.30029296875,
+              0.0
+            ],
+            [
+              1279.30029296875,
+              390.2069091796875
+            ],
+            [
+              446.2127685546875,
+              390.2069091796875
+            ]
+          ]
+        }
+      ],
+      "image": "frame_0937.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0937.jpg",
+          "name": "frame_0937.jpg",
+          "sha256": "ebdc22a1f0839b3ef7ba1ca25b8b5d8a427a35d50e1d6adcf4a3aa28bc682494"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0937.json",
+          "name": "frame_0937.json",
+          "sha256": "9bba45f3f52eb92daa8121d516df75748adfb0e0cd9dd690282a4ce09c7d6517"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_0937.txt",
+          "name": "frame_0937.txt",
+          "sha256": "6f1fdca1b17e629532085833a3de07a3198ac4dab4ad5f505de5018f7784d60b"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "rsafe",
+      "frame": 945,
+      "area": 0.045882504867040555,
+      "aspect": 1.209453451524327,
+      "edges": 1,
+      "center": [
+        0.9109683036804199,
+        0.3201003180609809
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "rsafe",
+          "points": [
+            [
+              1052.96630859375,
+              136.98114013671875
+            ],
+            [
+              1279.112548828125,
+              136.98114013671875
+            ],
+            [
+              1279.112548828125,
+              323.96331787109375
+            ],
+            [
+              1052.96630859375,
+              323.96331787109375
+            ]
+          ]
+        }
+      ],
+      "image": "frame_0945.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0945.jpg",
+          "name": "frame_0945.jpg",
+          "sha256": "de71ba37cef06f71153b1e69021543298f6a232164ce313cf1225a0b7dd19ab2"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0945.json",
+          "name": "frame_0945.json",
+          "sha256": "6e81e1ce627674c01e97bebd05afcc8a96b93059ae5b162b3fac45ac286bd1e6"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_0945.txt",
+          "name": "frame_0945.txt",
+          "sha256": "5dfb75abc80d871a042dfb1ce4550d29bd8d9acc0bf55fb62a371cfe7f936016"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "rsafe",
+      "frame": 973,
+      "area": 0.11954752604166667,
+      "aspect": 1.043076923076923,
+      "edges": 1,
+      "center": [
+        0.866796875,
+        0.40625
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "rsafe",
+          "points": [
+            [
+              940.0,
+              130.0
+            ],
+            [
+              1279.0,
+              130.0
+            ],
+            [
+              1279.0,
+              455.0
+            ],
+            [
+              940.0,
+              455.0
+            ]
+          ]
+        }
+      ],
+      "image": "frame_0973.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0973.jpg",
+          "name": "frame_0973.jpg",
+          "sha256": "b41ded6503d45fdeca276b7f115cdab381f6399a6e407bcb56b1e371c5890ded"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_0973.json",
+          "name": "frame_0973.json",
+          "sha256": "2d159ad0f6b5f8415a130b08c8a1c9ee52a7174f88b7f044967e9ee615789013"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_0973.txt",
+          "name": "frame_0973.txt",
+          "sha256": "2ee55cf0169974da7ce20bf1f46a92df3aad206f35c993512af50b5ad895f664"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "rsafe",
+      "frame": 1054,
+      "area": 0.21269322332045704,
+      "aspect": 1.6712295662634498,
+      "edges": 1,
+      "center": [
+        0.7764235019683838,
+        0.2473910437689887
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "rsafe",
+          "points": [
+            [
+              707.6441650390625,
+              6.88360595703125
+            ],
+            [
+              1280.0,
+              6.88360595703125
+            ],
+            [
+              1280.0,
+              349.3594970703125
+            ],
+            [
+              707.6441650390625,
+              349.3594970703125
+            ]
+          ]
+        }
+      ],
+      "image": "frame_1054.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_1054.jpg",
+          "name": "frame_1054.jpg",
+          "sha256": "9e7d678483afb1b606a2b7e63c6bc4c79df984a23dc0f897fde29c87969b377c"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_1054.json",
+          "name": "frame_1054.json",
+          "sha256": "fa69d2106a95f24bf24c6265227affeaeae479ca59ae3a0f1381fb7b80c2ae1e"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_1054.txt",
+          "name": "frame_1054.txt",
+          "sha256": "002a99e0765285dee1732b19b03e44160b1605836dda94f51a9cbde7d38f1dd7"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "bsafe",
+      "frame": 1074,
+      "area": 0.04930979070510754,
+      "aspect": 6.192798605777247,
+      "edges": 1,
+      "center": [
+        0.20727038383483887,
+        0.43200751410590277
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "bsafe",
+          "points": [
+            [
+              0.05859375,
+              268.21380615234375
+            ],
+            [
+              530.5535888671875,
+              268.21380615234375
+            ],
+            [
+              530.5535888671875,
+              353.87701416015625
+            ],
+            [
+              0.05859375,
+              353.87701416015625
+            ]
+          ]
+        }
+      ],
+      "image": "frame_1074.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_1074.jpg",
+          "name": "frame_1074.jpg",
+          "sha256": "8463ae5a22a918f7c1b2002ef347c6d235910d9ce9af866396e14ac125fbcabf"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_1074.json",
+          "name": "frame_1074.json",
+          "sha256": "1389bf19e8324ba90441d0b32ac4d2ad840bff18289bb3511e56cfaefe0ec362"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_1074.txt",
+          "name": "frame_1074.txt",
+          "sha256": "b6fd0118dd1ecd37c2fa7ea7e5cc139e1b50ab087830d78e1824c8f289e856b0"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "bsafe",
+      "frame": 1083,
+      "area": 0.09638671875,
+      "aspect": 5.595238095238095,
+      "edges": 0,
+      "center": [
+        0.580859375,
+        0.3375
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "bsafe",
+          "points": [
+            [
+              391.0,
+              180.0
+            ],
+            [
+              1096.0,
+              180.0
+            ],
+            [
+              1096.0,
+              306.0
+            ],
+            [
+              391.0,
+              306.0
+            ]
+          ]
+        }
+      ],
+      "image": "frame_1083.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\val\\frame_1083.jpg",
+          "name": "frame_1083.jpg",
+          "sha256": "9c82e43ed64e1fc6bb36c386862476ca774ce1140c27edf1392ac2a1dcad598e"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\val\\frame_1083.json",
+          "name": "frame_1083.json",
+          "sha256": "538737d01f18db06b0292f425d306b20cc61e2892dc32a17b8ff77d318dc46cd"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\val\\frame_1083.txt",
+          "name": "frame_1083.txt",
+          "sha256": "8033664e4dc2c61187b4eaee42424b37068e285bd7cc44917939a7e96e8ff938"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "bsafe",
+      "frame": 1109,
+      "area": 0.12673763221983486,
+      "aspect": 2.3280497328770746,
+      "edges": 1,
+      "center": [
+        0.794148063659668,
+        0.16589041815863714
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "bsafe",
+          "points": [
+            [
+              755.780029296875,
+              7.4462890625
+            ],
+            [
+              1277.239013671875,
+              7.4462890625
+            ],
+            [
+              1277.239013671875,
+              231.4359130859375
+            ],
+            [
+              755.780029296875,
+              231.4359130859375
+            ]
+          ]
+        }
+      ],
+      "image": "frame_1109.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_1109.jpg",
+          "name": "frame_1109.jpg",
+          "sha256": "193371c3d3b5e5d634c248504676433b5471e2dbf271de81db57a483de516144"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_1109.json",
+          "name": "frame_1109.json",
+          "sha256": "9fc8bf5a5caaa4a3e4c985644a581e1bad0bb61e2e30d4ce5858542b4974005a"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_1109.txt",
+          "name": "frame_1109.txt",
+          "sha256": "2710e994a14bc0d7f8dab2e3cc47ce43ae8e02988ae6857cae7279b4140319ab"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "bsafe",
+      "frame": 1189,
+      "area": 0.17855736685647572,
+      "aspect": 5.81484982678147,
+      "edges": 0,
+      "center": [
+        0.3864138126373291,
+        0.3385348637898763
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "bsafe",
+          "points": [
+            [
+              5.50775146484375,
+              159.63253784179688
+            ],
+            [
+              983.7116088867188,
+              159.63253784179688
+            ],
+            [
+              983.7116088867188,
+              327.857666015625
+            ],
+            [
+              5.50775146484375,
+              327.857666015625
+            ]
+          ]
+        }
+      ],
+      "image": "frame_1189.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_1189.jpg",
+          "name": "frame_1189.jpg",
+          "sha256": "b8aacea83a20ce290693da24e56ff926cd920ed4c709f90e3aea396b75208e27"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_1189.json",
+          "name": "frame_1189.json",
+          "sha256": "a13bdcaa192f3198a76c069cdfc64c953b6caa8050bbe7296c3c9fec2b6ef6c2"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_1189.txt",
+          "name": "frame_1189.txt",
+          "sha256": "ac9a925324dfaca96e0eea7e4f4febf688bcc0e1ee5b014c390bf02f9d9bda33"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "bsafe",
+      "frame": 1197,
+      "area": 0.0901388888888889,
+      "aspect": 5.966101694915254,
+      "edges": 1,
+      "center": [
+        0.275,
+        0.2222222222222222
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "bsafe",
+          "points": [
+            [
+              0,
+              101
+            ],
+            [
+              704,
+              101
+            ],
+            [
+              704,
+              219
+            ],
+            [
+              0,
+              219
+            ]
+          ]
+        }
+      ],
+      "image": "frame_1197.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_1197.jpg",
+          "name": "frame_1197.jpg",
+          "sha256": "65c017ce600cbfad143910313029dc7b297ef03823d2137dda5dccfe27c216df"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_1197.json",
+          "name": "frame_1197.json",
+          "sha256": "be5191ba1f0ebc91affd0dfd99e3271b57db2a97f30853dc38275c746bec4282"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_1197.txt",
+          "name": "frame_1197.txt",
+          "sha256": "5987963763afd47feb157e8a925212897658534e4d229d9aef9f40c3675e083b"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "bsafe",
+      "frame": 1205,
+      "area": 0.029830157173808707,
+      "aspect": 1.2516454294404562,
+      "edges": 2,
+      "center": [
+        0.07246022820472717,
+        0.102919069925944
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "bsafe",
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              185.49818420410156,
+              0.0
+            ],
+            [
+              185.49818420410156,
+              148.20346069335938
+            ],
+            [
+              0.0,
+              148.20346069335938
+            ]
+          ]
+        }
+      ],
+      "image": "frame_1205.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_1205.jpg",
+          "name": "frame_1205.jpg",
+          "sha256": "a1b8dcc61a4f95633cc665a85879479d2f65ab748e552d91115a3901a716096f"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\train\\frame_1205.json",
+          "name": "frame_1205.json",
+          "sha256": "0b71950e0d99764229585c6936539e4d553db71111dffa6e2b8906a4024a293a"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\train\\frame_1205.txt",
+          "name": "frame_1205.txt",
+          "sha256": "fe5e01d3dbae0d05895e5dde8574a27855c8f8bb331ec3230f05295f85006121"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    },
+    {
+      "kind": "bsafe",
+      "frame": 1219,
+      "area": 0.1458625204581444,
+      "aspect": 4.424024868573733,
+      "edges": 2,
+      "center": [
+        0.6971328735351563,
+        0.12206361558702257
+      ],
+      "width": 1280,
+      "height": 720,
+      "safe_boxes": [
+        {
+          "name": "bsafe",
+          "points": [
+            [
+              506.7435302734375,
+              0.7283935546875
+            ],
+            [
+              1277.9166259765625,
+              0.7283935546875
+            ],
+            [
+              1277.9166259765625,
+              175.043212890625
+            ],
+            [
+              506.7435302734375,
+              175.043212890625
+            ]
+          ]
+        }
+      ],
+      "image": "frame_1219.jpg",
+      "files": [
+        {
+          "role": "image",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\val\\frame_1219.jpg",
+          "name": "frame_1219.jpg",
+          "sha256": "6249c1b8ecc4635af596c7c8606f04b1b972bd4dc1153366256732d841e5f978"
+        },
+        {
+          "role": "json",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\images\\val\\frame_1219.json",
+          "name": "frame_1219.json",
+          "sha256": "b039467c2451b2401569a36e29d5aed816811dc651b39890c6419dedd9cf179d"
+        },
+        {
+          "role": "txt",
+          "source": "D:\\my_project\\deeplearning\\yolov8_simple_use\\datasets\\gongchuang_train\\labels\\val\\frame_1219.txt",
+          "name": "frame_1219.txt",
+          "sha256": "5331e4b605533f180f36384a44a32a3028ab9b5058e3214135770e119ebdf27b"
+        }
+      ],
+      "annotation_authority": "same-directory original JSON; copied TXT unchanged"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+2026-11-17 21:06:02
+安全区 HSV 客户端调参
+紫红蓝三组阈值作为 safety_detector_node 的 ROS 参数。Windows 调参页读取当前值，本地预览，点应用后通过现有 SSH 转发的 HTTP 接口原子更新三个参数。
+派端按调参页请求传一张原尺寸无损 PNG。Windows 和 ROS 节点编译同一份安全区算法。Windows 显示四图和原图取样直方图。
+WSL 构建 vision_pkg、desktop_server_pkg。HTTP/ROS 验证 512×288 和 641×319 帧逐像素无损、应用后的判色变化、无效参数原子拒绝，并跑完 72 张默认参数回归。
+Windows Qt 验证四图、两种分辨率、拖框与阈值读写，客户端打包与启动检查通过。
+构建：
+./tools/laptop_server/build.ps1 -Qt D:/MySoftware/QT/6.12.0/mingw_64 -MinGW D:/MySoftware/QT/Tools/mingw1310_64
+派上更新部署后：
+bash tools/build.sh
+bash tools/preview.sh stop
+bash tools/preview.sh start preview
+
+21:09:52 开发版按用户要求直接使用 dist/GongchuangClient.exe，构建已去掉压缩步骤。
+
+21:19:36 安全区 HSV 页加入本地图片文件夹、A/D 翻图和实时切换。Windows Qt 测试覆盖离线翻图、不同分辨率、跳过非图片文件和停止/恢复取流。原 EXE 正在使用，这次把新版放到 dist/GongchuangClient-dev.exe。
+
+21:43:18 白色主界面显示四图，右侧串口旁增加 HSV 调色。文件夹模式支持 A/D 翻图。
+配置模型时，派端持续推理。服务端按时间戳配对原图和检测坐标，客户端只在结果图叠框。同一帧用 HTTP 304 跳过重传 PNG。
+使用上述构建命令更新 dist/GongchuangClient.exe，清理备用 EXE 与 ZIP。Windows 验证启动、四图、叠框、翻图及切换。WSL 构建 desktop_server_pkg 并通过原图配对、无目标帧、HTTP 304、无损像素和 HSV 参数接口验证。
+
+22:04:52 左上角统一选择香橙派、文件夹或 IP Webcam。恢复上次输入源、文件夹、手机地址、SSH 别名和本地 HSV；保存的派或手机源在启动时自动尝试连接。
+三种输入共用四图和 HSV 流程。派端检测坐标只叠加到左上原图视图，HSV 用原始像素。
+按上面的 PowerShell 命令更新同一个 EXE。Windows 本机模拟 MJPEG、派端图像接口与 SSH 启动，验证配置恢复、A/D、分段视频和 YOLO 叠框。未连接实机。

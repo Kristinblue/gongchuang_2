@@ -1,0 +1,754 @@
+{
+  "summary": {
+    "n": 48,
+    "roi": 48,
+    "coverage_ge_90": 43,
+    "largest_only_coverage_ge_90": 31,
+    "quads": 48,
+    "ok": 9,
+    "median_roi_ms": 1.406,
+    "median_total_ms": 3.481,
+    "neg_roi": 0,
+    "neg_quad": 0
+  },
+  "records": [
+    {
+      "image": "frame_0142.jpg",
+      "roi": [
+        233,
+        0,
+        1239,
+        399
+      ],
+      "coverage": 0.9786,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_0157.jpg",
+      "roi": [
+        0,
+        0,
+        1174,
+        206
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_0185.jpg",
+      "roi": [
+        0,
+        248,
+        1136,
+        574
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_0227.jpg",
+      "roi": [
+        33,
+        103,
+        1280,
+        383
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": true
+    },
+    {
+      "image": "frame_0264.jpg",
+      "roi": [
+        0,
+        0,
+        1280,
+        301
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_0298.jpg",
+      "roi": [
+        0,
+        187,
+        1280,
+        565
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_0320.jpg",
+      "roi": [
+        0,
+        71,
+        1280,
+        720
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_0362.jpg",
+      "roi": [
+        0,
+        0,
+        586,
+        146
+      ],
+      "coverage": 0.8913,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_0608.jpg",
+      "roi": [
+        889,
+        11,
+        1280,
+        181
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_0663.jpg",
+      "roi": [
+        0,
+        0,
+        749,
+        87
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_0679.jpg",
+      "roi": [
+        157,
+        105,
+        1279,
+        321
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": true
+    },
+    {
+      "image": "frame_0699.jpg",
+      "roi": [
+        0,
+        329,
+        685,
+        553
+      ],
+      "coverage": 0.9988,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_0724.jpg",
+      "roi": [
+        829,
+        77,
+        1280,
+        283
+      ],
+      "coverage": 0.9018,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_0765.jpg",
+      "roi": [
+        0,
+        0,
+        766,
+        212
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_0819.jpg",
+      "roi": [
+        0,
+        22,
+        900,
+        490
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_0830.jpg",
+      "roi": [
+        0,
+        65,
+        1280,
+        667
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_0857.jpg",
+      "roi": [
+        0,
+        103,
+        1280,
+        720
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_0868.jpg",
+      "roi": [
+        0,
+        153,
+        1280,
+        720
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_0884.jpg",
+      "roi": [
+        367,
+        65,
+        1280,
+        583
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_0902.jpg",
+      "roi": [
+        0,
+        0,
+        696,
+        156
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_0918.jpg",
+      "roi": [
+        812,
+        30,
+        1280,
+        230
+      ],
+      "coverage": 0.5618,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_0937.jpg",
+      "roi": [
+        438,
+        0,
+        1280,
+        348
+      ],
+      "coverage": 0.8918,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_0945.jpg",
+      "roi": [
+        1069,
+        171,
+        1280,
+        301
+      ],
+      "coverage": 0.646,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_0973.jpg",
+      "roi": [
+        947,
+        147,
+        1280,
+        447
+      ],
+      "coverage": 0.904,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_1054.jpg",
+      "roi": [
+        717,
+        27,
+        1280,
+        343
+      ],
+      "coverage": 0.9076,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_1074.jpg",
+      "roi": [
+        0,
+        263,
+        499,
+        355
+      ],
+      "coverage": 0.9405,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_1083.jpg",
+      "roi": [
+        366,
+        156,
+        1098,
+        330
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": true
+    },
+    {
+      "image": "frame_1109.jpg",
+      "roi": [
+        754,
+        2,
+        1280,
+        224
+      ],
+      "coverage": 0.9668,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_1189.jpg",
+      "roi": [
+        0,
+        132,
+        996,
+        352
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_1197.jpg",
+      "roi": [
+        0,
+        68,
+        720,
+        240
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_1205.jpg",
+      "roi": [
+        0,
+        0,
+        185,
+        119
+      ],
+      "coverage": 0.8008,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "frame_1219.jpg",
+      "roi": [
+        487,
+        0,
+        1280,
+        199
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "sim_safe5fix_20261023_bright_side_05.jpg",
+      "roi": [
+        225,
+        199,
+        927,
+        395
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": true
+    },
+    {
+      "image": "sim_safe5fix_20261023_bright_side_06.jpg",
+      "roi": [
+        359,
+        199,
+        1061,
+        393
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": true
+    },
+    {
+      "image": "sim_safe5fix_20261023_bright_side_11.jpg",
+      "roi": [
+        0,
+        174,
+        1244,
+        656
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": true
+    },
+    {
+      "image": "sim_safe5fix_20261023_bright_side_12.jpg",
+      "roi": [
+        46,
+        176,
+        1280,
+        658
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": true
+    },
+    {
+      "image": "sim_safe5fix_20261023_cool_15.jpg",
+      "roi": [
+        367,
+        311,
+        897,
+        409
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": true
+    },
+    {
+      "image": "sim_safe5fix_20261023_cool_16.jpg",
+      "roi": [
+        389,
+        311,
+        919,
+        409
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": true
+    },
+    {
+      "image": "sim_safe5fix_20261023_cool_39.jpg",
+      "roi": [
+        7,
+        0,
+        1280,
+        720
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "sim_safe5fix_20261023_cool_40.jpg",
+      "roi": [
+        0,
+        0,
+        1280,
+        720
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "sim_safe5fix_20261023_dim_cross_25.jpg",
+      "roi": [
+        0,
+        157,
+        1280,
+        720
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "sim_safe5fix_20261023_dim_cross_26.jpg",
+      "roi": [
+        0,
+        157,
+        1280,
+        720
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "sim_safe5fix_20261023_neutral_01.jpg",
+      "roi": [
+        0,
+        70,
+        1078,
+        720
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "sim_safe5fix_20261023_neutral_02.jpg",
+      "roi": [
+        214,
+        70,
+        1280,
+        720
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "sim_safe5fix_20261023_warm_03.jpg",
+      "roi": [
+        0,
+        170,
+        1056,
+        720
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "sim_safe5fix_20261023_warm_04.jpg",
+      "roi": [
+        231,
+        171,
+        1280,
+        720
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "sim_safe5fix_20261023_warm_27.jpg",
+      "roi": [
+        0,
+        187,
+        1280,
+        555
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    },
+    {
+      "image": "sim_safe5fix_20261023_warm_28.jpg",
+      "roi": [
+        0,
+        177,
+        1280,
+        555
+      ],
+      "coverage": 1.0,
+      "quad": true,
+      "ok": false
+    }
+  ],
+  "negatives": [
+    {
+      "image": "frame_0004.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0006.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0007.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0008.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0009.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0010.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0011.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0013.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0014.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0015.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0021.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0023.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0024.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0025.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0027.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0030.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0051.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0052.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0053.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0055.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0056.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0058.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0059.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0060.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0061.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0063.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0065.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0068.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0070.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0071.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0072.jpg",
+      "roi": false,
+      "quad": false
+    },
+    {
+      "image": "frame_0073.jpg",
+      "roi": false,
+      "quad": false
+    }
+  ]
+}

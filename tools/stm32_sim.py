@@ -34,25 +34,34 @@ class Sim:
 
     def __init__(self, speed_gain=0.00015, turn_gain=0.0008,
                  speed_limit=0.1, turn_limit=0.5,
-                 speed_deadband=15, turn_deadband=12):
+                 speed_deadband=15, turn_deadband=12, min_turn=0., angle_turn_limit=.6):
         self.speed_gain = speed_gain
         self.turn_gain = turn_gain
         self.speed_limit = speed_limit
         self.turn_limit = turn_limit
         self.speed_deadband = speed_deadband
         self.turn_deadband = turn_deadband
+        self.min_turn = min_turn
+        self.angle_turn_limit = angle_turn_limit
         self.x = self.y = self.yaw = 0.0
         self.speed = self.turn = 0.0
         self.gripper = 0
         self.camera = 0
         self.turn_target = None
         self.distance_left = None
+        self.straight_done = False
         self.received = 0
         self.last_report = 0.0
         self.pose_known = False
+        self.turn_window = None
 
     def handle(self, command, value, distributing=False):
         self.received += 1
+        if command in (1, 2, 5, 7, 8):
+            self.straight_done = False
+        if command == 2 and self.distance_left is not None:
+            self.distance_left = None
+            self.speed = 0.0
         if command == 1:
             self.distance_left = None
             gain = .0016 if distributing else self.speed_gain
@@ -63,8 +72,9 @@ class Sim:
             self.turn_target = None
             gain = .0032 if distributing else self.turn_gain
             limit = 1.2 if distributing else self.turn_limit
-            self.turn = 0.0 if abs(value) <= self.turn_deadband else max(
-                -limit, min(limit, -value * gain))
+            minimum = 0. if distributing else self.min_turn
+            self.turn = 0.0 if abs(value) <= self.turn_deadband else math.copysign(
+                min(limit, max(minimum, abs(value)*gain)), -value)
         elif command == 3:
             self.gripper = 1 if value else 0
         elif command == 4:
@@ -73,7 +83,7 @@ class Sim:
             self.distance_left = None
             self.speed = 0.0
             self.turn_target = self.yaw - math.radians(value)
-            self.turn = math.copysign(0.6, -value) if value else 0.0
+            self.turn = math.copysign(self.angle_turn_limit, -value) if value else 0.0
         elif command == 7:
             self.turn = 0.0
             self.turn_target = None
@@ -81,6 +91,7 @@ class Sim:
             self.speed = math.copysign(self.speed_limit, value) if value else 0.0
         elif command == 8:
             self.speed = self.turn = 0.0
+            self.turn_window = None
             self.turn_target = None
             self.distance_left = None
         print(f'[Stm32Sim] {CODES.get(command, "未知")}({command:02d}) = {value}', flush=True)
@@ -99,6 +110,7 @@ class Sim:
                 distance = self.distance_left
                 self.distance_left = None
                 self.speed = 0.0
+                self.straight_done = True
             else:
                 self.distance_left -= distance
         self.x += distance * math.cos(self.yaw)
@@ -117,6 +129,7 @@ class Sim:
             if abs(remaining) < .005 or remaining * self.distance_left <= 0:
                 self.distance_left = None
                 self.speed = 0.
+                self.straight_done = True
             else:
                 self.distance_left = remaining
         if self.pose_known:
@@ -134,7 +147,21 @@ class Sim:
                 self.turn_target = None
                 self.turn = 0.
             else:
-                self.turn = max(-.6, min(.6, 2 * error))
+                self.turn = math.copysign(min(self.angle_turn_limit, max(self.min_turn, 2*abs(error))), error)
+
+    def turn_output(self, sim_ns, distributing):
+        """原地转向没带动车身时，短暂加力一次，用物理时间计时。"""
+        if sim_ns is None or not self.min_turn or distributing or self.speed or not self.turn:
+            self.turn_window = None
+            return self.turn
+        sign = math.copysign(1, self.turn)
+        start = self.turn_window
+        if start is None or sign != start[2] or abs(self.yaw-start[1]) >= math.radians(2):
+            self.turn_window = (sim_ns, self.yaw, sign)
+            return self.turn
+        if 650_000_000 <= sim_ns-start[0] < 900_000_000:
+            return sign * max(abs(self.turn), self.turn_limit)
+        return self.turn
 
 
 class Link:
@@ -201,6 +228,8 @@ def main():
     parser.add_argument('--turn-limit', type=float, default=0.5, help='转向角速度上限 rad/s')
     parser.add_argument('--speed-deadband', type=int, default=15, help='前进死区，像素')
     parser.add_argument('--turn-deadband', type=int, default=12, help='转向死区，像素')
+    parser.add_argument('--min-turn', type=float, default=0., help='转向死区外的最小角速度 rad/s')
+    parser.add_argument('--angle-turn-limit', type=float, default=.6, help='相对转角的角速度上限 rad/s')
     args = parser.parse_args()
 
     ros = None
@@ -229,7 +258,7 @@ def main():
         print(name, flush=True)
         sys.stdout = open(os.devnull, 'w')
     sim = Sim(args.speed_gain, args.turn_gain, args.speed_limit,
-              args.turn_limit, args.speed_deadband, args.turn_deadband)
+              args.turn_limit, args.speed_deadband, args.turn_deadband, args.min_turn, args.angle_turn_limit)
     link = Link(args.sim_host, args.sim_port) if args.sim_host else None
     print(f'[Stm32Sim] 伪串口 {name}', flush=True)
     if link is None:
@@ -243,6 +272,7 @@ def main():
     last_forward = 0.0
     last_angle = 0.0
     last_pose = float('-inf')
+    sim_ns = None
     try:
         while True:
             if ros is not None:
@@ -289,7 +319,10 @@ def main():
                 if now - last_pose > .5 and (sim.speed or sim.turn):
                     sim.handle(8, 0)
                 last_forward = now
-                link.send(f'D {sim.speed:.4f} {sim.turn:.4f}')
+                link.send(f'D {sim.speed:.4f} {sim.turn_output(sim_ns, distributing):.4f}')
+            if opened and sim.straight_done:
+                os.write(master, pack(7, 0))  # 协议只定义命令位，内容不用于判断。
+                sim.straight_done = False
             if opened and (link is None or now - last_pose <= .5) and now - last_angle >= 0.05:
                 os.write(master, pack(1, round(math.degrees(sim.yaw)) % 360))
                 last_angle = now

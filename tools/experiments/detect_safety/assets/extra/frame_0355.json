@@ -1,0 +1,41 @@
+{
+  "version": "4.0.0-beta.7",
+  "flags": {},
+  "checked": false,
+  "shapes": [
+    {
+      "label": "bsafe",
+      "score": null,
+      "points": [
+        [
+          0.0,
+          90.0
+        ],
+        [
+          1279.0,
+          90.0
+        ],
+        [
+          1279.0,
+          719.0
+        ],
+        [
+          0.0,
+          719.0
+        ]
+      ],
+      "group_id": null,
+      "description": "",
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    }
+  ],
+  "imagePath": "frame_0355.jpg",
+  "imageData": null,
+  "imageHeight": 720,
+  "imageWidth": 1280,
+  "description": "只有蓝垫安全区（紫围栏+内部蓝垫）与区里黑色长条挡板，无其他目标物块。"
+}

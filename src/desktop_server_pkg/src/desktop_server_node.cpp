@@ -89,6 +89,7 @@ public:
       [this](const MatchState &message) {
         std::lock_guard lock(mutex_);
         stage_ = message.stage;
+        phase_ = message.phase;
         frames_ = message.frames;
         if (stage_ != "track" && stage_ != "grab") selected_.reset();
       });
@@ -206,7 +207,10 @@ public:
     safety_http_ = std::make_unique<SafetyHttp>(*this, server_,
       declare_parameter("yolo_enabled", false), point_x, point_y, [this] {
         std::lock_guard lock(mutex_);
-        return stage_ == "track" ? selected_ : Objects::ConstSharedPtr{};
+        return (stage_ == "track" || stage_ == "grab") ? selected_ : Objects::ConstSharedPtr{};
+      }, [this] {
+        std::lock_guard lock(mutex_);
+        return phase_.empty() ? stage_ : stage_ + "/" + phase_;
       });
     if (!server_.bind_to_port(host, port)) throw std::runtime_error("无法监听 HTTP 端口");
     // HTTP 接请求和图像压缩各跑各的，ROS 的 spin 在 main() 里继续接话题和参数服务回复。
@@ -356,7 +360,7 @@ private:
   Image::ConstSharedPtr newest_;
   std::shared_ptr<const std::vector<uchar>> jpeg_;
   uint64_t serial_{0};
-  std::string stage_;
+  std::string stage_, phase_;
   uint64_t frames_{0};
   std::optional<int> camera_angle_;
   Objects::ConstSharedPtr selected_;

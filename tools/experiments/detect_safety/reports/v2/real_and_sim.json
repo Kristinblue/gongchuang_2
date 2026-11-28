@@ -1,0 +1,480 @@
+{
+  "opencv": "4.13.0",
+  "threads": 1,
+  "counts": {
+    "0": 0,
+    "1": 45,
+    "2": 2,
+    "3": 1
+  },
+  "bbox_iou_ge_50": 45,
+  "median_ms": 4.78,
+  "records": [
+    {
+      "image": "frame_0142.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.9641
+    },
+    {
+      "image": "frame_0157.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.9432
+    },
+    {
+      "image": "frame_0185.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.9293
+    },
+    {
+      "image": "frame_0227.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 1,
+      "best_bbox_iou": 0.9129
+    },
+    {
+      "image": "frame_0264.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.9637
+    },
+    {
+      "image": "frame_0298.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.9322
+    },
+    {
+      "image": "frame_0320.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.9793
+    },
+    {
+      "image": "frame_0362.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.7662
+    },
+    {
+      "image": "frame_0608.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.8506
+    },
+    {
+      "image": "frame_0663.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.9339
+    },
+    {
+      "image": "frame_0679.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 1,
+      "best_bbox_iou": 0.9215
+    },
+    {
+      "image": "frame_0699.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.8658
+    },
+    {
+      "image": "frame_0724.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.7813
+    },
+    {
+      "image": "frame_0765.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.9019
+    },
+    {
+      "image": "frame_0819.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.9465
+    },
+    {
+      "image": "frame_0830.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.9224
+    },
+    {
+      "image": "frame_0857.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.9491
+    },
+    {
+      "image": "frame_0868.jpg",
+      "labeled_regions": 1,
+      "candidates": 2,
+      "ok": 0,
+      "best_bbox_iou": 0.253
+    },
+    {
+      "image": "frame_0884.jpg",
+      "labeled_regions": 1,
+      "candidates": 2,
+      "ok": 1,
+      "best_bbox_iou": 0.4515
+    },
+    {
+      "image": "frame_0902.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.9573
+    },
+    {
+      "image": "frame_0918.jpg",
+      "labeled_regions": 1,
+      "candidates": 3,
+      "ok": 2,
+      "best_bbox_iou": 0.1378
+    },
+    {
+      "image": "frame_0937.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.764
+    },
+    {
+      "image": "frame_0945.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.6041
+    },
+    {
+      "image": "frame_0973.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.8343
+    },
+    {
+      "image": "frame_1054.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.8307
+    },
+    {
+      "image": "frame_1074.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.6311
+    },
+    {
+      "image": "frame_1083.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 1,
+      "best_bbox_iou": 0.8841
+    },
+    {
+      "image": "frame_1109.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.8193
+    },
+    {
+      "image": "frame_1189.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.9061
+    },
+    {
+      "image": "frame_1197.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.8852
+    },
+    {
+      "image": "frame_1205.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.7392
+    },
+    {
+      "image": "frame_1219.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.7349
+    },
+    {
+      "image": "sim_safe5fix_20261023_bright_side_05.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 1,
+      "best_bbox_iou": 0.8706
+    },
+    {
+      "image": "sim_safe5fix_20261023_bright_side_06.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 1,
+      "best_bbox_iou": 0.8677
+    },
+    {
+      "image": "sim_safe5fix_20261023_bright_side_11.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 1,
+      "best_bbox_iou": 0.9579
+    },
+    {
+      "image": "sim_safe5fix_20261023_bright_side_12.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 1,
+      "best_bbox_iou": 0.957
+    },
+    {
+      "image": "sim_safe5fix_20261023_cool_15.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 1,
+      "best_bbox_iou": 0.8407
+    },
+    {
+      "image": "sim_safe5fix_20261023_cool_16.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 1,
+      "best_bbox_iou": 0.8348
+    },
+    {
+      "image": "sim_safe5fix_20261023_cool_39.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.9779
+    },
+    {
+      "image": "sim_safe5fix_20261023_cool_40.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.9796
+    },
+    {
+      "image": "sim_safe5fix_20261023_dim_cross_25.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.9441
+    },
+    {
+      "image": "sim_safe5fix_20261023_dim_cross_26.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.9439
+    },
+    {
+      "image": "sim_safe5fix_20261023_neutral_01.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.79
+    },
+    {
+      "image": "sim_safe5fix_20261023_neutral_02.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.7887
+    },
+    {
+      "image": "sim_safe5fix_20261023_warm_03.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.9897
+    },
+    {
+      "image": "sim_safe5fix_20261023_warm_04.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.9894
+    },
+    {
+      "image": "sim_safe5fix_20261023_warm_27.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.9232
+    },
+    {
+      "image": "sim_safe5fix_20261023_warm_28.jpg",
+      "labeled_regions": 1,
+      "candidates": 1,
+      "ok": 0,
+      "best_bbox_iou": 0.9266
+    }
+  ],
+  "negative_examples": [
+    {
+      "image": "frame_0004.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0006.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0007.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0008.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0009.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0010.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0011.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0013.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0014.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0015.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0021.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0023.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0024.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0025.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0027.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0030.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0051.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0052.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0053.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0055.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0056.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0058.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0059.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0060.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0061.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0063.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0065.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0068.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0070.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0071.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0072.jpg",
+      "candidates": 0
+    },
+    {
+      "image": "frame_0073.jpg",
+      "candidates": 0
+    }
+  ]
+}

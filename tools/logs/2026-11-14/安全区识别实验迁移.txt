@@ -1,0 +1,5 @@
+安全区调试工具从旧仓迁到 tools/experiments/detect_safety。保留 48 张图片、标注、配置、用户问题记录和实验报告。新目录省去 15 个缓存、重复预览及旧双 HSV 检查文件，删掉运行代码中闲置的霍夫直线和凸包绘图。
+
+迁移前通过 git pull --ff-only 确认目标仓库已是最新。用旧仓和新仓的 segment_safety 对照 48 个已有 ROI，掩膜、四边形坐标、中心、ok、叠加图完全一致。新目录的窗口实际加载 ONNX 验证了 0298 的局部四边形及标注切换。
+
+启动：双击 tools/experiments/detect_safety/启动安全区识别.cmd。Windows Python 环境与外置 ONNX 模型仍使用原路径。旧目录归档到已忽略的 tools/experiments/output/detect_safety_before_move_20261114。

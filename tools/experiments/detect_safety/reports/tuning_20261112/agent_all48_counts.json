@@ -1,0 +1,486 @@
+{
+  "roi_source": "Actual train5 ONNX inference at confidence 0.35, frozen ROI across variants",
+  "configs": {
+    "old_saved": {
+      "h_min": 125,
+      "h_max": 155,
+      "s_min": 100,
+      "s_max": 200,
+      "v_min": 25,
+      "v_max": 255,
+      "second_enabled": true,
+      "close_size": 3,
+      "min_length_ratio": 0.08,
+      "merge_angle_deg": 10.0,
+      "merge_distance_ratio": 0.035,
+      "second_range": {
+        "h_min": 0,
+        "s_min": 20,
+        "v_min": 25,
+        "h_max": 20,
+        "s_max": 200,
+        "v_max": 255
+      }
+    },
+    "single_base": {
+      "h_min": 125,
+      "h_max": 155,
+      "s_min": 100,
+      "s_max": 255,
+      "v_min": 25,
+      "v_max": 255,
+      "second_enabled": false,
+      "close_size": 3,
+      "min_length_ratio": 0.08,
+      "merge_angle_deg": 10.0,
+      "merge_distance_ratio": 0.035
+    },
+    "proposed": {
+      "h_min": 125,
+      "h_max": 155,
+      "s_min": 100,
+      "s_max": 255,
+      "v_min": 25,
+      "v_max": 255,
+      "second_enabled": false,
+      "close_size": 3,
+      "min_length_ratio": 0.12,
+      "merge_angle_deg": 10.0,
+      "merge_distance_ratio": 0.06
+    }
+  },
+  "records": [
+    {
+      "image": "frame_0142.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 12,
+        "single_base": 3,
+        "proposed": 3
+      }
+    },
+    {
+      "image": "frame_0157.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 1,
+        "single_base": 2,
+        "proposed": 1
+      }
+    },
+    {
+      "image": "frame_0185.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 11,
+        "single_base": 5,
+        "proposed": 5
+      }
+    },
+    {
+      "image": "frame_0227.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 8,
+        "single_base": 4,
+        "proposed": 3
+      }
+    },
+    {
+      "image": "frame_0264.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 8,
+        "single_base": 4,
+        "proposed": 3
+      }
+    },
+    {
+      "image": "frame_0298.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 17,
+        "single_base": 6,
+        "proposed": 4
+      }
+    },
+    {
+      "image": "frame_0320.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 12,
+        "single_base": 5,
+        "proposed": 3
+      }
+    },
+    {
+      "image": "frame_0362.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 11,
+        "single_base": 3,
+        "proposed": 2
+      }
+    },
+    {
+      "image": "frame_0608.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 29,
+        "single_base": 7,
+        "proposed": 4
+      }
+    },
+    {
+      "image": "frame_0663.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 1,
+        "single_base": 1,
+        "proposed": 1
+      }
+    },
+    {
+      "image": "frame_0679.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 5,
+        "single_base": 6,
+        "proposed": 4
+      }
+    },
+    {
+      "image": "frame_0699.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 6,
+        "single_base": 5,
+        "proposed": 4
+      }
+    },
+    {
+      "image": "frame_0724.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 13,
+        "single_base": 9,
+        "proposed": 5
+      }
+    },
+    {
+      "image": "frame_0765.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 6,
+        "single_base": 6,
+        "proposed": 5
+      }
+    },
+    {
+      "image": "frame_0819.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 6,
+        "single_base": 4,
+        "proposed": 3
+      }
+    },
+    {
+      "image": "frame_0830.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 13,
+        "single_base": 6,
+        "proposed": 4
+      }
+    },
+    {
+      "image": "frame_0857.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 15,
+        "single_base": 7,
+        "proposed": 4
+      }
+    },
+    {
+      "image": "frame_0868.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 14,
+        "single_base": 5,
+        "proposed": 4
+      }
+    },
+    {
+      "image": "frame_0884.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 10,
+        "single_base": 4,
+        "proposed": 3
+      }
+    },
+    {
+      "image": "frame_0902.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 7,
+        "single_base": 4,
+        "proposed": 5
+      }
+    },
+    {
+      "image": "frame_0918.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 23,
+        "single_base": 13,
+        "proposed": 5
+      }
+    },
+    {
+      "image": "frame_0937.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 17,
+        "single_base": 7,
+        "proposed": 5
+      }
+    },
+    {
+      "image": "frame_0945.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 9,
+        "single_base": 8,
+        "proposed": 5
+      }
+    },
+    {
+      "image": "frame_0973.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 16,
+        "single_base": 12,
+        "proposed": 8
+      }
+    },
+    {
+      "image": "frame_1054.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 21,
+        "single_base": 9,
+        "proposed": 7
+      }
+    },
+    {
+      "image": "frame_1074.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 5,
+        "single_base": 2,
+        "proposed": 3
+      }
+    },
+    {
+      "image": "frame_1083.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 9,
+        "single_base": 6,
+        "proposed": 3
+      }
+    },
+    {
+      "image": "frame_1109.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 6,
+        "single_base": 4,
+        "proposed": 4
+      }
+    },
+    {
+      "image": "frame_1189.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 10,
+        "single_base": 6,
+        "proposed": 4
+      }
+    },
+    {
+      "image": "frame_1197.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 7,
+        "single_base": 6,
+        "proposed": 5
+      }
+    },
+    {
+      "image": "frame_1205.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 7,
+        "single_base": 6,
+        "proposed": 3
+      }
+    },
+    {
+      "image": "frame_1219.jpg",
+      "kind": "real",
+      "counts": {
+        "old_saved": 9,
+        "single_base": 6,
+        "proposed": 5
+      }
+    },
+    {
+      "image": "sim_safe5fix_20261023_bright_side_05.jpg",
+      "kind": "sim",
+      "counts": {
+        "old_saved": 14,
+        "single_base": 5,
+        "proposed": 4
+      }
+    },
+    {
+      "image": "sim_safe5fix_20261023_bright_side_06.jpg",
+      "kind": "sim",
+      "counts": {
+        "old_saved": 9,
+        "single_base": 5,
+        "proposed": 4
+      }
+    },
+    {
+      "image": "sim_safe5fix_20261023_bright_side_11.jpg",
+      "kind": "sim",
+      "counts": {
+        "old_saved": 22,
+        "single_base": 6,
+        "proposed": 5
+      }
+    },
+    {
+      "image": "sim_safe5fix_20261023_bright_side_12.jpg",
+      "kind": "sim",
+      "counts": {
+        "old_saved": 18,
+        "single_base": 5,
+        "proposed": 5
+      }
+    },
+    {
+      "image": "sim_safe5fix_20261023_cool_15.jpg",
+      "kind": "sim",
+      "counts": {
+        "old_saved": 7,
+        "single_base": 5,
+        "proposed": 4
+      }
+    },
+    {
+      "image": "sim_safe5fix_20261023_cool_16.jpg",
+      "kind": "sim",
+      "counts": {
+        "old_saved": 5,
+        "single_base": 7,
+        "proposed": 5
+      }
+    },
+    {
+      "image": "sim_safe5fix_20261023_cool_39.jpg",
+      "kind": "sim",
+      "counts": {
+        "old_saved": 8,
+        "single_base": 4,
+        "proposed": 4
+      }
+    },
+    {
+      "image": "sim_safe5fix_20261023_cool_40.jpg",
+      "kind": "sim",
+      "counts": {
+        "old_saved": 10,
+        "single_base": 4,
+        "proposed": 4
+      }
+    },
+    {
+      "image": "sim_safe5fix_20261023_dim_cross_25.jpg",
+      "kind": "sim",
+      "counts": {
+        "old_saved": 4,
+        "single_base": 5,
+        "proposed": 3
+      }
+    },
+    {
+      "image": "sim_safe5fix_20261023_dim_cross_26.jpg",
+      "kind": "sim",
+      "counts": {
+        "old_saved": 3,
+        "single_base": 3,
+        "proposed": 3
+      }
+    },
+    {
+      "image": "sim_safe5fix_20261023_neutral_01.jpg",
+      "kind": "sim",
+      "counts": {
+        "old_saved": 8,
+        "single_base": 6,
+        "proposed": 5
+      }
+    },
+    {
+      "image": "sim_safe5fix_20261023_neutral_02.jpg",
+      "kind": "sim",
+      "counts": {
+        "old_saved": 6,
+        "single_base": 6,
+        "proposed": 5
+      }
+    },
+    {
+      "image": "sim_safe5fix_20261023_warm_03.jpg",
+      "kind": "sim",
+      "counts": {
+        "old_saved": 9,
+        "single_base": 7,
+        "proposed": 5
+      }
+    },
+    {
+      "image": "sim_safe5fix_20261023_warm_04.jpg",
+      "kind": "sim",
+      "counts": {
+        "old_saved": 11,
+        "single_base": 8,
+        "proposed": 6
+      }
+    },
+    {
+      "image": "sim_safe5fix_20261023_warm_27.jpg",
+      "kind": "sim",
+      "counts": {
+        "old_saved": 11,
+        "single_base": 8,
+        "proposed": 7
+      }
+    },
+    {
+      "image": "sim_safe5fix_20261023_warm_28.jpg",
+      "kind": "sim",
+      "counts": {
+        "old_saved": 6,
+        "single_base": 4,
+        "proposed": 4
+      }
+    }
+  ]
+}

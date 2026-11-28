@@ -66,29 +66,38 @@ task_node:
       confirm_frames: 3
       align_px: 20
       camera_settle_ms: 400
-      search_score_min: 10
+      search_near_y: 360  # 30° 搜寻角度，忽略底边在此行以上的远处物块。
       lost_move: 200
       lost_move_ms: 1000
       track_gate_px: 150
       turn_only_px: 80
       turn_limit_px: 100
       move_limit_px: 180
-      distance_reward: 0.002
       score:
-        green: 5.0
-        black: 5.0
+        green: 4.0
+        black: 4.0
         orange: 2.0
-        count_reward: 4.0
-        our_safe: 6.0
     grab:
-      # 沿用搜寻相机角度。720p 下检测框底边进入此范围才合爪，实机需标定。
-      y_min: 620
-      y_max: 690
-      align_px: 26
-      forward_px: 105
+      # 抓取时单独压低相机。合爪范围以 near_camera_deg 和 720p 原图为准，实机需标定。
+      camera_deg: 55
+      camera_settle_ms: 700
+      near_camera_deg: 67  # 低速接近后再看爪口，避免只夹到物块边缘。
+      near_y: 575          # 55° 下决定何时切换近处视角。
+      y_min: 670
+      y_max: 710
+      align_px: 20
+      forward_px: 150
       confirm_frames: 3
+      lost_frames: 8
       settle_ms: 500
-      timeout_ms: 9000
+      timeout_ms: 25000
+      verify_deg: 72   # 合爪后从更低的视角重新确认爪口里只有一个目标。
+      scatter_attempts: 3
+      scatter_angle_deg: 28         # 从堆边斜推的相对角度。
+      scatter_back_cm: 8            # 斜推前和斜推后各退的距离，厘米。
+      scatter_push_cm: 17           # 开爪斜推距离，厘米。
+      scatter_drive_timeout_ms: 3000 # 等 07 直行到位回包的上限。
+      scatter_turn_timeout_ms: 3000 # 等航向回包确认转向到位的上限。
 
 approach_test_node:
   ros__parameters:
