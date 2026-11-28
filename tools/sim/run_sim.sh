@@ -26,11 +26,11 @@ if [[ ${1:-} == --desktop ]]; then
   export FASTRTPS_DEFAULT_PROFILES_FILE="$PWD/tools/preview_fastdds.xml"
   source /opt/ros/humble/setup.bash
   source install/local_setup.bash
-  # 追踪用较快的速度映射，转向超过死区后给够起转速度。打散仍用独立映射。
+  # 桌面仿真的速度指令按两倍发送。
   coproc STM32 {
     exec python3 tools/stm32_sim.py --device-only --ros-clock --sim-host "$host" \
       --sim-port "${SIM_CONTROL_PORT:-8091}" --speed-gain .00075 --turn-gain .0028 \
-      --speed-limit .12 --turn-limit .8 --min-turn .22 --angle-turn-limit .9
+      --speed-limit .12 --turn-limit .8 --min-turn .22 --angle-turn-limit .9 --motion-scale 2
   }
   serial_pid=$STM32_PID
   launch_pid=

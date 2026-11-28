@@ -34,15 +34,16 @@ class Sim:
 
     def __init__(self, speed_gain=0.00015, turn_gain=0.0008,
                  speed_limit=0.1, turn_limit=0.5,
-                 speed_deadband=15, turn_deadband=12, min_turn=0., angle_turn_limit=.6):
-        self.speed_gain = speed_gain
-        self.turn_gain = turn_gain
-        self.speed_limit = speed_limit
-        self.turn_limit = turn_limit
+                 speed_deadband=15, turn_deadband=12, min_turn=0., angle_turn_limit=.6, motion_scale=1.):
+        self.speed_gain = speed_gain * motion_scale
+        self.turn_gain = turn_gain * motion_scale
+        self.speed_limit = speed_limit * motion_scale
+        self.turn_limit = turn_limit * motion_scale
         self.speed_deadband = speed_deadband
         self.turn_deadband = turn_deadband
-        self.min_turn = min_turn
-        self.angle_turn_limit = angle_turn_limit
+        self.min_turn = min_turn * motion_scale
+        self.angle_turn_limit = angle_turn_limit * motion_scale
+        self.motion_scale = motion_scale
         self.x = self.y = self.yaw = 0.0
         self.speed = self.turn = 0.0
         self.gripper = 0
@@ -64,14 +65,14 @@ class Sim:
             self.speed = 0.0
         if command == 1:
             self.distance_left = None
-            gain = .0016 if distributing else self.speed_gain
-            limit = .3 if distributing else self.speed_limit
+            gain = .0016 * self.motion_scale if distributing else self.speed_gain
+            limit = .3 * self.motion_scale if distributing else self.speed_limit
             self.speed = 0.0 if abs(value) <= self.speed_deadband else max(
                 -limit, min(limit, value * gain))
         elif command == 2:
             self.turn_target = None
-            gain = .0032 if distributing else self.turn_gain
-            limit = 1.2 if distributing else self.turn_limit
+            gain = .0032 * self.motion_scale if distributing else self.turn_gain
+            limit = 1.2 * self.motion_scale if distributing else self.turn_limit
             minimum = 0. if distributing else self.min_turn
             self.turn = 0.0 if abs(value) <= self.turn_deadband else math.copysign(
                 min(limit, max(minimum, abs(value)*gain)), -value)
@@ -88,13 +89,20 @@ class Sim:
             self.turn = 0.0
             self.turn_target = None
             self.distance_left = value / 100.0
-            self.speed = math.copysign(self.speed_limit, value) if value else 0.0
+            self.speed = self.distance_speed(self.distance_left)
         elif command == 8:
             self.speed = self.turn = 0.0
             self.turn_window = None
             self.turn_target = None
             self.distance_left = None
         print(f'[Stm32Sim] {CODES.get(command, "未知")}({command:02d}) = {value}', flush=True)
+
+    def distance_speed(self, remaining):
+        speed = self.speed_limit
+        if self.motion_scale > 1.0:
+            # 在目标附近提前减速，给仿真底盘留出刹车距离。
+            speed = min(speed, math.sqrt(.7*abs(remaining)))
+        return math.copysign(speed, remaining) if remaining else 0.0
 
     def step(self, dt):
         delta = self.turn * dt
@@ -113,6 +121,7 @@ class Sim:
                 self.straight_done = True
             else:
                 self.distance_left -= distance
+                self.speed = self.distance_speed(self.distance_left)
         self.x += distance * math.cos(self.yaw)
         self.y += distance * math.sin(self.yaw)
 
@@ -132,6 +141,7 @@ class Sim:
                 self.straight_done = True
             else:
                 self.distance_left = remaining
+                self.speed = self.distance_speed(remaining)
         if self.pose_known:
             delta = yaw - self.yaw
             self.yaw += math.atan2(math.sin(delta), math.cos(delta))
@@ -230,7 +240,10 @@ def main():
     parser.add_argument('--turn-deadband', type=int, default=12, help='转向死区，像素')
     parser.add_argument('--min-turn', type=float, default=0., help='转向死区外的最小角速度 rad/s')
     parser.add_argument('--angle-turn-limit', type=float, default=.6, help='相对转角的角速度上限 rad/s')
+    parser.add_argument('--motion-scale', type=float, default=1., help='仿真移动和转向倍率')
     args = parser.parse_args()
+    if not math.isfinite(args.motion_scale) or args.motion_scale <= 0:
+        parser.error('--motion-scale 必须为正数')
 
     ros = None
     distributing = False
@@ -242,7 +255,7 @@ def main():
 
         def match_state(message):
             nonlocal distributing
-            distributing = message.stage == 'init_dis'
+            distributing = message.stage == 'init_dis' and message.phase in ('', 'approach')
 
         rclpy.init(args=[])
         ros = rclpy.create_node('stm32_sim')
@@ -258,7 +271,8 @@ def main():
         print(name, flush=True)
         sys.stdout = open(os.devnull, 'w')
     sim = Sim(args.speed_gain, args.turn_gain, args.speed_limit,
-              args.turn_limit, args.speed_deadband, args.turn_deadband, args.min_turn, args.angle_turn_limit)
+              args.turn_limit, args.speed_deadband, args.turn_deadband, args.min_turn, args.angle_turn_limit,
+              args.motion_scale)
     link = Link(args.sim_host, args.sim_port) if args.sim_host else None
     print(f'[Stm32Sim] 伪串口 {name}', flush=True)
     if link is None:

@@ -4,9 +4,19 @@
 
 通信包里的 [MyCMD](../communication_pkg/communication_pkg/my_cmd.py) 用 `move_straight()`、`move_straight_dis()`、`move_turn()` 和 `move_turn_angle()` 将命令发到 `/robot/command`。角度回包从 `/robot/feedback` 交给 `MyCMD.read_feedback()`。
 
-`task_node` 开场打散一次。GoTo 选定并靠近目标，Grabber 低头对准、合爪并复查。启用投放时，Delivery 把单块送往本方对应格，退回后再搜寻。首趟只选绿，后续可选绿、黑、橙；整场复位后恢复 YAML 的首趟设置。单项靠近测试见 [tests_pkg](../tests_pkg/README.md)。
+`task_node` 开场打散一次。GoTo 选定并靠近目标，Grabber 低头对准、合爪并复查。启用投放时，Delivery 把单块送往本方对应格，退回后再搜寻。首趟只选绿，后续按同样流程循环搜寻和转运。按规则整场只送一次橙色伤员，完成后继续搜寻绿、黑物资。比赛从启动计时，3 分钟到即停车，整场复位后恢复 YAML 的首趟设置。单项靠近测试见 [tests_pkg](../tests_pkg/README.md)。
 
-抓取时可以先合爪、后退。爪口被挡住，或后退后看到多块，就开爪从堆边斜推。退开后先转回目标，再靠近试夹。开爪后按顺序后退、转向、前推、后退、回转。距离和角度见 YAML 的 `grab.scatter_back_cm`、`grab.scatter_push_cm` 和 `grab.scatter_angle_deg`。转向靠航向回包确认完成。直行段等 STM32 的 07 到位回包。超过 `grab.scatter_drive_timeout_ms` 就停车并重新搜寻。
+抓取时可以先合爪、后退。爪口被挡住，或后退后看到多块，就开爪直推，再后退，用新画面确认可抓的物块。距离见 YAML 的 `grab.scatter_push_cm` 和 `grab.scatter_back_cm`。两段直行都等 STM32 的 07 到位回包。超过 `grab.scatter_drive_timeout_ms` 就停车并重新搜寻。
+
+## 开局打散
+
+前进到物块堆附近后停车，按最短方向转向对方安全区。前进 5 cm，沿第一次转向的方向转 120°，再前进 15 cm，仍沿同方向转 180°，最后停车进入搜寻。转向等 STM32 的航向反馈，直行等 07 到位。开局动作超时后停车，复位可重新开始。
+
+`distribute.move_ms` 控制开局直行时间，`distribute.red_home_deg` 是红方朝本方安全区的 STM32 航向。蓝方取相反方向。仿真使用场地坐标里的红 90°、蓝 270°，配置里的实机默认值为红 0°、蓝 180°。
+
+## 安全区投放
+
+只对本方 `ok=true` 且能解算前长边的安全区规划。连续三张新图的解算稳定后，下发转向和定距指令去对准点。到位停车后，再用三张新图复核方向、横向位置和距离。通过后直行、开爪、短推、最后后退，各段定距直行都等 07 回包。
 
 ## GoTo 和 STM32
 

@@ -26,6 +26,7 @@ struct Safety {
     bool ok{false};
   } status;
   std::vector<cv::Point> polygon;
+  std::vector<cv::Point> object_polygon;
 };
 
 struct SafetyDebug {
@@ -35,7 +36,8 @@ struct SafetyDebug {
 
 class SafetyDetector {
 public:
-  Safety detect(const cv::Mat &image, const SafetyHsv &ranges = default_hsv, SafetyDebug *debug = nullptr) const;
+  Safety detect(const cv::Mat &image, const SafetyHsv &ranges = default_hsv, SafetyDebug *debug = nullptr,
+                bool extend_for_objects = false) const;
 };
 
 }  // namespace vision_pkg

@@ -86,6 +86,38 @@ void classify_color(const cv::Mat &image, const cv::Mat &purple, const cv::Rect 
   }
 }
 
+// 紫框被画面裁掉时，凸包可能把同一片红蓝地面切在外面。
+// 只补与原轮廓有交集、颜色一致的连通地面，补出的范围仅用于过滤物块。
+void extend_object_polygon(const cv::Mat &hsv, const SafetyHsv &ranges, Safety &safety) {
+  const auto color = safety.flag == "r_safety" ? Red : Blue;
+  auto floor = hsv_mask(hsv, ranges[color]);
+  std::vector<std::vector<cv::Point>> contours;
+  cv::findContours(floor, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+  const auto bounds = cv::boundingRect(safety.polygon);
+  cv::Mat inside = cv::Mat::zeros(bounds.size(), CV_8UC1);
+  cv::fillPoly(inside, std::vector<std::vector<cv::Point>>{safety.polygon},
+               cv::Scalar(255), cv::LINE_8, 0, -bounds.tl());
+  cv::Mat overlap = cv::Mat::zeros(bounds.size(), CV_8UC1);
+  const std::vector<cv::Point> *best = nullptr;
+  int best_area = 39;
+  for (const auto &contour : contours) {
+    if (cv::contourArea(contour) < 40 || (bounds & cv::boundingRect(contour)).empty()) continue;
+    overlap.setTo(0);
+    cv::fillPoly(overlap, std::vector<std::vector<cv::Point>>{contour},
+                 cv::Scalar(255), cv::LINE_8, 0, -bounds.tl());
+    cv::bitwise_and(overlap, inside, overlap);
+    const int area = cv::countNonZero(overlap);
+    if (area > best_area) {
+      best = &contour;
+      best_area = area;
+    }
+  }
+  if (!best) return;
+  auto points = safety.polygon;
+  points.insert(points.end(), best->begin(), best->end());
+  cv::convexHull(points, safety.object_polygon);
+}
+
 }  // namespace
 
 bool valid_hsv(const HsvRange &range) {
@@ -95,7 +127,8 @@ bool valid_hsv(const HsvRange &range) {
          v_min >= 0 && v_min <= v_max && v_max <= 255;
 }
 
-Safety SafetyDetector::detect(const cv::Mat &image, const SafetyHsv &ranges, SafetyDebug *debug) const {
+Safety SafetyDetector::detect(const cv::Mat &image, const SafetyHsv &ranges, SafetyDebug *debug,
+                              bool extend_for_objects) const {
   Safety safety;
   cv::Mat blurred, hsv, closed;
   cv::GaussianBlur(image, blurred, {3, 3}, 0);
@@ -119,6 +152,8 @@ Safety SafetyDetector::detect(const cv::Mat &image, const SafetyHsv &ranges, Saf
   safety.status.full = margin >= frame_edge_margin &&
                        std::min(size.width, size.height) >= .075 * std::max(size.width, size.height);
   classify_color(image, purple, roi, ranges, safety, debug);
+  if (extend_for_objects && margin < frame_edge_margin && safety.flag != "safety")
+    extend_object_polygon(hsv, ranges, safety);
   return safety;
 }
 

@@ -88,7 +88,7 @@ private:
       auto ranges = vision_pkg::default_hsv;
       for (std::size_t i = 0; i < ranges.size(); ++i)
         read_range(get_parameter("hsv." + std::string(vision_pkg::hsv_names[i])).as_integer_array(), ranges[i]);
-      const auto safety = detector_.detect(frame, ranges);
+      const auto safety = detector_.detect(frame, ranges, nullptr, paired_);
       Detection detection;
       detection.header = image.header;
       detection.flag = safety.flag;
@@ -109,7 +109,8 @@ private:
         if (zone.flag != "r_safety" && zone.flag != "b_safety") return;
         auto &region = regions.regions.emplace_back();
         region.name = zone.flag;
-        for (const auto &point : zone.polygon) {
+        const auto &polygon = zone.object_polygon.empty() ? zone.polygon : zone.object_polygon;
+        for (const auto &point : polygon) {
           auto &pixel = region.polygon.emplace_back();
           pixel.x = static_cast<float>(point.x);
           pixel.y = static_cast<float>(point.y);
@@ -119,7 +120,7 @@ private:
       if (paired_ && safety.polygon.size() >= 3) {
         auto other_frame = frame.clone();
         cv::fillConvexPoly(other_frame, safety.polygon, cv::Scalar::all(0));
-        const auto other = detector_.detect(other_frame, ranges);
+        const auto other = detector_.detect(other_frame, ranges, nullptr, true);
         if (other.flag != safety.flag) add(other);
       }
       regions_->publish(regions);

@@ -76,9 +76,8 @@ def nodes(context):
                 'grab.width': int(camera.get('width', 1280)), 'grab.height': int(camera.get('height', 720))}
         if value('sim_distribute') == 'true':
             task.update({'distribute.use_sim_clock': True, 'delivery.enabled': value('safety_detector') == 'true',
-                         'distribute.move_ms': 6200,
-                         'distribute.scatter_ms': 1800, 'distribute.scatter_forward': -100,
-                         'distribute.base_turn': 170,
+                         'distribute.move_ms': 3100,
+                         'distribute.red_home_deg': 90,
                          'grab.camera_deg': 50, 'grab.near_y': 650})
         actions.append(node('action_pkg', 'task_node', **task))
     return actions

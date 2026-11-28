@@ -8,9 +8,13 @@ from .delivery import Delivery
 from .init_dis import InitDisributor
 from .grab.grabber import Grabber
 from .grab.go_to import GoTo
+from .utils.my_timer import MyTimer
 
 STOP = 'stop'
 GRAB_CLOSED = 'grab_closed'
+INIT_DIS_TIMEOUT = 'init_dis_timeout'
+MATCH_DONE = 'match_done'
+MATCH_DURATION_MS = 180_000
 
 
 class Task:
@@ -21,7 +25,7 @@ class Task:
         self.team, self.note = None, ''
         point = config.get('point',{})
         self.x0, self.y0 = point.get('x0',640.), point.get('y0',550.)
-        # Task 管阶段。InitDisributor 按时间打散，GoTo 按每帧的物块位置搜寻和靠近。
+        # Task 管阶段。InitDisributor 按动作反馈打散，GoTo 按每帧的物块位置搜寻和靠近。
         self.distributor = InitDisributor(cmd,config.get('distribute',{}))
         trans = config.get('trans',{})
         grab = config.get('grab', {})
@@ -30,24 +34,35 @@ class Task:
         self.delivery = Delivery(cmd, grab) if config.get('deliver') else None
         self.state, self.camera_deg = STOP, self.distributor.angle
         self.frame_count = 0
+        self.match_timer = MyTimer()
 
     def start(self):
         """重置任务，等待新帧推进打散。"""
         self.frame_count = 0
         self.camera_deg = self.distributor.angle
         self._change_state('distribute')
+        self.match_timer.restart()
 
     def stop(self):
         """结束当前任务并停车。"""
-        self._change_state(STOP)
+        if self.state != MATCH_DONE:
+            self._change_state(STOP)
+
+    def check_match_time(self):
+        if self.running and self.match_timer.is_timeout(MATCH_DURATION_MS):
+            self._change_state(MATCH_DONE)
+            self._note('比赛计时到 3 分钟，停车')
+            return True
+        return False
 
     @property
     def running(self):
-        return self.state not in (STOP, GRAB_CLOSED, 'delivery_timeout')
+        return self.state not in (STOP, MATCH_DONE, INIT_DIS_TIMEOUT, GRAB_CLOSED, 'delivery_timeout')
 
     def reset(self):
         """停车并清空上位机的本场进度。"""
-        self.stop()
+        self._change_state(STOP)
+        self.match_timer.reset()
         self.distributor.reset()
         self.go_to.reset()
         self.grabber.reset()
@@ -57,27 +72,31 @@ class Task:
         self.frame_count = 0
         self.note = ''
 
-    def process_objects(self, objs, now=None, camera_ready=True, safety=None):
+    def process_objects(self, objs, now=None, camera_ready=True, safety=None, now_ns=0):
         """接收当前帧的感知结果，不在任务内重新做推理。"""
         self._now = time.monotonic() if now is None else now
-        if not self.running:
+        if not self.running or self.check_match_time():
             return
         self.frame_count += 1
         if self.state == 'delivery_done':
             # 一趟的投放动作结束。下一趟可以选绿、黑、橙，直接搜寻。
             self.go_to.first = False
+            if self.grabber.target_key and self.grabber.target_key[0] == 'orange':
+                self.go_to.allow_orange = False
             self._change_state('search')
             return
-        # 初次打散只按时间执行，不调用物块检测或计数。
-        if self.state=='distribute':
-            if self.distributor.run():
-                self._change_state('search')
-            else:
-                self._note(self.distributor.note)
-            return
+        # 初次打散只用下位机反馈，不调用物块检测或计数。
         try:
-            if self.state in ('seek', 'align_zone', 'deliver', 'clear_lane'):
-                state = self.delivery.run(safety, objs, camera_ready)
+            if self.state == 'distribute':
+                done = self.distributor.run(self.team)
+                self._note(self.distributor.note)
+                if done:
+                    self._change_state('search')
+                elif self.distributor.failed:
+                    self._change_state(INIT_DIS_TIMEOUT)
+                return
+            if self.state in ('seek', 'align_zone', 'deliver'):
+                state = self.delivery.run(safety, now_ns)
                 self.camera_deg = self.delivery.camera_deg
                 self._note(self.delivery.note)
                 if state in ('delivery_done', 'delivery_timeout'):
@@ -121,6 +140,7 @@ class Task:
             self.go_to.first = self.go_to.config.get('first', True)
         if state=='distribute':
             self.distributor.reset()
+            self.go_to.allow_orange = True
         elif state=='search':
             self.go_to.reset()
             self.go_to.team = self.team

@@ -50,14 +50,11 @@ task_node:
       x0: 640.0
       y0: 550.0
     distribute:
-      # 临时动作：0-3秒前进，3-8秒边前进边旋转；由同一计时器逐帧判断。
-      # 当前动作：先直推5秒，再前进转圈7秒；后段误差-125，电脑约0.20m/s与0.90rad/s，扩大推转半径。
+      # 前进到物块堆附近，随后用航向、定距反馈执行开局打散。
       angle: 0
       move_ms: 5000
-      scatter_ms: 7000
       base_forward: -100
-      scatter_forward: -125
-      base_turn: 281
+      red_home_deg: 0  # STM32 航向，红方朝本方安全区的角度，蓝方相差 180°。
     trans:
       # 候选参数：实际速度由STM32的PID决定，以下是像素误差限幅。
       search_camera_1: 30
@@ -93,11 +90,9 @@ task_node:
       timeout_ms: 25000
       verify_deg: 72   # 合爪后从更低的视角重新确认爪口里只有一个目标。
       scatter_attempts: 3
-      scatter_angle_deg: 28         # 从堆边斜推的相对角度。
-      scatter_back_cm: 8            # 斜推前和斜推后各退的距离，厘米。
-      scatter_push_cm: 17           # 开爪斜推距离，厘米。
+      scatter_back_cm: 8            # 直推后退开的距离，厘米。
+      scatter_push_cm: 17           # 开爪直推距离，厘米。
       scatter_drive_timeout_ms: 3000 # 等 07 直行到位回包的上限。
-      scatter_turn_timeout_ms: 3000 # 等航向回包确认转向到位的上限。
 
 approach_test_node:
   ros__parameters:

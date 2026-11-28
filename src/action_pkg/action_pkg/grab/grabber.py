@@ -20,7 +20,6 @@ class Grabber:
         self.cmd, self.x0, self.config = cmd, x0, config
         self.timer = MyTimer()
         self.phase_timer = MyTimer()
-        self.scatter_dir = -1
         self.reset()
 
     def reset(self):
@@ -72,7 +71,7 @@ class Grabber:
                 carried = self.in_jaw(objs, .68)
                 self.misses = self.misses+1 if self.wrong_load(carried) else 0
                 if self.misses >= self.config['confirm_frames']:
-                    return self.start_scatter('后退后爪口仍有旁块', carried)
+                    return self.start_scatter('后退后爪口仍有旁块')
             if not self.cmd.straight_done and self.phase_timer.is_timeout(self.config['scatter_drive_timeout_ms']):
                 return self.retry('合爪后退未收到到位回包，开爪重新搜寻', release=True)
             if self.cmd.straight_done:
@@ -100,7 +99,7 @@ class Grabber:
             self.misses += 1
             if self.misses >= self.config['lost_frames']:
                 if self.phase == 'near' and self.jaw_blocked(objs):
-                    return self.start_scatter('近处丢失目标，爪口仍有物块', objs)
+                    return self.start_scatter('近处丢失目标，爪口仍有物块')
                 return self.retry(f'抓取目标丢失（{self.phase}），重新搜寻')
             return 'grab'
         self.misses = 0
@@ -150,7 +149,7 @@ class Grabber:
                 return 'grab'
         # 旁块一直堵在爪口时也能打散，避免一直退回又靠近。
         if near and self.phase_timer.is_timeout(5500) and self.jaw_blocked(objs, target):
-            return self.start_scatter('爪口一直被旁块挡住', objs, target)
+            return self.start_scatter('爪口一直被旁块挡住')
         if (y2 > height-2 or (near and y > y_max)) and (not near or abs(dx) > align):
             # 底边贴边或太近时稍微退回，等完整框回到合爪范围再确认。
             self.hits = 0
@@ -166,7 +165,7 @@ class Grabber:
             if self.hits >= self.config['confirm_frames']:
                 if near:
                     if self.jaw_blocked(objs, target):
-                        return self.start_scatter('有旁块挡在爪口正前方', objs, target)
+                        return self.start_scatter('有旁块挡在爪口正前方')
                     self.cmd.grab(1)
                     self.timer.restart()  # 合爪后的后退、复核有自己的时间，避免吃完对准的剩余时间。
                     self.phase = 'close'
@@ -235,7 +234,7 @@ class Grabber:
         wrong = self.wrong_load(carried)
         self.misses = self.misses+1 if wrong else 0
         if self.misses >= self.config['confirm_frames']:
-            return self.start_scatter('合爪复查发现多块或错块', carried)
+            return self.start_scatter('合爪复查发现多块或错块')
         if carried and not wrong:
             obj = carried[0]
             x1, y1, x2, y2 = obj['box']
@@ -273,28 +272,15 @@ class Grabber:
             return self.retry('无法确认只抓到一个，开爪重新搜寻', release=True)
         return 'grab'
 
-    def start_scatter(self, note, objs, target=None):
+    def start_scatter(self, note):
         self.cmd.move_stop()
         if self.scatter_count >= self.config['scatter_attempts']:
             return self.retry('局部打散次数用完，重新搜寻', release=True)
         self.scatter_count += 1
-        # 朝贴着目标的旁块斜推。左右都有或看不清时，才轮流换边试。
-        blocks = self.visible_blocks(objs)
-        if target is None:
-            same = [obj for obj in blocks if obj['name'] == self.anchor['name']]
-            target = same[0] if len(same) == 1 else None
-        self.scatter_dir = 1 if self.scatter_count % 2 else -1
-        if target is not None:
-            x, y = bottom_center(target)
-            offsets = [bottom_center(obj)[0]-x for obj in blocks if obj is not target
-                       and abs(bottom_center(obj)[1]-y) < .35*self.config['height']
-                       and abs(bottom_center(obj)[0]-x) < .5*self.config['width']]
-            if offsets and (min(offsets) > 0 or max(offsets) < 0):
-                self.scatter_dir = 1 if offsets[0] > 0 else -1
         self.cmd.grab(0)
         self.phase = 'scatter'
         self.scatter_step = 0
-        self.note = f'{note}，开爪，从堆边斜推'
+        self.note = f'{note}，开爪向前推'
         self.hits = 0
         self.misses = 0
         self.verify_point = None
@@ -305,23 +291,10 @@ class Grabber:
 
     def scatter(self):
         cfg = self.config
-        angle = cfg['scatter_angle_deg'] * self.scatter_dir
-        back = -cfg['scatter_back_cm']
-        # 每段只发一次。STM32 的转角和距离指令会互相覆盖，所以分段执行。
-        steps = (
-            (self.cmd.move_straight_dis, back),
-            (self.cmd.move_turn_angle, angle),
-            (self.cmd.move_straight_dis, cfg['scatter_push_cm']),
-            (self.cmd.move_straight_dis, back),
-            (self.cmd.move_turn_angle, -angle),
-        )
+        # 直推和后退各发一次，收到 07 到位回包再走下一段。
+        steps = (cfg['scatter_push_cm'], -cfg['scatter_back_cm'])
         if self.scatter_step == 0:
             if not self.phase_timer.is_timeout(cfg['settle_ms']):
-                return 'grab'
-        elif self.scatter_step in (2, 5):
-            if not self.cmd.turn_done:
-                if self.phase_timer.is_timeout(cfg['scatter_turn_timeout_ms']):
-                    return self.retry('打散转向未收到到位角度，停车重新搜寻', release=True)
                 return 'grab'
         elif not self.cmd.straight_done:
             if self.phase_timer.is_timeout(cfg['scatter_drive_timeout_ms']):
@@ -329,8 +302,7 @@ class Grabber:
             return 'grab'
 
         if self.scatter_step < len(steps):
-            send, value = steps[self.scatter_step]
-            send(value)
+            self.cmd.move_straight_dis(steps[self.scatter_step])
             self.scatter_step += 1
         else:
             self.cmd.move_stop()
@@ -344,7 +316,7 @@ class Grabber:
         """在当前画面找回可抓的一块，避免刚拨开就转身搜寻。"""
         if not self.phase_timer.is_timeout(self.config['camera_settle_ms']):
             return 'grab'
-        width, height = self.config['width'], self.config['height']
+        height = self.config['height']
         candidates = [obj for obj in self.visible_blocks(objs)
                       if obj['name'] == self.anchor['name'] and not obj['in_safe_zone']
                       and obj['box'][3] >= .30*height]
@@ -355,23 +327,11 @@ class Grabber:
         self.verify_key = key
         # 相机稳定后，连续看不到同类目标就交回搜寻，无需等满转向时间。
         self.misses = 0 if candidates else self.misses + 1
-        if not candidates and not self.phase_timer.is_timeout(self.config['camera_settle_ms'] + 950):
-            # 斜推后目标常留在回转的一侧。原地多看一小段，一见到框就交回视觉对准。
-            self.cmd.move_straight(0)
-            self.cmd.move_turn(-160*self.scatter_dir)
-            return 'grab'
         if self.misses >= self.config['lost_frames']:
             return self.retry('打散后近处没有目标，重新搜寻')
         if self.phase_timer.is_timeout(self.config['settle_ms']+5000):
             return self.retry('打散后未能重新对准，重新搜寻')
         if self.hits >= self.config['confirm_frames']:
-            # 斜推会把目标留在画面侧边。先原地转到它面前，再低头靠近。
-            dx = bottom_center(target)[0] - self.x0
-            if abs(dx) > .14*width:
-                self.cmd.move_straight(0)
-                self.cmd.move_turn(max(-160, min(160, int(dx))))
-                self.note = '打散后原地转向目标'
-                return 'grab'
             self.cmd.move_stop()
             # 打散后车已经退远，先回到爪口再判断是否还堵，避免隔着一段距离空拨。
             self.anchor, self.anchor_deg = target, self.camera_deg
@@ -380,13 +340,6 @@ class Grabber:
             self.hits = self.misses = 0
             self.timer.restart()
             self.phase_timer.restart()
-            # 同一视角已连续看到该目标，只有真正低头时才重新确认 ID。
-            if target['box'][3] >= self.config['near_y']:
-                self.target_key = self.last_target = None
-                self.reacquire_key, self.reacquire_hits = None, 0
-                self.camera_deg = self.config['near_camera_deg']
-                self.cmd.camera(self.camera_deg)
-                self.phase = 'near_camera'
             self.note = '打散后重新看到目标，直接靠近再夹'
         else:
             self.cmd.move_stop()

@@ -76,13 +76,17 @@ protected:
     if (!stage_.isEmpty()) {
       auto font = painter.font();
       font.setBold(true);
-      font.setPixelSize(20);
-      painter.setFont(font);
-      const auto metrics = painter.fontMetrics();
-      const QRectF box(target.left(), target.top(), std::min(target.width(), double(metrics.horizontalAdvance(stage_) + 16)), metrics.height() + 8);
-      painter.fillRect(box, QColor(15, 25, 40, 215));
-      painter.setPen(Qt::white);
-      painter.drawText(box, Qt::AlignCenter, metrics.elidedText(stage_, Qt::ElideRight, int(box.width()) - 10));
+      font.setPixelSize(17);
+      const QFontMetrics metrics(font);
+      const auto label = metrics.elidedText(stage_, Qt::ElideRight, std::max(0, int(target.width()) - 12));
+      QPainterPath text;
+      text.addText(target.left() + 6, target.top() + metrics.ascent() + 4, font, label);
+      painter.save();
+      painter.setClipRect(target);
+      painter.setRenderHint(QPainter::Antialiasing);
+      painter.strokePath(text, QPen(QColor(25, 25, 25), 2));
+      painter.fillPath(text, QColor("#ffe04a"));
+      painter.restore();
     }
     if (selection_.isEmpty()) return;
     const double scale = target.width() / image_.width();
@@ -816,19 +820,7 @@ void SafetyTuning::showFrame() {
     if (!safety_enabled_) draw_reference(marked);
   }
   const auto stage = overlays_.value("stage").toString();
-  static const QHash<QString, QString> labels{
-    {"waiting_start","等待启动"},{"waiting_ready","等待就绪"},{"init_dis","开局打散"},
-    {"search","搜寻"},{"track","追踪"},{"grab","抓取"},{"camera","低头确认目标"},
-    {"near_camera","低头看爪口"},{"approach","靠近"},{"near","对准爪口"},{"close","合爪"},
-    {"retreat","后退"},{"verify","检查爪内物块"},{"scatter","打散"},{"scatter_check","打散后重找"},
-    {"grab_closed","已确认单块"},{"seek","寻找本方安全区"},{"align_zone","对准安全区"},
-    {"clear_lane","绕开障碍"},{"deliver","投放"},{"drive","直行"},{"near_drive","近距直行"},
-    {"turn","转向"},{"bypass","绕行"},{"check","检查路线"},{"open","开爪"},
-    {"delivery_done","投放动作结束"},{"delivery_timeout","投放中止"}};
-  QStringList parts;
-  for (const auto &part : stage.split('/', Qt::SkipEmptyParts))
-    parts << labels.value(part == "near" && !stage.startsWith("grab/") ? QString("near_drive") : part, part);
-  const QString title = parts.isEmpty() ? QString("等待任务状态") : parts.join(" · ");
+  const auto title = stage.isEmpty() ? QString("waiting") : QString(stage).replace("/", " / ");
   views_[0]->setImage(preview, {}, title);
   frame_info_->setText(QString("%1 × %2").arg(image_.width()).arg(image_.height()));
   if (!safety_enabled_) return;
@@ -860,5 +852,5 @@ void SafetyTuning::showFrame() {
   views_[1]->setImage(QImage(purple.data, purple.cols, purple.rows, purple.step, QImage::Format_Grayscale8).copy());
   views_[2]->setImage(QImage(colors.data, colors.cols, colors.rows, colors.step, QImage::Format_BGR888).copy());
   views_[3]->setImage(QImage(overlay.data, overlay.cols, overlay.rows, overlay.step, QImage::Format_BGR888).copy(),
-    QString::fromStdString(result.flag) + (result.status.full ? " · full=True" : " · full=False"), title);
+    QString::fromStdString(result.flag) + (result.status.ok ? " · ok=True" : " · ok=False"), title);
 }

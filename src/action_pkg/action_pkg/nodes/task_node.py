@@ -21,8 +21,7 @@ class TaskNode(Node):
         super().__init__('task_node')
         # 从 robot.yaml 读取参数，再拼回原 Task 使用的 point / distribute / trans。
         point = self.parameters({'x0':640., 'y0':550.}, 'point.')
-        distribute = self.parameters({'angle':0, 'move_ms':5000, 'scatter_ms':7000, 'base_forward':-100,
-                                      'scatter_forward':-125, 'base_turn':281}, 'distribute.')
+        distribute = self.parameters({'angle':0, 'move_ms':5000, 'base_forward':-100, 'red_home_deg':0}, 'distribute.')
         trans = self.parameters({
             'search_camera_1':30, 'search_camera_2':20, 'first':True, 'confirm_frames':3, 'align_px':20,
             'camera_settle_ms':400, 'search_near_y':360,
@@ -35,9 +34,9 @@ class TaskNode(Node):
                                 'y_min':670, 'y_max':710,
                                 'align_px':20, 'forward_px':150,
                                 'confirm_frames':3, 'lost_frames':8, 'settle_ms':500,
-                                'timeout_ms':25000, 'verify_deg':72, 'scatter_attempts':3, 'scatter_angle_deg':28,
+                                'timeout_ms':25000, 'verify_deg':72, 'scatter_attempts':3,
                                 'scatter_back_cm':8, 'scatter_push_cm':17,
-                                'scatter_drive_timeout_ms':3000, 'scatter_turn_timeout_ms':3000}, 'grab.')
+                                'scatter_drive_timeout_ms':3000}, 'grab.')
         # Task 调 MyCMD 的动作方法，MyCMD 发话题，SerialNode 才真正写串口。
         self.cmd = MyCMD(self.create_publisher(Command, 'robot/command', 10))
         deliver = self.declare_parameter('delivery.enabled', False).value
@@ -60,6 +59,7 @@ class TaskNode(Node):
         self.use_sim_clock = self.declare_parameter('distribute.use_sim_clock', False).value
         self.sim_ns, self.sim_clock_at = 0, float('-inf')
         if self.use_sim_clock:
+            self.task.match_timer = MyTimer(lambda: self.sim_ns // 1_000_000)
             self.task.distributor.timer = MyTimer(lambda: self.sim_ns // 1_000_000)
             self.task.grabber.timer = MyTimer(lambda: self.sim_ns // 1_000_000)
             self.task.grabber.phase_timer = MyTimer(lambda: self.sim_ns // 1_000_000)
@@ -159,8 +159,8 @@ class TaskNode(Node):
                     capture < Time.from_msg(self.robot.camera_changed).nanoseconds + 700_000_000 or
                     not 0 <= elapsed <= self.vision_timeout_s * 1e9):
                 safety = None
-        now = self.sim_ns / 1e9 if self.use_sim_clock else received_at
-        self.task.process_objects(objs, now=now, camera_ready=camera_ready, safety=safety)
+        task_time = self.sim_ns / 1e9 if self.use_sim_clock else received_at
+        self.task.process_objects(objs, now=task_time, camera_ready=camera_ready, safety=safety, now_ns=now)
         selected = None
         goto = self.task.go_to
         target = goto.rank2_target
@@ -181,7 +181,9 @@ class TaskNode(Node):
         if stage == STOP:
             stage = 'waiting_start' if self.can_start() else 'waiting_ready'
         phase = self.task.grabber.phase if stage == 'grab' else ''
-        if stage in ('deliver', 'clear_lane', 'align_zone') and self.task.delivery.moves:
+        if stage == 'init_dis':
+            phase = self.task.distributor.phase
+        if stage in ('deliver', 'align_zone') and self.task.delivery.moves:
             phase = self.task.delivery.moves[0][0]
         match = MatchState(stage=stage, phase=phase, frames=self.task.frame_count)
         if selected is not None:
@@ -236,7 +238,7 @@ class TaskNode(Node):
 
     def watchdog(self):
         """检测帧超时就停车。"""
-        if not self.task.running:
+        if not self.task.running or self.task.check_match_time():
             self.publish_status()
             return
         if time.monotonic() - self.last_frame > self.vision_timeout_s:

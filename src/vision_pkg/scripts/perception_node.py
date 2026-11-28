@@ -13,10 +13,17 @@ from sensor_msgs.msg import Image
 
 from robot_interfaces.msg import Object, Objects, SafetyRegions, State
 from vision_pkg.detect.get_objs import GetObjs
-from vision_pkg.detect.objs import bottom_center
 
 COLORS = {'green': (65,190,80), 'orange': (0,140,255), 'black': (160,100,230),
           'blue': (255,140,50)}
+
+
+def near_safety_zone(box, polygons, margin):
+    """底边三点都明确在安全区外时，物块才可参与搜寻。"""
+    x1, _, x2, y2 = box
+    samples = [(x1 + (x2-x1)*ratio, y2) for ratio in (.2, .5, .8)]
+    return any(cv2.pointPolygonTest(polygon, point, True) >= -margin
+               for polygon in polygons for point in samples)
 
 
 def orange_at_claw(frame, box):
@@ -53,6 +60,7 @@ class PerceptionNode(Node):
         self.settle = self.declare_parameter('camera_settle_ms', 400).value / 1000
         self.processor = None
         self.size = None
+        self.zone_ids = set()
         self.robot = State()
         self.frames = OrderedDict()
         self.detections = OrderedDict()
@@ -82,6 +90,7 @@ class PerceptionNode(Node):
         if self.processor and (state.camera_changed != self.robot.camera_changed or
                                state.team != self.robot.team):
             self.processor.reset()
+            self.zone_ids.clear()
         self.robot = state
 
     def pair(self, message, pending):
@@ -107,6 +116,7 @@ class PerceptionNode(Node):
         if self.size != (width,height):
             self.processor = GetObjs(self.config, width=width, height=height)
             self.size = (width,height)
+            self.zone_ids.clear()
         processor = self.processor
         frame = np.frombuffer(image.data, np.uint8).reshape(height,image.step)
         frame = frame[:, :width * 3].reshape(height,width,3).copy()
@@ -127,11 +137,20 @@ class PerceptionNode(Node):
         polygons = [np.asarray([(p.x,p.y) for p in region.polygon], dtype=np.float32)
                     for region in zones.regions if len(region.polygon) >= 3]
 
+        # 给轮廓和检测框的像素抖动留一点误差，按图像高度缩放。
+        zone_margin = 8. * height / 720
         output = Objects(header=image.header)
+        if not ready:
+            self.zone_ids.clear()
+        # 同一视角中，安全区短暂识别不到也保留已排除的物块，直到跟踪 ID 消失。
+        self.zone_ids.intersection_update((obj['name'], obj['id']) for obj in objects)
         for obj in objects:
             x1,y1,x2,y2 = map(float,obj['box'])
-            in_zone = any(cv2.pointPolygonTest(polygon, bottom_center(obj), False) >= 0
-                          for polygon in polygons)
+            key = obj['name'], obj['id']
+            in_zone = near_safety_zone((x1,y1,x2,y2), polygons, zone_margin)
+            if ready and in_zone and obj['observed']:
+                self.zone_ids.add(key)
+            in_zone = in_zone or key in self.zone_ids
             output.items.append(Object(name=obj['name'], id=obj['id'], score=obj['score'],
                                        x1=x1,y1=y1,x2=x2,y2=y2, observed=obj['observed'],
                                        in_safe_zone=in_zone))

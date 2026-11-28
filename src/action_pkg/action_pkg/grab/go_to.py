@@ -84,6 +84,7 @@ class GoTo:
         self.width, self.height = width, height
         self.first, self.team, self.cmd = first, team, cmd
         self.config = config or {}
+        self.allow_orange = True
         self.reset()
 
     def _materials(self, objs):
@@ -97,7 +98,7 @@ class GoTo:
 
     def _targets(self, material):
         kinds = ('green',) if self.first else ('green','black','orange')
-        return [obj for obj in material if obj['name'] in kinds]
+        return [obj for obj in material if obj['name'] in kinds and (self.allow_orange or obj['name'] != 'orange')]
 
     def first_rank(self, objs, now=None):
         """在本帧可见、无遮挡的目标中选一次，达到门槛才停车。"""
